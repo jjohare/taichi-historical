@@ -102,3 +102,17 @@ test('PE-34 the hash check still runs first: a mismatching hash on a mislabelled
     assert.equal(r.errors[0].code, 'E_HASH');
   });
 });
+
+test('C5 provenanceFor carries the panel note and canvas aria-label for each state', async () => {
+  const {provenanceFor, TEXT} = await provenance();
+  const file = fixture('valid-full.json');
+  const est = provenanceFor({kind: 'estimate', origin: 'published', file}, {rig: 'avatar', imageLabel: 'Chen Weiming 1933, photograph 1'});
+  assert.equal(est.note, TEXT.estimateNote);
+  assert.equal(est.aria, TEXT.ariaEstimate('Chen Weiming 1933, photograph 1'));
+  const neutral = provenanceFor({kind: 'neutral'}, {rig: 'avatar'});
+  assert.deepEqual([neutral.note, neutral.aria], [TEXT.independent, TEXT.aria]);
+  const local = provenanceFor({kind: 'estimate', origin: 'local', file}, {rig: 'avatar'});
+  assert.equal(local.note, TEXT.otherNote);
+  const mid = provenanceFor({kind: 'interpolated'}, {rig: 'avatar', transition: {hopsTotal: 2}});
+  assert.equal(mid.note, TEXT.otherNote);
+});
