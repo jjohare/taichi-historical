@@ -1,10 +1,12 @@
-# ADR-0007: Labelled transitions between reviewed poses along the sequence
+# ADR-0007: Reviewed estimates by default, with labelled transitions along the sequence
 
-Status: proposed · 24 October 2026 · Amends ADR-0004 (the "never applied on navigation" rule) · Spec: PE-42–PE-59; amends PE-08, PE-11, PE-19, PE-36 · Design §12
+Status: proposed · 24 October 2026 · Amends ADR-0004 (explicit application only) · Spec: PE-42–PE-59; amends PE-08, PE-11, PE-16, PE-18, PE-19, PE-20, PE-26, PE-28, PE-35, PE-36 · Design §12
 
 ## Context
 
 The operator asked for "a smooth transition between poses such that moving between adjacent poses gives a plausible transition, and selecting a pose further out quickly cycles through all intermediate pose points to the new target".
+
+The operator then decided that reviewed estimates are **always on**. When the displayed photograph has one, it is shown without any user action, and the neutral avatar appears only when none exists.
 
 SAM 3D Body estimates now exist offline for all 240 photographs. They are waiting for human review. Under ADR-0003 and ADR-0004 only reviewed estimates, published as `assets/pose-estimates/<imageId>.json`, may appear on the avatar. They are keyed by source image, not by catalogue entry. An entry has up to 17 images across the drawings and the Yang and Chen photographs. The default source is the drawings, which never have estimates. Neighbouring entries often reuse one photograph.
 
@@ -21,13 +23,13 @@ They are still acceptable here, under four conditions:
 
 ## Decision
 
-- **Opt-in estimate mode.** Activating "Apply estimated pose" (PE-36) enters estimate mode `'follow'`. Only then does navigation carry estimates forward. Clear, reset, context failure and the fallback rig leave the mode. It starts `'off'` on every load and is never persisted. This amends ADR-0004's rule that estimates "are never applied automatically on navigation": they still never are until the user has opted in on this page load.
-- **Sequence and keyframes.** Adjacency is ascending catalogue `ordinal`. An entry's keyframe is the photograph `site.js` would show there with the route source selected: the first image of that source. A keyframe counts only if it has a reviewed estimate. Consecutive repeats collapse. The explorer reads `catalogue.json` itself, once, when it first enters estimate mode. The `yang:image-shown` event (design §7) is not widened.
-- **Triggers.** A transition runs only on a user navigation (`#previous`, `#next`, a list link or a `#move=` hash), in `follow` mode, from a published applied estimate, to an entry whose displayed photograph has a reviewed estimate. It never runs on load or on its own, and never from or to a local file. An image change within one entry snaps.
+- **Estimates on by default.** When the displayed image has a reviewed estimate and the avatar has loaded, it is shown: at once on load and on an image change, and by a transition on a navigation. The `#apply-estimate` button is withdrawn. A `Show neutral avatar` checkbox (`#show-neutral`) shows the illustrative rig and unlocks the joint checks. It starts off on every load, is never persisted, survives navigation, and reset turns it off. While an estimate is shown, its PE-18 provenance line and detail ("an estimate, not a measurement") are always visible. This amends ADR-0004's explicit-application rule.
+- **Sequence and keyframes.** Adjacency is ascending catalogue `ordinal`. An entry's keyframe is the photograph `site.js` would show there with the route source selected: the first image of that source. A keyframe counts only if it has a reviewed estimate. Consecutive repeats collapse. The explorer reads `catalogue.json` itself, once, on the first navigation that needs a route, never on load. The `yang:image-shown` event (design §7) is not widened.
+- **Triggers.** A transition runs only on a user navigation (`#previous`, `#next`, a list link or a `#move=` hash), with `Show neutral avatar` off, from a published estimate, to an entry whose displayed photograph has a reviewed estimate. It never runs on load or on its own, and never from or to a local file. An image change, toggling the neutral avatar, reset and load all snap.
 - **Motion.** Per-joint shortest-arc slerp of the file's delta quaternions, including `root.rotation`, and a lerp of `root.translation`. A route of `N` hops lasts `T = min(HOP_MS·N, CAP_MS)`, with `HOP_MS = 1600` and `CAP_MS = 3000` as named exports of `transition.js`, also exposed in the test snapshot as `transition.hopMs` and `transition.capMs`. An adjacent move takes 1.6 s, 2 hops take 3.0 s, and 20 hops stream at 150 ms per keyframe. One ease-in-out-cubic runs across the whole route, so the figure passes through each reviewed keyframe without stopping. Routes longer than `MAX_KEYFRAMES = 24` are sub-sampled evenly, always keeping the target, and the detail line says how many poses were skipped. Reduced motion snaps to the target.
-- **Interruption.** A new navigation retargets from the current interpolated pose. Reset, clear and context failure cancel. A context loss completes to the target without rendering.
+- **Interruption.** A new navigation retargets from the current interpolated pose. Reset, checking `Show neutral avatar` and context failure cancel. A context loss completes to the target without rendering.
 - **Rendering.** A new pure module, `assets/explorer/transition.js`, owns the only rAF loop. It has an injected clock and scheduler, and runs only while a transition is active.
-- **Arrival** gives exactly the S5 applied-estimate state for the target photograph.
+- **Arrival** gives exactly the state a snap to the target photograph's estimate would give.
 
 ## Consequences
 
@@ -35,10 +37,18 @@ They are still acceptable here, under four conditions:
 - **Amended criteria:**
   - PE-08: the static ban on rAF loops gains one exception, the S6 driver.
   - PE-11: the only motion is a user-initiated, capped and reduced-motion-aware pose transition. The camera still never animates.
-  - PE-19: in `follow` mode navigation replaces the estimate instead of returning to rest.
-  - PE-36: activation also enters `follow` mode.
-  - ADR-0004 keeps every other rule.
-- **More requests.** One `catalogue.json` fetch, usually from cache, and up to 24 pose files of at most 64 KiB each per navigation, all after opt-in. PE-28's on-load request set is unchanged.
+  - PE-16: reset turns the neutral avatar off and shows the displayed image's estimate.
+  - PE-18: the provenance lines are always visible while an estimate is shown.
+  - PE-19: the new image's estimate replaces the old one, by transition or snap, and is never stale.
+  - PE-20: the slider note now points at `Show neutral avatar`.
+  - PE-26: the scripted session toggles the neutral avatar.
+  - PE-28: the exact on-load request set.
+  - PE-35: the empty index shows no toggle.
+  - PE-36: the Apply button is replaced by default application and the toggle.
+  - ADR-0004 gains an amendment paragraph. Its other rules stand.
+- **More requests.** On load: `index.json`, plus at most one pose file, for the displayed image if it is indexed (PE-28). On navigation: up to 24 pose files of at most 64 KiB each, cached after first use, and one `catalogue.json` fetch on the first route, usually served from the HTTP cache.
+- **Why default display is acceptable now.** The default view used to be neutral because an estimate could be mistaken for recovered fact. With estimates on by default, every one shown is reviewed, every one is labelled as an estimate, and its source image id and review date stay in view for as long as it is on screen (PE-18). The neutral avatar is one click away. Interpolated frames carry their own label (PE-50).
+- **Open: the default source is the drawings.** `site.js` shows the Drawings source first, and every entry except no. 1 has a drawing. So on a fresh load, and after navigation until the user picks Yang or Chen, the displayed image has no estimate and the avatar stays neutral. "Always on" is therefore invisible in the default view. Once a photographic source is chosen it sticks across navigation, and estimates and transitions then show. Making estimates visible by default needs a separate product decision, outside this ADR: either make a photographic source the default in `site.js`, or show an entry's estimate beside a drawing under a label naming the source photograph.
 - **Waiting.** With a 3 s cap, someone moving across the whole form waits up to 3 s per jump, and 1.6 s for each *Next*. That is acceptable only because every transition can be interrupted (PE-52): a new navigation retargets at once from the current pose with a fresh duration, so waits never stack and the user is never locked out. The catalogue text and photograph update immediately; only the avatar takes the time. Reduced motion removes the wait entirely.
 - **The 24-keyframe thinning rule still makes sense.** At the 3 s cap its mean hop is 125 ms, and the fastest eased hop is about 83 ms, 5 frames at 60 Hz. Each reviewed keyframe stays visible for several frames, and a whole-form jump still shows 24 distinct reviewed poses. A higher limit would show more poses for a shorter time each, and under about 4 frames they blur into a morph.
 - **Budget pressure.** `transition.js` adds about 5 KiB. The explorer is already at 36.2 KiB of PE-28's 48 KiB before S3–S5. If S3–S5 come in near their line caps, the budget needs a superseding decision, not a silent rise.

@@ -19,6 +19,8 @@ DESIGN.md forbids implying that the neutral rig demonstrates the selected moveme
 - Reviewed dates are stored as ISO `YYYY-MM-DD` and shown as `24 October 2026`.
 - A rejected file leaves the neutral state and its label untouched, explains the rejection in a status line, and logs through `console.warn`.
 
+**Amended by ADR-0007.** The default view may now show estimates. When the displayed photograph has a reviewed estimate, it is applied without user action: at once on load and on an image change, and through a labelled transition on a navigation. The `Apply estimated pose` button is withdrawn. A `Show neutral avatar` toggle, which is never persisted and is reset to off, brings back the illustrative rig and the joint checks. This is consistent with the purpose of this ADR. Every estimate shown is reviewed and labelled as an estimate, and its source image id and review date are in view at all times while it is on screen. Every other rule above stands: labels derived from state, no stale estimate, sliders locked, local files labelled unreviewed, and rejection leaving the page neutral.
+
 ## Consequences
 
 - Each label state has an exact string, so tests can assert it and copy changes are deliberate (they require spec updates).

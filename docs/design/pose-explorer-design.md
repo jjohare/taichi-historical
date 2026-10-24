@@ -15,7 +15,7 @@ Today the spatial study panel is one 83-line module, `assets/viewer.js`. `assets
 
 The catalogue (`site.js`) and the rig never talk to each other. That separation is a design rule (DESIGN.md: "independent of the catalogue selection").
 
-This design splits the viewer into small ES modules with no bundler. The first slice behaves exactly as today. The later slices add presets, joint inspection, failure handling and an explicit, labelled path for reviewed pose estimates. The catalogue and the rig only ever meet through one documented DOM event (§7), and only to *offer* an estimate.
+This design splits the viewer into small ES modules with no bundler. The first slice behaves exactly as today. The later slices add presets, joint inspection, failure handling and an explicit, labelled path for reviewed pose estimates. The catalogue and the rig only ever meet through one documented DOM event (§7), and only to *offer* an estimate. (*Amended by ADR-0007:* reviewed estimates for the displayed image are now shown by default; see §12.3.)
 
 ## 2. Avatar facts the design relies on
 
@@ -207,6 +207,8 @@ state = {
 | `clearPose()` | `rig.resetToRest()`; `pose = neutral`; sliders enabled at 0 |
 | `reset()` | camera reset, `preset = 'three-quarter'`, `clearPose()`, checks to 0, skeleton off. `selectedJoint` is kept |
 | `imageShown({imageId, label})` | if `pose.kind === 'estimate'` and `imageId ≠ pose.imageId`, then `clearPose()`; recompute `availableEstimate` |
+
+*Amended by ADR-0007:* `applyEstimate()` is withdrawn as a user action, and `clearPose()` stays internal. The defaults, `setShowNeutral(bool)` and the S6 rows replace both; see §12.3.
 | context `lost` / `webgl` / `failed` | `renderer` changes. `failed` swaps in the still image; rig state is kept for `webgl` |
 
 Renderer states: `pending → webgl` on success. `pending → still` if WebGL2 is unavailable or the renderer constructor throws. `webgl → lost` on `webglcontextlost`, with `preventDefault()`. `lost → webgl` on `webglcontextrestored`. `lost → failed` after 5 s without a restore. `failed` and `still` render the same fallback, with different text.
@@ -355,7 +357,7 @@ After schema validation, `checkLeftRight` (PE-33) runs forward kinematics on the
 | S3 | Context restore, still fallback, 44 px and 360 px fixes | PE-22–25 |
 | S4 | `pose-schema.js`, `retarget.js`, fixtures, empty `index.json`, `SAM-LICENSE.txt`, check integration | PE-30–35 |
 | S5 | `site.js` event, `poses.js`, apply/clear/local-file UI | PE-18–21, 36, 41 |
-| S6 | `transition.js`, estimate mode, transition state and label, amended PE-08/11/19/36 (§12, ADR-0007). Depends on S5 | PE-42–59 |
+| S6 | `transition.js`, estimates on by default with a `Show neutral avatar` toggle, transition state and label, and the amended S2–S5 criteria (§12, ADR-0007). Depends on S5 | PE-42–59 |
 
 S1 must not change pixels. Compare screenshots of the default view, the elbow at 60, the crouch at 40 and the skeleton on, before and after, with no visible difference.
 
@@ -385,8 +387,9 @@ This section adds to §§3–9 and changes none of them except where marked. Req
 
 ### 12.1 Constraints that shape it
 
+- **Estimates are on by default** (ADR-0007, PE-36). Whenever the displayed photograph has a reviewed estimate it is shown, with its provenance in view. The neutral avatar is the fallback, or the user's explicit choice through `Show neutral avatar`.
 - **Only reviewed poses are poses** (ADR-0003, ADR-0004). Each keyframe is a published, validated estimate. Interpolated frames are synthetic, so they get their own label and are never stored.
-- **The catalogue and the rig meet at one event** (§7). S6 adds no new event and does not widen `yang:image-shown`. The explorer tells a navigation from an image change by comparing `moveId` with the previous event. It reads the sequence from `catalogue.json`, the same bytes `site.js` loaded, so normally the HTTP cache serves it.
+- **The catalogue and the rig meet at one event** (§7). S6 adds no new event and does not widen `yang:image-shown`. The explorer tells a navigation from an image change by comparing `moveId` with the previous event. It reads the sequence from `catalogue.json`, the same bytes `site.js` loaded, so normally the HTTP cache serves it. It does so only on the first navigation that needs a route, never on load (PE-28).
 - **Rendering on demand** (PE-08). An rAF loop exists only while a transition runs.
 - **Estimates are keyed by source image, not by entry** (§7). An entry has up to 17 images across three sources, and 8 adjacent pairs per photographic source share their first image. The keyframe rule therefore follows what `site.js` actually shows (spec I, "Keyframe image"), and the route collapses repeats.
 - **Budget** (PE-28). The explorer modules are 36.2 KiB of 48 KiB before S3–S5. `transition.js` is capped at 140 lines, about 5 KiB.
@@ -440,36 +443,50 @@ The easing is global, across the route, not per hop. Per-hop easing would stop t
 
 ```js
 state += {
-  estimateMode: 'off' | 'follow',
-  // transition also carries hopMs, capMs and maxKeyframes, copied from transition.js constants (PE-58)                 // never persisted; 'off' on every load (PE-42)
-  transition: { active: false, from: null, to: null, progress: 0, hopsTotal: 0, hopIndex: 0, skipped: 0 },
+  showNeutral: false,     // the 'Show neutral avatar' checkbox; false on every load, never persisted, survives navigation
+  transition: { active: false, from: null, to: null, progress: 0, hopsTotal: 0, hopIndex: 0, skipped: 0,
+                hopMs: HOP_MS, capMs: CAP_MS, maxKeyframes: MAX_KEYFRAMES },   // the last three are constants (PE-58)
 }
 state.pose |= { kind: 'interpolated', fromImageId, toImageId }   // only while transition.active (PE-59)
 ```
 
-`displayedImage` gains `moveId` and `source`, which are already in the §7 event detail. `main.js` also keeps two private fields, never exposed in the snapshot: `sequenceBySource` (memoised `keyframeSequence` results, filled from `catalogue.json` on first entry to `follow`) and `estimateCache` (a Map from image id to validated pose file, bounded to the files the index lists).
+`displayedImage` gains `moveId` and `source`, which are already in the §7 event detail. `main.js` also keeps two private fields, never exposed in the snapshot: `sequenceBySource` (memoised `keyframeSequence` results, filled from `catalogue.json` on the first navigation that needs a route) and `estimateCache` (a Map from image id to validated pose file, bounded to the files the index lists).
+
+**Which pose to show.** Outside a transition, the pose is a function of state. Only the local-file override stores a pose of its own:
+
+```
+wanted = localFile                                    if a local file is loaded (PE-21; cleared by image change, reset, showNeutral)
+       | neutral                                      if showNeutral, rig ≠ 'avatar', or displayedImage is not indexed
+       | estimate(displayedImage.imageId)             otherwise
+```
+
+Every action below ends by moving the rig towards `wanted`. Only a navigation between two reviewed estimates moves there by transition; everything else snaps.
 
 | Action | Effect |
 |---|---|
-| `applyEstimate()` (S5) | as §6, and also `estimateMode = 'follow'`. On first entry, fetch `catalogue.json` once |
-| `clearPose()`, `reset()` | as §6, and also `driver.cancel()`, `transition` inactive, `estimateMode = 'off'` |
-| `imageShown(detail)`, navigation (`moveId` changed) | if `estimateMode === 'follow'` and `pose.kind ∈ {estimate (published), interpolated}`: run the route steps below. Otherwise §6 behaviour (PE-19) |
-| `imageShown(detail)`, image change (same `moveId`) | `driver.cancel()`. In `follow` with a reviewed estimate for the new image, apply it at once. Otherwise `clearPose()` but leave `estimateMode` alone (PE-54) |
+| start-up | read `data-image-id`, `loadIndex()`. Once the avatar has loaded and the index lists the image, fetch that one file and snap to it. Until then the PE-17 label shows. No transition, no `catalogue.json` (PE-28, PE-42) |
+| `setShowNeutral(true)` | `driver.cancel()`, clear any local file, `rig.resetToRest()`, `pose = neutral`, sliders enabled at 0 |
+| `setShowNeutral(false)` | snap to `wanted` (the displayed image's estimate if indexed) |
+| `reset()` | as §6, plus `driver.cancel()`, `showNeutral = false`, clear the local file, then snap to `wanted` (PE-16) |
+| `imageShown(detail)`, navigation (`moveId` changed) | if not `showNeutral`, `pose.kind ∈ {estimate (published), interpolated}` and the target is indexed: run the route steps below. Otherwise snap to `wanted` (PE-19, PE-45) |
+| `imageShown(detail)`, image change (same `moveId`) | `driver.cancel()`, clear the local file, snap to `wanted` (PE-54) |
 | context `lost` | `driver.finish()`: the target is applied without rendering (PE-56). If the keyframes are still loading, the driver has not started: the target is applied without frames when the fetch settles |
-| context `failed`, avatar fallback | `driver.cancel()`, `clearPose()`, `estimateMode = 'off'` |
+| context `failed`, avatar fallback | `driver.cancel()`, `pose = neutral` (estimates need the avatar) |
 
 Route steps on a navigation, all in the event's task until the fetch:
 
-1. Look up `toIndex`. For `fromIndex`, use the sequence index of the previous `displayedImage` when idle. Mid-transition (PE-52), use the endpoint of the current hop on the far side from the target, so the new route's first keyframe is the near one.
-2. `planRoute(…)`. Empty, which means the target is unreviewed: `clearPose()`, PE-19. Done.
-3. Set `pose = {kind:'interpolated', …}`, `transition = {active: true, progress: 0, hopsTotal, …}`, then `ui.sync()`. The transition label now shows (PE-50) and the sliders are disabled (PE-51). The start pose is the rig's current pose: the applied estimate, or `driver.current().pose` when retargeting.
+1. Look up `toIndex`; load `catalogue.json` first if this is the first route. For `fromIndex`, use the sequence index of the previous `displayedImage` when idle. Mid-transition (PE-52), use the endpoint of the current hop on the far side from the target, so the new route's first keyframe is the near one.
+2. `planRoute(…)`. Empty, which means the target is unreviewed: snap to `wanted`, which is neutral (PE-19). Done.
+3. Set `pose = {kind:'interpolated', …}`, `transition = {active: true, progress: 0, hopsTotal, …}`, then `ui.sync()`. The transition label now shows (PE-50) and the sliders are disabled (PE-51). The start pose is the rig's current pose: the shown estimate, or `driver.current().pose` when retargeting.
 4. Fetch the keyframes not already in `estimateCache`, in parallel, through `poses.fetchEstimate` (index entries only). Bump a generation counter first. A completion whose generation is stale is discarded.
-5. Drop failed or invalid intermediates, with one `console.warn` each. If the target failed: `clearPose()` and the PE-41 status. If the route is now empty but the target is fine, apply the target at once.
+5. Drop failed or invalid intermediates, with one `console.warn` each. If the target failed: neutral and the PE-41 status. If the route is now empty but the target is fine, apply the target at once.
 6. Reduced motion (checked now): `driver.start(...)` and then `finish()` at once. Otherwise `driver.start(poses, meta)`.
 7. `onFrame`: apply the pose to the rig, update `transition.progress` and `hopIndex`, then `requestRender()`. The DOM is **not** synced per frame: only the label and slider state are set at step 3, and `ui.sync()` runs again on arrival. This keeps `aria-live` quiet (PE-51).
-8. `onArrive`: `pose = {kind:'estimate', origin:'published', imageId: to, file}` (the normal S5 applied estimate), `transition` inactive, `ui.sync()`. Nothing else renders after this (PE-53).
+8. `onArrive`: `pose = {kind:'estimate', origin:'published', imageId: to, file}`, the same state a snap would give, then `transition` inactive and `ui.sync()`. Nothing else renders after this (PE-53).
 
-**How S6 and S5 share the "applied estimate" state.** The state reached on arrival is the same as clicking Apply on that photograph. The same `file` object, label, slider lock and clearing rules apply, and a later reset or image change treats it exactly as an S5 estimate. `interpolated` is a transient third pose kind. Only the driver enters it, and only arrival or cancellation leaves it. It is not in the URL, storage, the hook's `actions` or any validator input. `provenanceFor(pose, {rig, transition})` gains one branch that returns the PE-50 strings. The label stays derived from state (ADR-0004).
+**How S6 and S5 share the "applied estimate" state.** The state reached on arrival is identical to snapping to that photograph's estimate. The same `file` object, PE-18 label, permanently visible provenance line, slider lock and replacement rules apply. A later reset or image change treats it exactly like any other shown estimate. `interpolated` is a transient third pose kind: only the driver enters it, and only arrival or cancellation leaves it. It is not in the URL, storage, the hook's `actions` or any validator input. `provenanceFor(pose, {rig, transition})` gains one branch, which returns the PE-50 strings. The label stays derived from state (ADR-0004).
+
+**Controls.** `#apply-estimate` is withdrawn. `#show-neutral` is an `<input type="checkbox">` inside a 44 px label (PE-25), placed with the estimate controls in tab order (PE-12). It is present while `state.rig === 'avatar'` and the index lists at least one estimate. `controls.js` binds it to `actions.setShowNeutral`.
 
 ### 12.4 Dependencies and budget (amends §3)
 
@@ -477,12 +494,13 @@ Route steps on a navigation, all in the event's task until the fetch:
 |---|---|---|---|
 | `transition.js` | pure | Keyframe sequence, route planning, timing, interpolation, frame driver | ≤ 140 |
 
-Dependency direction: `main → transition → three.core`. `controls.js` does not import `transition.js`; it reads `state.transition` through `getState()`. Test-hook additions (§6): `transition` and `estimateMode` in the snapshot (PE-58). No new actions.
+Dependency direction: `main → transition → three.core`. `controls.js` does not import `transition.js`; it reads `state.transition` and `state.showNeutral` through `getState()`. Test-hook changes (§6): the snapshot gains `transition` and `showNeutral` (PE-58). In `actions`, `setShowNeutral(bool)` replaces `applyEstimate` and `clearPose`.
 
 ### 12.5 Failure modes
 
 | What breaks | First symptom | Detection |
 |---|---|---|
+| Default estimates invisible because the Drawings source is the default (`site.js` starts every entry but no. 1 on a drawing) | Neutral avatar on load and on navigation until the user picks Yang or Chen; afterwards the source sticks and estimates show | Open product decision (ADR-0007 *Consequences*); PE-42 tests load-time application on `#move=1` |
 | A slow or failed fetch on a far jump | The transition label holds on the old pose until the files arrive | `transition.active && progress === 0` for more than 1 s (before the clock starts, so it is not part of the 1.6–3 s motion); one `console.warn` per dropped intermediate (PE-55) |
 | A corrupt target file | Neutral rig and the PE-41 status line, never a half-applied pose | PE-55 browser check; CI already rejects unindexed or invalid files (PE-34) |
 | A background tab or throttled rAF | Arrives late or in one step | The driver clamps `elapsed` and completes on the next tick, so the end state is always exact |
