@@ -46,7 +46,8 @@ async function recordSteady(page, {home, action, target}) {
   for (let attempt = 0; attempt < 5 && !steady; attempt++) {
     rec = await recordNavigation(page, action, target);
     const first = rec.findIndex(f => f.active && f.progress > 0), last = rec.findLastIndex(f => f.active);
-    steady = first >= 0 && last + 1 < rec.length && maxGap(rec, first, last + 1) <= 100;
+    // A stall before the first progress frame hides in the gap to the frame before it: that frame must be an early tick (p < 0.05).
+    steady = first >= 0 && last + 1 < rec.length && rec[first].progress < 0.05 && maxGap(rec, Math.max(0, first - 2), last + 1) <= 100;
     if (!steady && attempt < 4) { await go(page, home); await settled(page, firstImage(home)); }
   }
   return {rec, steady};

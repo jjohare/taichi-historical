@@ -1,5 +1,5 @@
 // Slice S6 helpers (PE-42 to PE-59): a fixture tree of distinct estimates, a SHA-256 binding for pages without
-// crypto.subtle (plain-http host names such as http://agentbox:*), and a per-frame recorder.
+// crypto.subtle (plain-http hosts, which lack it), and a per-frame recorder.
 //
 // Fixture: one Yang estimate per consecutive entry (ids 2..17), whose left_elbow bends by a zig-zag angle, so
 // a straight start→target blend cannot pass for a route through the keyframes. Ids 0 and 1 share yang-001.
