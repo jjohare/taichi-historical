@@ -16,6 +16,10 @@ function makeRig(kind, group, extras = {}) {
     if (object.isMesh) meshes.push(object);
   });
   const skeleton = extras.skeleton;
+  // Joint marker: a child of the selected bone, so it follows every pose change with no per-frame bookkeeping.
+  // depthTest is off so it is never hidden inside the mesh; the meshes list above predates it, so skeleton mode ignores it.
+  const marker = new THREE.Mesh(new THREE.SphereGeometry(.06, 16, 12), new THREE.MeshBasicMaterial({color: extras.accent, depthTest: false, transparent: true, opacity: .8}));
+  marker.renderOrder = 999; marker.visible = false;
   return {
     kind, rest, jointNames: [...bones.keys()],
     setLocal(name, quaternion) { bones.get(name)?.quaternion.fromArray(quaternion); },
@@ -35,6 +39,17 @@ function makeRig(kind, group, extras = {}) {
       for (const mesh of meshes) mesh.visible = !show || SKELETON_VISIBLE.test(mesh.name);
     },
     setVisible(show) { group.visible = show; },
+    // Returns false (and hides the marker) when this rig has no such bone, e.g. the fallback rig's different names.
+    setMarker(name) {
+      const bone = name && bones.get(name);
+      marker.removeFromParent(); marker.visible = false;
+      if (!bone) return false;
+      bone.add(marker); marker.position.set(0, 0, 0); marker.visible = true; return true;
+    },
+    markerState: () => ({
+      visible: marker.visible && !!marker.parent, position: marker.parent ? marker.getWorldPosition(new THREE.Vector3()).toArray() : null,
+      depthTest: marker.material.depthTest, colour: `#${marker.material.color.getHexString()}`,
+    }),
     // Read-only view for the test hook: skeleton helper and per-mesh visibility, keyed by mesh name.
     visibility: () => ({
       skeletonVisible: skeleton ? skeleton.visible : false,
@@ -70,7 +85,7 @@ export function createFallbackRig(scene, colour) {
     const hip = joint(`${side}_hip`, root, [sign * .13, -.04, 0]); const knee = joint(`${side}_knee`, hip, [sign * .015, -.42, 0]); const ankle = joint(`${side}_ankle`, knee, [0, -.4, 0], .036);
     const foot = new THREE.Mesh(new THREE.BoxGeometry(.115, .065, .24), handMaterial); foot.position.set(0, -.045, .07); ankle.add(foot);
   }
-  return makeRig('fallback-rig', root);
+  return makeRig('fallback-rig', root, {accent: colour('--accent')});
 }
 
 // Authored avatar with a named 24-bone hierarchy. No catalogue event reaches it. Throws if it cannot load.
@@ -79,5 +94,5 @@ export async function loadAvatar(scene, url, colour) {
   const avatar = gltf.scene; scene.add(avatar);
   const skeleton = new THREE.SkeletonHelper(avatar);
   skeleton.material.color.set(colour('--jade')); skeleton.material.depthTest = false; skeleton.visible = false; scene.add(skeleton);
-  return makeRig('avatar', avatar, {skeleton});
+  return makeRig('avatar', avatar, {skeleton, accent: colour('--accent')});
 }

@@ -4,6 +4,8 @@ import {createScene} from './scene.js';
 import {createFallbackRig, loadAvatar} from './rig.js';
 import {bindControls} from './controls.js';
 import {bendQuaternion, jointAngleDegrees} from './retarget.js';
+import {presetPosition, detectPreset} from './presets.js';
+import {JOINT_LABELS} from './joints.js';
 import {TEXT} from './provenance.js';
 
 const host = document.getElementById('model-view'), status = document.getElementById('model-status');
@@ -25,15 +27,30 @@ const view = createScene({
 });
 const {requestRender} = view;
 state.renderer = 'webgl';
-view.controls.addEventListener('start', () => { state.camera.preset = 'custom'; });
+// A drag starts as 'custom'; when it ends the camera is compared with the presets, so dragging back onto one re-selects it.
+// Never the controls' change event: it also fires on programmatic updates (spec PE-10).
+const settlePreset = () => { state.camera.preset = detectPreset(view.camera.position.toArray()); ui.sync(); };
+view.controls.addEventListener('start', () => { state.camera.preset = 'custom'; ui.sync(); });
+view.controls.addEventListener('end', settlePreset);
 
 let rig = createFallbackRig(view.scene, colour); // state.rig stays 'pending' until the avatar load settles
 
 
 const bendBoth = (names, degrees) => { for (const name of names) { const q = bendQuaternion(rig.rest, name, degrees); if (q) rig.setLocal(name, q); } };
 const actions = {
-  orbit(angle) { state.camera.preset = 'custom'; view.orbit(angle); },
-  zoom(factor) { state.camera.preset = 'custom'; view.zoom(factor); },
+  setPreset(name) {
+    const position = presetPosition(name); if (!position) return;
+    view.setCameraPosition(position); state.camera.preset = name; ui.sync();
+  },
+  orbit(angle) { view.orbit(angle); settlePreset(); },
+  zoom(factor) { view.zoom(factor); settlePreset(); },
+  // Unknown names are ignored. A bone the current rig lacks stays selected, so the choice survives the avatar loading.
+  selectJoint(name) {
+    if (name !== null && !Object.hasOwn(JOINT_LABELS, name)) return;
+    state.selectedJoint = name; rig.setMarker(name); requestRender(); ui.sync();
+  },
+  hasJoint: name => rig.rest.has(name),
+  jointAngle: name => (rig.rest.has(name) ? jointAngleDegrees(rig.rest.get(name).local, rig.localOf(name)) : null),
   setElbow(angle) { state.checks.elbow = angle; bendBoth(['left_elbow', 'right_elbow'], -angle); requestRender(); ui.sync(); },
   setCrouch(angle) {
     if (rig.kind !== 'avatar') return;
@@ -51,13 +68,15 @@ const actions = {
   },
 };
 const ui = bindControls(document, actions, () => state);
+ui.sync();
 
 if (new URLSearchParams(location.search).get('explorer-test') === '1') {
   // Read-only test hook, absent from production URLs. State is a snapshot; the rest is for browser checks.
   const bones = () => Object.fromEntries(rig.jointNames.map(name => [name, {quaternion: rig.localOf(name), position: rig.worldPositionOf(name)}]));
   window.__explorer = Object.freeze({
     get state() {
-      return structuredClone({...state, ...rig.visibility(), bones: bones(), cameraPosition: view.camera.position.toArray(), label: document.getElementById('model-label').textContent});
+      return structuredClone({...state, ...rig.visibility(), bones: bones(), cameraPosition: view.camera.position.toArray(), label: document.getElementById('model-label').textContent,
+        readout: document.getElementById('joint-readout').textContent, provenance: document.getElementById('model-provenance').textContent, marker: rig.markerState()});
     },
     get renderer() { return view.renderer; }, camera: view.camera, controls: view.controls,
     get rig() { return rig; },
@@ -69,7 +88,7 @@ if (new URLSearchParams(location.search).get('explorer-test') === '1') {
 status.hidden = true;
 try {
   const avatar = await loadAvatar(view.scene, new URL('../model/archive-avatar.glb', import.meta.url).href, colour);
-  rig.setVisible(false); rig = avatar; state.rig = 'avatar';
+  rig.setVisible(false); rig.setMarker(null); rig = avatar; state.rig = 'avatar'; rig.setMarker(state.selectedJoint);
   ui.sync(); requestRender();
 } catch (error) {
   // A usable joint rig remains available if the avatar asset cannot be fetched.

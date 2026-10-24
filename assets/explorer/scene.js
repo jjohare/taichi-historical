@@ -12,7 +12,7 @@ export function createScene({host, colour, onRender, onContextChange}) {
   renderer.domElement.setAttribute('role', 'img'); host.append(renderer.domElement);
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.target.set(0, .95, 0); controls.minDistance = 2.2; controls.maxDistance = 7; controls.maxPolarAngle = Math.PI * .86;
-  controls.enablePan = false; controls.update(); controls.saveState();
+  controls.enablePan = false; controls.enableDamping = false; controls.autoRotate = false; controls.update(); controls.saveState();
   scene.add(new THREE.HemisphereLight(colour('--surface'), colour('--jade'), 2.5));
   const light = new THREE.DirectionalLight(colour('--surface'), 3); light.position.set(3, 5, 4); scene.add(light);
   const base = new THREE.Mesh(new THREE.CylinderGeometry(.8, .8, .02, 64), new THREE.MeshStandardMaterial({color: colour('--bg'), roughness: 1}));
@@ -41,7 +41,9 @@ export function createScene({host, colour, onRender, onContextChange}) {
     offset.setLength(THREE.MathUtils.clamp(offset.length() * factor, controls.minDistance, controls.maxDistance));
     camera.position.copy(controls.target).add(offset); controls.update(); requestRender();
   }
+  // Instant jump to a preset position; the target never moves (design §5.4).
+  function setCameraPosition(position) { camera.position.fromArray(position); controls.update(); requestRender(); }
   function resetCamera() { controls.reset(); requestRender(); }
   resize();
-  return {scene, camera, controls, renderer, requestRender, orbit, zoom, resetCamera};
+  return {scene, camera, controls, renderer, requestRender, orbit, zoom, setCameraPosition, resetCamera};
 }
