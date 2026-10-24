@@ -3,7 +3,7 @@ on:
   pull_request:
     paths: ['lee/**', 'tools/check-lee.mjs', 'tools/catalogue/src/bin/lee_catalogue.rs', 'index.html', 'assets/traditions.css', '.github/workflows/**']
   push:
-    branches: [research/lee-main-form]
+    branches: [main]
 permissions:
   contents: read
 jobs:
