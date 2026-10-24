@@ -14,13 +14,15 @@ This is body-mesh estimation, not detailed finger reconstruction. The source's V
 
 The published model setup requires:
 
-- A DPMesh checkpoint; the project's Tsinghua download directory was reachable during setup.
+- A DPMesh checkpoint. `3dpw_best_ckpt.pth.tar` has been downloaded from the project's Tsinghua directory outside this repository: 5,727,074,287 bytes, ZIP integrity verified, SHA-256 `dbb565c0ec49ee9eef3ed450028f4597ee23801398bab507b06cb9d94af0bff7`.
 - SMPL neutral, male and female model data for the upstream `SMPL_Layer` initialiser, plus its `smplpytorch` implementation.
 - VPoser model configuration and weights.
 - The extra and Human3.6M joint regressors expected by the source.
 - Its Python/PyTorch environment and reviewed 2D joint detections for these photographs.
 
 These body-model assets were not found in the local workspace. Their location has been requested. GPU hardware is available, but an available GPU alone is not a runnable model. Model weights and licensed body-model data belong outside the public repository and Pages artifact.
+
+An isolated Python 3.10 / PyTorch 1.12.1+cu113 / torchvision 0.13.1+cu113 environment has passed a GPU arithmetic smoke check. This verifies the numerical runtime only, not a complete DPMesh installation or inference. SMPL's official download endpoint requires a registered account; see the [upstream asset instructions](https://github.com/hongsukchoi/3DCrowdNet_RELEASE/blob/main/assets/directory.md#pytorch-smpl-layer-and-vposer) for the requested files.
 
 ## Review before binding
 
