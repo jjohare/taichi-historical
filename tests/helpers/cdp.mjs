@@ -109,6 +109,8 @@ export async function openPage({block} = {}) {
   await new Promise((resolve, reject) => { ws.onopen = resolve; ws.onerror = () => reject(new Error('CDP websocket failed')); });
   const page = new Page(target.id, ws);
   for (const domain of ['Page', 'Runtime', 'Log', 'Network']) await page.send(`${domain}.enable`);
+  // The sidecar Chrome once served a stale viewer.js from cache; never cache in tests.
+  await page.send('Network.setCacheDisabled', {cacheDisabled: true});
   // A tab that is not frontmost can have its requestAnimationFrame paused, which would starve render-on-demand.
   await page.send('Page.bringToFront');
   await page.send('Emulation.setFocusEmulationEnabled', {enabled: true});
