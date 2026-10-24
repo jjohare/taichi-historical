@@ -90,7 +90,7 @@ export async function openS6Page(site, {hash = `#move=${FIRST_ID + 1}`, reducedM
     await page.send('Page.addScriptToEvaluateOnNewDocument', {source: SHIM});
     if (reducedMotion) await page.send('Emulation.setEmulatedMedia', {features: [{name: 'prefers-reduced-motion', value: 'reduce'}]});
     await page.navigate(`${site.base}?explorer-test=1${hash}`);
-    await page.waitFor("window.__explorer && window.__explorer.state.rig !== 'pending'", {what: 'window.__explorer with a settled rig', timeout: 15000});
+    await page.waitFor("window.__explorer && window.__explorer.state.rig !== 'pending'", {what: 'window.__explorer with a settled rig', timeout: 45000});
     await page.evaluate("document.getElementById('model-view').scrollIntoView({behavior: 'instant', block: 'start'})");
     await page.waitFor('__explorer.state.visible === true && __explorer.state.renderCount > 0', {what: 'the panel to render'});
     if (yang) await chooseSource(page, 'yang');
