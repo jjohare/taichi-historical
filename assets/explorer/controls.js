@@ -29,7 +29,7 @@ export function bindControls(doc, actions, getState) {
       for (const button of presets) button.setAttribute('aria-pressed', String(button.dataset.preset === camera.preset));
       $('elbow-angle').value = checks.elbow; $('joint-value').textContent = `${checks.elbow}°`;
       $('stance-angle').value = checks.crouch; $('stance-value').textContent = `${checks.crouch}°`;
-      $('show-skeleton').checked = checks.skeleton; $('show-neutral').checked = state.showNeutral;
+      $('show-skeleton').checked = checks.skeleton; $('show-neutral').checked = state.showNeutral; $('show-neutral').parentElement.hidden = !(state.indexed && rig === 'avatar');
       // A shown estimate is never modified under its reviewed label (PE-20).
       const locked = pose.kind !== 'neutral';
       $('elbow-angle').disabled = locked; $('stance-angle').disabled = locked; $('slider-note').hidden = !locked;

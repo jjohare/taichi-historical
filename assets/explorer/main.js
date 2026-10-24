@@ -16,7 +16,7 @@ const css = getComputedStyle(document.documentElement), colour = name => css.get
 const state = {
   renderer: 'pending', rig: 'pending', camera: {preset: 'three-quarter'},
   checks: {elbow: 0, crouch: 0, skeleton: false}, selectedJoint: null,
-  displayedImage: null, availableEstimate: null, showNeutral: false, pose: {kind: 'neutral'}, poseError: null, renderCount: 0,
+  displayedImage: null, availableEstimate: null, showNeutral: false, indexed: false, pose: {kind: 'neutral'}, poseError: null, renderCount: 0,
 };
 
 const view = createScene({
@@ -61,7 +61,8 @@ function show(pose) {
 async function refreshEstimate() {
   const ticket = ++seq, image = state.displayedImage;
   if (state.pose.kind !== 'neutral' && (state.showNeutral || state.pose.origin === 'local' || state.pose.imageId !== image?.imageId)) { toNeutral(); settle(); }
-  const entry = (await indexPromise).entries?.get(image?.imageId);
+  const {entries} = await indexPromise, entry = entries?.get(image?.imageId);
+  if (!state.indexed && entries?.size) { state.indexed = true; ui.sync(); }
   if (ticket !== seq) return;
   state.availableEstimate = entry ? image.imageId : null;
   if (!entry || state.showNeutral || rig.kind !== 'avatar') { if (state.pose.kind !== 'neutral') toNeutral(); return settle(); }

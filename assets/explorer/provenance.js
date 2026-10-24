@@ -8,7 +8,7 @@ export const TEXT = {
   estimated: 'ESTIMATED POSE',
   local: 'LOCAL FILE · NOT REVIEWED',
   localText: 'Unpublished pose file — local preview, not reviewed for this site',
-  slidersLocked: 'Clear the estimate to use the joint checks.',
+  slidersLocked: 'Choose “Show neutral avatar” to use the joint checks.',
   rejected: message => `This pose file was rejected: ${message}`,
 };
 
