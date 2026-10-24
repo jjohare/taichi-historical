@@ -39,6 +39,7 @@ function makeRig(kind, group, extras = {}) {
       for (const mesh of meshes) mesh.visible = !show || SKELETON_VISIBLE.test(mesh.name);
     },
     setVisible(show) { group.visible = show; },
+    isVisible: () => group.visible,
     // Returns false (and hides the marker) when this rig has no such bone, e.g. the fallback rig's different names.
     setMarker(name) {
       const bone = name && bones.get(name);
@@ -91,8 +92,10 @@ export function createFallbackRig(scene, colour) {
 // Authored avatar with a named 24-bone hierarchy. No catalogue event reaches it. Throws if it cannot load.
 export async function loadAvatar(scene, url, colour) {
   const gltf = await new GLTFLoader().loadAsync(url);
-  const avatar = gltf.scene; scene.add(avatar);
-  const skeleton = new THREE.SkeletonHelper(avatar);
-  skeleton.material.color.set(colour('--jade')); skeleton.material.depthTest = false; skeleton.visible = false; scene.add(skeleton);
-  return makeRig('avatar', avatar, {skeleton, accent: colour('--accent')});
+  const avatar = gltf.scene, skeleton = new THREE.SkeletonHelper(avatar);
+  skeleton.material.color.set(colour('--jade')); skeleton.material.depthTest = false; skeleton.visible = false;
+  // Build the rig before touching the scene, so a throw leaves the fallback rig as the only thing shown.
+  const rig = makeRig('avatar', avatar, {skeleton, accent: colour('--accent')});
+  scene.add(avatar, skeleton);
+  return rig;
 }

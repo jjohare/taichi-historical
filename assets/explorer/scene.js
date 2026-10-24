@@ -45,5 +45,5 @@ export function createScene({host, colour, onRender, onContextChange}) {
   function setCameraPosition(position) { camera.position.fromArray(position); controls.update(); requestRender(); }
   function resetCamera() { controls.reset(); requestRender(); }
   resize();
-  return {scene, camera, controls, renderer, requestRender, orbit, zoom, setCameraPosition, resetCamera};
+  return {isVisible: () => visible, scene, camera, controls, renderer, requestRender, orbit, zoom, setCameraPosition, resetCamera};
 }

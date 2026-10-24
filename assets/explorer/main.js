@@ -33,7 +33,7 @@ const settlePreset = () => { state.camera.preset = detectPreset(view.camera.posi
 view.controls.addEventListener('start', () => { state.camera.preset = 'custom'; ui.sync(); });
 view.controls.addEventListener('end', settlePreset);
 
-let rig = createFallbackRig(view.scene, colour); // state.rig stays 'pending' until the avatar load settles
+let rig = createFallbackRig(view.scene, colour); const fallback = rig; // state.rig stays 'pending' until the avatar load settles
 
 
 const bendBoth = (names, degrees) => { for (const name of names) { const q = bendQuaternion(rig.rest, name, degrees); if (q) rig.setLocal(name, q); } };
@@ -75,7 +75,7 @@ if (new URLSearchParams(location.search).get('explorer-test') === '1') {
   const bones = () => Object.fromEntries(rig.jointNames.map(name => [name, {quaternion: rig.localOf(name), position: rig.worldPositionOf(name)}]));
   window.__explorer = Object.freeze({
     get state() {
-      return structuredClone({...state, ...rig.visibility(), bones: bones(), cameraPosition: view.camera.position.toArray(), label: document.getElementById('model-label').textContent,
+      return structuredClone({...state, ...rig.visibility(), bones: bones(), cameraPosition: view.camera.position.toArray(), label: document.getElementById('model-label').textContent, fallbackVisible: fallback.isVisible(), visible: view.isVisible(),
         readout: document.getElementById('joint-readout').textContent, provenance: document.getElementById('model-provenance').textContent, marker: rig.markerState()});
     },
     get renderer() { return view.renderer; }, camera: view.camera, controls: view.controls,
