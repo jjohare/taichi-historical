@@ -48,11 +48,12 @@
               <div id="thumbnails" class="thumbnails" aria-label="Images of this position"></div>
             </div>
             <section class="model-panel" data-od-id="three-dimensional-study" aria-labelledby="model-title">
-              <div class="model-heading"><h4 id="model-title">Spatial study</h4><span class="tag">NEUTRAL RIG</span></div>
+              <div class="model-heading"><h4 id="model-title">Spatial study</h4><span id="model-label" class="tag">NEUTRAL RIG</span></div>
               <div id="model-view" class="model-view"><p id="model-status" role="status">Preparing the orbitable model…</p></div>
               <div class="model-controls" role="group" aria-label="Model camera controls"><button id="orbit-left" aria-label="Orbit left">↶</button><button id="orbit-right" aria-label="Orbit right">↷</button><button id="zoom-in" aria-label="Zoom in">+</button><button id="zoom-out" aria-label="Zoom out">−</button><button id="reset-view">Reset view</button></div>
               <label class="joint-label" for="elbow-angle">Joint check <span id="joint-value">0°</span></label><input id="elbow-angle" type="range" min="0" max="100" value="0" aria-label="Bend elbows to check the joint hierarchy">
-              <p class="small">Drag to orbit · scroll or pinch to zoom. The rig is independent of the selected position. It is not a reconstruction of the photograph.</p>
+              <div id="avatar-controls" hidden><label class="joint-label" for="stance-angle">Crouch clearance check <span id="stance-value">0°</span></label><input id="stance-angle" type="range" min="0" max="65" value="0"><label class="skeleton-toggle"><input id="show-skeleton" type="checkbox"> Show skeleton, hands &amp; feet</label></div>
+              <p class="small">Drag to orbit · scroll or pinch to zoom. This illustrative avatar is independent of the selected position. The crouch is a clothing check, not a recovered form posture. <a href="assets/model/README.md">Model notes</a></p>
             </section>
           </div>
           <div class="evidence"><span id="match-label" class="tag"></span><p id="mapping-note"></p></div>

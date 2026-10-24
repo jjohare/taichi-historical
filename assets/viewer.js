@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import {OrbitControls} from './vendor/OrbitControls.js';
+import {GLTFLoader} from './vendor/GLTFLoader.js';
 const host=document.getElementById('model-view'),status=document.getElementById('model-status');
 const css=getComputedStyle(document.documentElement),colour=name=>css.getPropertyValue(name).trim();
 const scene=new THREE.Scene();scene.background=new THREE.Color(colour('--floor'));
@@ -42,3 +43,41 @@ document.getElementById('reset-view').onclick=()=>{controls.reset();requestRende
 document.getElementById('elbow-angle').oninput=e=>{const angle=Number(e.target.value);for(const elbow of elbows)elbow.rotation.x=-THREE.MathUtils.degToRad(angle);document.getElementById('joint-value').textContent=`${angle}°`;requestRender();};
 renderer.domElement.addEventListener('webglcontextlost',event=>{event.preventDefault();status.hidden=false;status.textContent='The 3D graphics context was interrupted. Reload to restore the viewer.';});
 status.hidden=true;resize();
+
+// Authored avatar with a named 24-bone hierarchy. No catalogue event reaches it.
+try {
+  const gltf=await new GLTFLoader().loadAsync(new URL('./model/archive-avatar.glb',import.meta.url).href);
+  const avatar=gltf.scene;scene.add(avatar);root.visible=false;
+  avatar.updateMatrixWorld(true);
+  const joints=new Map(),rest=new Map(),avatarMeshes=[];
+  avatar.traverse(object=>{
+    if(object.isBone){joints.set(object.name,object);rest.set(object.name,{local:object.quaternion.clone(),world:object.getWorldQuaternion(new THREE.Quaternion()),position:object.position.clone()});}
+    if(object.isMesh)avatarMeshes.push(object);
+  });
+  const skeleton=new THREE.SkeletonHelper(avatar);skeleton.material.color.set(colour('--jade'));skeleton.material.depthTest=false;skeleton.visible=false;scene.add(skeleton);
+  function bend(name,degrees){const bone=joints.get(name),basis=rest.get(name);if(!bone||!basis)return;const axis=new THREE.Vector3(1,0,0).applyQuaternion(basis.world.clone().invert());bone.quaternion.copy(basis.local).multiply(new THREE.Quaternion().setFromAxisAngle(axis,THREE.MathUtils.degToRad(degrees)));}
+  document.getElementById('model-label').textContent='ILLUSTRATIVE AVATAR';
+  document.getElementById('avatar-controls').hidden=false;
+  document.getElementById('elbow-angle').oninput=e=>{const angle=Number(e.target.value);bend('left_elbow',-angle);bend('right_elbow',-angle);document.getElementById('joint-value').textContent=`${angle}°`;requestRender();};
+  document.getElementById('stance-angle').oninput=e=>{
+    const angle=Number(e.target.value);for(const side of ['left','right']){bend(`${side}_hip`,-angle);bend(`${side}_knee`,angle*2);bend(`${side}_ankle`,-angle);}
+    const pelvis=joints.get('pelvis');pelvis.position.y=rest.get('pelvis').position.y-.8*(1-Math.cos(THREE.MathUtils.degToRad(angle)));
+    document.getElementById('stance-value').textContent=`${angle}°`;requestRender();
+  };
+  document.getElementById('show-skeleton').onchange=e=>{
+    skeleton.visible=e.target.checked;
+    for(const mesh of avatarMeshes)mesh.visible=!e.target.checked||/palm|finger|thumb|shoe|Head/.test(mesh.name);
+    requestRender();
+  };
+  document.getElementById('reset-view').onclick=()=>{
+    controls.reset();for(const [name,bone] of joints){bone.quaternion.copy(rest.get(name).local);bone.position.copy(rest.get(name).position);}
+    for(const id of ['elbow-angle','stance-angle'])document.getElementById(id).value=0;
+    for(const id of ['joint-value','stance-value'])document.getElementById(id).textContent='0°';
+    document.getElementById('show-skeleton').checked=false;skeleton.visible=false;for(const mesh of avatarMeshes)mesh.visible=true;requestRender();
+  };
+  requestRender();
+} catch(error){
+  // A usable joint rig remains available if the avatar asset cannot be fetched.
+  document.getElementById('model-label').textContent='JOINT RIG · AVATAR UNAVAILABLE';
+  console.error('Avatar could not be loaded',error);
+}
