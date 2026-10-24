@@ -317,3 +317,19 @@ withSite(['chen-001'], {name: 'PE-16 (fixture index) after selecting a joint and
   const s = await page.evaluate(`(() => ({showNeutral: __explorer.state.showNeutral, preset: __explorer.state.camera.preset, elbow: document.getElementById('elbow-angle').value}))()`);
   assert.deepEqual(s, {showNeutral: false, preset: 'three-quarter', elbow: '0'});
 });
+
+// ---- fail closed without crypto.subtle --------------------------------------------------------------------------
+// Not a secure context (plain http on a host name) means no crypto.subtle: the hash cannot be checked, so nothing is applied.
+if (cdpSkipReason) test('PE-30 without crypto.subtle a published estimate fails closed', {skip: cdpSkipReason});
+else test('PE-30 without crypto.subtle a published estimate fails closed: neutral, PE-17 labels, #pose-error text', {timeout: 90000}, async () => {
+  const site = await serveSite({estimates: ['yang-001']});
+  try {
+    await withExplorer({base: site.base, hash: '#move=1'}, async page => {
+      if (await page.evaluate('!!crypto.subtle')) return; // secure context (localhost): the native path is covered by the node test
+      await page.waitFor(`document.getElementById('pose-error').textContent.trim() !== ''`, {what: 'the rejection text'});
+      assert.equal(await page.evaluate(`document.getElementById('pose-error').textContent.trim()`), 'This pose file was rejected: The estimate could not be loaded.');
+      assert.equal((await page.evaluate(STATE)).kind, 'neutral');
+      assert.deepEqual(await page.evaluate(NEUTRAL_UI), {label: 'ILLUSTRATIVE AVATAR', text: NEUTRAL_TEXT});
+    });
+  } finally { await site.close(); }
+});
