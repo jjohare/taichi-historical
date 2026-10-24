@@ -454,7 +454,7 @@ state.pose |= { kind: 'interpolated', fromImageId, toImageId }   // only while t
 | `clearPose()`, `reset()` | as §6, and also `driver.cancel()`, `transition` inactive, `estimateMode = 'off'` |
 | `imageShown(detail)`, navigation (`moveId` changed) | if `estimateMode === 'follow'` and `pose.kind ∈ {estimate (published), interpolated}`: run the route steps below. Otherwise §6 behaviour (PE-19) |
 | `imageShown(detail)`, image change (same `moveId`) | `driver.cancel()`. In `follow` with a reviewed estimate for the new image, apply it at once. Otherwise `clearPose()` but leave `estimateMode` alone (PE-54) |
-| context `lost` | `driver.finish()`: the target is applied without rendering (PE-56) |
+| context `lost` | `driver.finish()`: the target is applied without rendering (PE-56). If the keyframes are still loading, the driver has not started: the target is applied without frames when the fetch settles |
 | context `failed`, avatar fallback | `driver.cancel()`, `clearPose()`, `estimateMode = 'off'` |
 
 Route steps on a navigation, all in the event's task until the fetch:
