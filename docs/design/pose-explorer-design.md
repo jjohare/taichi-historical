@@ -396,7 +396,7 @@ This section adds to §§3–9 and changes none of them except where marked. Req
 It imports only `../vendor/three.core.js` (for `Quaternion.slerpQuaternions`) and has no DOM, `window` or timer access: the driver receives its clock and frame scheduler. That keeps it under `node --test` with a fake clock, and keeps §3's rule that pure modules never touch `window`.
 
 ```js
-export const HOP_MS = 350, TOTAL_CAP_MS = 1200, MAX_KEYFRAMES = 24;
+export const HOP_MS = 1600, CAP_MS = 3000, MAX_KEYFRAMES = 30;   // ADR-0007 justifies the values; exposed in the snapshot
 
 // Sequence in ascending ordinal; imageId is the keyframe image for `source`, or null (spec I, PE-43).
 export function keyframeSequence(catalogue, source) → [{moveId, imageId: string | null}]
@@ -409,7 +409,7 @@ export function sequenceIndexOf(sequence, moveId) → number      // −1 if abs
 export function planRoute(sequence, fromIndex, toIndex, estimatesIndex, {startImageId} = {})
   → {keyframes: string[], skipped: number}
 
-export function routeTiming(hops) → {total, perHop}             // total = min(HOP_MS·hops, TOTAL_CAP_MS)
+export function routeTiming(hops) → {total, perHop}             // perHop = min(HOP_MS, CAP_MS/hops); total = min(HOP_MS·hops, CAP_MS)
 export function easeInOutCubic(x) → number
 
 // Per-joint shortest-arc slerp of Q over POSE_JOINTS and root.rotation; lerp of root.translation; a missing
@@ -434,13 +434,14 @@ export function createDriver({requestFrame, cancelFrame, now, onFrame, onArrive}
 
 `interpolatePose` works on the file's delta `Q_j`, not on bone locals. The retarget rule `L = L_r · (W_r⁻¹ · Q · W_r)` is a fixed left product and a fixed conjugation, and both preserve slerp paths, so this gives the same frames as slerping `L`. It also means the module never needs the rig. `rig.js` gains nothing: `main.js` applies each frame with `applyPose` (§4) and `rig.setLocal` / `setRootTranslation`, as it does for an estimate.
 
-The easing is global, across the route, not per hop. Per-hop easing would stop the figure at every intermediate keyframe and look like stuttering when hops are 50–100 ms. With global easing the figure moves continuously, passes through each reviewed keyframe exactly at `p = k/N`, and starts and ends at rest.
+The easing is global, across the route, not per hop. Per-hop easing would stop the figure at every intermediate keyframe and look like stuttering when hops are 100–150 ms. With global easing the figure moves continuously, passes through each reviewed keyframe exactly at `p = k/N`, and starts and ends at rest.
 
 ### 12.3 State model changes (amends §6)
 
 ```js
 state += {
-  estimateMode: 'off' | 'follow',                 // never persisted; 'off' on every load (PE-42)
+  estimateMode: 'off' | 'follow',
+  // transition also carries hopMs, capMs and maxKeyframes, copied from transition.js constants (PE-58)                 // never persisted; 'off' on every load (PE-42)
   transition: { active: false, from: null, to: null, progress: 0, hopsTotal: 0, hopIndex: 0, skipped: 0 },
 }
 state.pose |= { kind: 'interpolated', fromImageId, toImageId }   // only while transition.active (PE-59)
@@ -482,7 +483,7 @@ Dependency direction: `main → transition → three.core`. `controls.js` does n
 
 | What breaks | First symptom | Detection |
 |---|---|---|
-| A slow or failed fetch on a far jump | The transition label holds on the old pose until the files arrive | `transition.active && progress === 0` for more than 1 s; one `console.warn` per dropped intermediate (PE-55) |
+| A slow or failed fetch on a far jump | The transition label holds on the old pose until the files arrive | `transition.active && progress === 0` for more than 1 s (before the clock starts, so it is not part of the 1.6–3 s motion); one `console.warn` per dropped intermediate (PE-55) |
 | A corrupt target file | Neutral rig and the PE-41 status line, never a half-applied pose | PE-55 browser check; CI already rejects unindexed or invalid files (PE-34) |
 | A background tab or throttled rAF | Arrives late or in one step | The driver clamps `elapsed` and completes on the next tick, so the end state is always exact |
 | Rapid repeated navigation (holding Enter on `#next`) | Constant retargeting; the figure keeps easing in | The generation counter discards stale fetches; each retarget starts from the current pose, so nothing jumps |
