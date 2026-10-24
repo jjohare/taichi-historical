@@ -33,10 +33,19 @@ browserTest('PE-06 zoom-in scales the distance by 0.85, zoom-out by 1.15, clampe
   }));
 
 const renderCount = page => page.evaluate('__explorer.state.renderCount');
+/** Wait until load-time renders (resize, observers, scroll) have drained: the count is unchanged for 1 s. */
+async function settle(page) {
+  for (let last = -1, i = 0; i < 20; i++) {
+    const now = await renderCount(page);
+    if (now === last) return;
+    last = now; await page.quiet(1000);
+  }
+  throw new Error('renderCount never settled: something is rendering continuously');
+}
 
 browserTest('PE-08 renderCount does not change over 3 s without interaction, and rises after a camera action', () =>
   withExplorer({}, async page => {
-    await page.quiet(500);                       // let the load-time renders (resize, observers) drain
+    await settle(page);
     const before = await renderCount(page);
     await page.quiet(3000);
     assert.equal(await renderCount(page), before, 'a render loop is running');
@@ -46,7 +55,7 @@ browserTest('PE-08 renderCount does not change over 3 s without interaction, and
 
 browserTest('PE-08 a programmatic orbit while the panel is scrolled out of view does not render until it is visible again', () =>
   withExplorer({}, async page => {
-    await page.quiet(500);
+    await settle(page);
     await page.evaluate("document.body.append(Object.assign(document.createElement('div'), {id: 'test-spacer', style: 'height:20000px'})); window.scrollTo(0, document.body.scrollHeight);");
     await page.waitFor("(() => { const r = document.getElementById('model-view').getBoundingClientRect(); return r.bottom < 0 || r.top > innerHeight; })()", {what: 'model panel out of view'});
     await page.quiet(500);                       // IntersectionObserver delivers asynchronously; there is no event to await
