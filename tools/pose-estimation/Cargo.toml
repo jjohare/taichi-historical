@@ -1,0 +1,10 @@
+[package]
+name = "yang-pose-estimation"
+version = "0.1.0"
+edition = "2024"
+publish = false
+description = "Offline converter from SAM 3D Body (MHR) output to the yang-form pose-estimate schema v1"
+
+[dependencies]
+serde_json = { version = "1", features = ["preserve_order"] }
+sha2 = "0.10"

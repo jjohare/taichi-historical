@@ -63,7 +63,7 @@ export function makePose(deltas, {imageId = 'chen-001', notes, overlay = true} =
     estimator: {name: 'SAM 3D Body', repository: 'https://github.com/facebookresearch/sam-3d-body', revision: REV_A,
       checkpoint: 'facebook/sam-3d-body-dinov3', checkpointSha256: HASH_B, licence: 'SAM License', outputFrame: 'camera frame: +X right, +Y down, +Z forward'},
     rig: {name: 'MHR', repository: 'https://github.com/facebookresearch/MHR', revision: REV_B, modelSha256: HASH_A},
-    converter: {path: 'tools/pose-estimation/convert.py', revision: REV_A},
+    converter: {path: 'tools/pose-estimation/src/main.rs', revision: REV_A},
     jointConvention: 'yang-form-24/rest-world-delta@1', jointMap: 'mhr-to-yang24@1',
     frame: {up: '+Y', forward: '+Z', left: '+X', units: 'm'},
     root: {translation: [0, 0, 0], rotation: [0, 0, 0, 1]},

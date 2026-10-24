@@ -2,7 +2,7 @@
 
 This SOP adds one `assets/pose-estimates/<imageId>.json` file for one historical photograph. It follows [ADR-0002](../adr/ADR-0002-pose-schema-versioning.md) (schema), [ADR-0003](../adr/ADR-0003-offline-estimation-no-runtime-ml.md) (offline estimation) and [ADR-0004](../adr/ADR-0004-provenance-labelling.md) (labelling). The schema itself is in [design §8](../design/pose-explorer-design.md#8-pose-estimate-data).
 
-**Status:** the converter (`tools/pose-estimation/convert.py`), the validator and the explorer binding arrive in slices S4 and S5. Until then this SOP is the agreed procedure, and steps 4–6 cannot be completed.
+**Status:** the converter is the Rust binary `tools/pose-estimation/src/main.rs` ([README](../../tools/pose-estimation/README.md); ADR-0002 amendment). The validator and the explorer binding shipped in slices S4 and S5.
 
 ## 0. Before you start
 
@@ -28,17 +28,23 @@ Run the demo or Python API on the PNG from `extracted/historical/`, never on a r
 
 ## 3. Convert to the avatar convention
 
+The converter reads the raw SAM 3D Body JSON (one `<imageId>.json` per photograph, as written by the batch runner, with `pred_global_rots`, `pred_joint_coords`, `pred_keypoints_3d` and a `provenance` block), and a review table with one row per photograph (`| id | dinov3 | vith | preferred | note |`):
+
 ```sh
-python tools/pose-estimation/convert.py \
-  --raw <workdir>/<imageId>/raw --image extracted/historical/<imageId>.png \
-  --out <workdir>/<imageId>/draft.json --review-render <workdir>/<imageId>/overlay.png
+cargo run --manifest-path tools/pose-estimation/Cargo.toml -- \
+  --batch <workdir>/batch-dinov3 [--batch-alt <workdir>/batch-vith] \
+  --review <workdir>/review.md --out tools/pose-estimation/out \
+  --reviewer <name> --date <YYYY-MM-DD> \
+  [--only <imageId>,…] [--bones] [--tentative-draft] [--publish]
 ```
 
-The converter does three things. First, it computes each mapped joint's world delta `D_j` from MHR's posed and rest global orientations and changes basis into the avatar frame (+X left, +Y up, +Z forward, metres). Second, it writes `Q_j = D_parent⁻¹ · D_j` for each of the 23 non-root joints (design §5.3). Third, it writes root translation, landmarks, and confidence with its method. The landmarks come from the estimator's own wrist and ankle keypoints, through the basis change only and never through the joint map, so the automated left/right check stays independent of the rotations. It writes `review.status: "draft"` and leaves the reviewer fields empty. **Never copy MHR local rotations by bone name.** The avatar's rest orientations differ, and the result would look plausible but be wrong.
+Commit converter changes first: `converter.revision` is the repository's `HEAD` at run time, and the tool warns when `tools/pose-estimation` has uncommitted changes. It asserts that the PNG's SHA-256 matches the one the estimator recorded, and that the MHR model hash matches the reference skeleton's.
+
+The converter does three things. First, it computes each mapped joint's world delta `D_j = G_posed · G_rest⁻¹` from MHR's posed and rest global orientations. These are already in the avatar's axes (+X left, +Y up, +Z forward). Camera-frame positions go through `C = diag(1, −1, −1)`. It aligns each MHR bone's rest direction to the avatar's, so that every avatar bone points where MHR's does. Second, it writes `Q_j = D'_parent⁻¹ · D'_j` for the 21 mapped non-root joints and the pelvis (design §5.3). The hands are left at rest. Third, it writes root translation, landmarks, and confidence with its method. The landmarks come from the estimator's own wrist and ankle keypoints, through the basis change only and never through the joint map, so the automated left/right check stays independent of the rotations. Rows graded `?` or C go to `<out>/draft/` with `review.status: "draft"`. Everything else is written as accepted, with `index.json`, into `--out`, or into `assets/pose-estimates/` with `--publish`. **Never copy MHR local rotations by bone name.** The avatar's rest orientations differ, and the result would look plausible but be wrong.
 
 ## 4. Review
 
-Open the site locally (`python -m http.server 8080`), go to an entry showing the photograph, and load `draft.json` with **Review a pose file**. It is labelled `LOCAL FILE · NOT REVIEWED`, which is expected. Compare it with the photograph and the overlay render from several camera presets, and tick each item honestly:
+Open the site locally (`python -m http.server 8080`), go to an entry showing the photograph, and load the converted file (`<out>/<imageId>.json`, or `<out>/draft/<imageId>.json`) with **Review a pose file**. It is labelled `LOCAL FILE · NOT REVIEWED`, which is expected. Compare it with the photograph and the overlay render from several camera presets, and tick each item honestly:
 
 | Check (`review.checks`) | Question |
 |---|---|
@@ -48,16 +54,11 @@ Open the site locally (`python -m http.server 8080`), go to an entry showing the
 | `handsFeet` | Are wrist and ankle orientations plausible? Fingers are not represented: the avatar has no finger bones. |
 | `truncation` | Is no estimated joint lying outside the crop or hidden by clothing without a note? |
 
-If any answer is "no" and cannot be fixed by re-prompting or re-cropping, **do not publish**. Write what you found in the image's research notes instead. Record uncertainty in `review.notes` ("sleeve hides the left elbow"). Set `confidence.overall` to reflect the review, not only the model score, and describe how in `confidence.method`. Then set `review.status: "accepted"`, `review.reviewer`, `review.date` (ISO `YYYY-MM-DD`), and optionally `review.overlaySha256`.
+If any answer is "no" and cannot be fixed by re-prompting or re-cropping, **do not publish**. Write what you found in the image's research notes instead. Record uncertainty in `review.notes` ("sleeve hides the left elbow"). The converter derives `confidence.overall` from the grade (A 0.9, B 0.7), not from a model score, and says so in `confidence.method`. Record the grade (A, B, C or `?`) and any note in the review table and re-run the converter. It sets `review.status` and `review.notes` from the table, and `review.reviewer` and `review.date` from `--reviewer` and `--date`.
 
 ## 5. Write and index the file
 
-```sh
-cp <workdir>/<imageId>/draft.json assets/pose-estimates/<imageId>.json
-sha256sum assets/pose-estimates/<imageId>.json
-```
-
-Add `{"imageId": "<imageId>", "file": "<imageId>.json", "sha256": "<hash>"}` to `assets/pose-estimates/index.json`. Check that `assets/pose-estimates/SAM-LICENSE.txt` is present. If this is the first published estimate, add the SAM 3D Body acknowledgement to the README and the site's sources section.
+Re-run step 3 with `--publish`. It writes `assets/pose-estimates/<imageId>.json` and rebuilds `assets/pose-estimates/index.json` from every pose file in that directory, hashing the exact bytes. Check that `assets/pose-estimates/SAM-LICENSE.txt` is present. If this is the first published estimate, add the SAM 3D Body acknowledgement to the README and the site's sources section.
 
 ## 6. Run the checks
 

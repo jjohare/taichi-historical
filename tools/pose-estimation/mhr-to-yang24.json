@@ -1,0 +1,30 @@
+{
+  "tag": "mhr-to-yang24@1",
+  "doc": "Avatar joint <- MHR joint. Rotations: D = G_posed * G_rest^-1 in MHR body axes, which are the avatar axes (+Y up, +Z forward, +X left), so C = I for rotations; camera-frame positions (pred_joint_coords, pred_keypoints_3d) use C = diag(1,-1,-1). 'align' names the bone [avatar child, MHR child] whose posed direction the avatar bone must match (shortest-arc rest alignment, MHR rest direction taken per identity as D^-1 times the posed bone); null means no alignment (leaves: feet, head). The pelvis has three child bones and is aligned as a frame (TRIAD): 'across' (right hip to left hip) exactly, then the spine bone. The avatar ankle takes l_subtalar, not l_foot: MHR's ankle hinge (l_talocrural) and subtalar joint are children of l_foot, so l_foot's own rotation omits plantar flexion and inversion, while l_subtalar's world rotation carries the whole foot (rigid to l_ball within 0.3 deg). c_spine0 sits at pelvis level and is folded into the pelvis (pelvis D = root D; spine1 absorbs c_spine0's motion). left_hand/right_hand have no reviewed MHR counterpart (fingers are below this rig's fidelity): unmapped, so they hold rest relative to the wrist (Q = identity, omitted from the file). The wrist bone is aimed with the middle-finger base as a proxy child. Every unmapped joint is a leaf, so the even-share chain rule of design 5.3 is never needed by this map.",
+  "joints": [
+    { "avatar": "pelvis", "mhr": "root", "align": ["spine1", "c_spine1"], "across": ["right_hip", "left_hip", "r_upleg", "l_upleg"] },
+    { "avatar": "left_hip", "mhr": "l_upleg", "align": ["left_knee", "l_lowleg"] },
+    { "avatar": "left_knee", "mhr": "l_lowleg", "align": ["left_ankle", "l_foot"] },
+    { "avatar": "left_ankle", "mhr": "l_subtalar", "align": ["left_foot", "l_ball"] },
+    { "avatar": "left_foot", "mhr": "l_ball", "align": null },
+    { "avatar": "right_hip", "mhr": "r_upleg", "align": ["right_knee", "r_lowleg"] },
+    { "avatar": "right_knee", "mhr": "r_lowleg", "align": ["right_ankle", "r_foot"] },
+    { "avatar": "right_ankle", "mhr": "r_subtalar", "align": ["right_foot", "r_ball"] },
+    { "avatar": "right_foot", "mhr": "r_ball", "align": null },
+    { "avatar": "spine1", "mhr": "c_spine1", "align": ["spine2", "c_spine2"] },
+    { "avatar": "spine2", "mhr": "c_spine2", "align": ["spine3", "c_spine3"] },
+    { "avatar": "spine3", "mhr": "c_spine3", "align": ["neck", "c_neck"] },
+    { "avatar": "left_collar", "mhr": "l_clavicle", "align": ["left_shoulder", "l_uparm"] },
+    { "avatar": "left_shoulder", "mhr": "l_uparm", "align": ["left_elbow", "l_lowarm"] },
+    { "avatar": "left_elbow", "mhr": "l_lowarm", "align": ["left_wrist", "l_wrist"] },
+    { "avatar": "left_wrist", "mhr": "l_wrist", "align": ["left_hand", "l_middle1"] },
+    { "avatar": "left_hand", "mhr": null, "align": null },
+    { "avatar": "neck", "mhr": "c_neck", "align": ["head", "c_head"] },
+    { "avatar": "head", "mhr": "c_head", "align": null },
+    { "avatar": "right_collar", "mhr": "r_clavicle", "align": ["right_shoulder", "r_uparm"] },
+    { "avatar": "right_shoulder", "mhr": "r_uparm", "align": ["right_elbow", "r_lowarm"] },
+    { "avatar": "right_elbow", "mhr": "r_lowarm", "align": ["right_wrist", "r_wrist"] },
+    { "avatar": "right_wrist", "mhr": "r_wrist", "align": ["right_hand", "r_middle1"] },
+    { "avatar": "right_hand", "mhr": null, "align": null }
+  ]
+}

@@ -59,7 +59,7 @@ const SCHEMA = {obj: {
     checkpoint: text('E_TYPE', 'estimator.checkpoint', {re: /^[A-Za-z0-9._-]+\/[A-Za-z0-9._-]+$/}), checkpointSha256: sha('estimator.checkpointSha256'),
     licence: text('E_TYPE', 'estimator.licence', {eq: 'SAM License'}), outputFrame: label('estimator.outputFrame')}},
   rig: {obj: {name: text('E_TYPE', 'rig.name', {eq: 'MHR'}), repository: repo('rig.repository'), revision: rev('rig.revision'), modelSha256: sha('rig.modelSha256')}},
-  converter: {obj: {path: text('E_TYPE', 'converter.path', {re: /^tools\/[\w./-]+\.py$/}), revision: rev('converter.revision')}},
+  converter: {obj: {path: text('E_TYPE', 'converter.path', {re: /^tools\/[\w./-]+\.(py|rs)$/}), revision: rev('converter.revision')}},
   jointConvention: text('E_CONVENTION', 'jointConvention', {eq: 'yang-form-24/rest-world-delta@1'}),
   jointMap: text('E_TYPE', 'jointMap', {re: /^[a-z0-9-]+@\d+$/}),
   frame: null, root: {obj: {translation: vec(3, 1), rotation: quat}}, joints: null,
