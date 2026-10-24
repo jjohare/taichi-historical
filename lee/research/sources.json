@@ -1,0 +1,176 @@
+{
+  "wy": {
+    "title": "West Yorkshire Tai Chi · main-form video index",
+    "author": "Mark and Kate Popplewell / West Yorkshire Tai Chi",
+    "url": "https://westyorkshiretaichi.weebly.com/videos.html",
+    "kind": "Later teaching",
+    "date": "Undated webpage; checked 24 October 2026",
+    "note": "41 lesson links cover movements 1–140. The last lesson combines gathering and finishing. Names and movement ranges are factual catalogue metadata. Videos remain with their publisher; their descriptions are not a frame-by-frame visual audit."
+  },
+  "angie": {
+    "title": "Angie Wood · 42-set course index",
+    "author": "Angie Wood",
+    "url": "https://taichiworkshops.co.uk/tai-chi-shop/",
+    "kind": "Later teaching",
+    "date": "Current course listings; checked 24 October 2026",
+    "note": "Names corroborate the sequence structure. Public summaries supply brief later teaching descriptions, not a transcription of Chee Soo’s book. Set 9 is spelt ‘Stalk’ on this site; the video index and Gibbon tradition use ‘Stork’. Sets 41 and 42 are separate listings, without an exact numbered boundary."
+  },
+  "gibbon": {
+    "title": "Howard Gibbon · The First Five Sets",
+    "author": "Howard Gibbon / East–West Publications",
+    "url": "https://taichionlinetraining.com/wp-content/uploads/Free-Tai-Chi-eBook-Download.pdf",
+    "local": "sources/gibbon-first-five-sets.pdf",
+    "kind": "Later photographic manual",
+    "date": "Edition undated; checked 24 October 2026",
+    "note": "37-page PDF. Opening photographs: printed/PDF pages 24, 26, 28, 30 and 32. Text faces them on the preceding page. Copyright notice on page 3 permits electronic distribution without alteration or sale and prohibits printing. The local copy is byte-for-byte unchanged. Photographs show Gibbon’s teaching material, not Chee Soo in the 1970s."
+  },
+  "book": {
+    "title": "Chee Soo · The Chinese Art of T’ai Chi Ch’uan",
+    "author": "Chee Soo; current publisher Seahorse Books",
+    "url": "https://www.seahorsebooks.co.uk/product/the-chinese-art-of-tai-chi-chuan-by-chee-soo/",
+    "kind": "Historical manual / publisher record",
+    "date": "1976; Aquarian Press 1984; Seahorse Books 2003",
+    "note": "Publisher describes photographs of all 140 movements and says its reprint retains the Aquarian edition’s text, photographs and pagination. ISBN 9780954524401. Full plates were not directly inspected in this research; no historical image-to-movement matches are asserted. Publisher pages were intermittently unavailable.",
+    "accessNote": "Direct fetch returned HTTP 503 on 24 October 2026; description read through the indexed publisher page."
+  },
+  "bibliography": {
+    "title": "Seahorse Books · Chee Soo bibliography and life story",
+    "author": "Seahorse Books",
+    "url": "https://seahorsebooks.co.uk/chee-soo-biography/",
+    "kind": "Publisher biography",
+    "date": "Undated webpage; checked 24 October 2026",
+    "note": "Lists 1976 Gordon and Cremonesi ISBN 0860330370, 1984 Aquarian Press ISBN 0850303877, and 2003 Seahorse ISBN 9780954524401. Publisher testimony about early lineage is not independent corroboration. The pictured archer-like pose is explicitly captioned as the Tai Chi dance.",
+    "accessNote": "Direct fetch returned HTTP 503 on 24 October 2026; bibliography read through the indexed page.",
+    "archiveUrl": "https://web.archive.org/web/20260105142505/https://www.seahorsebooks.co.uk/chee-soo-biography/"
+  },
+  "interview": {
+    "title": "Chee Soo interviewed by John R. Jones, April 1992",
+    "author": "Chee Soo / John R. Jones; edited by Taoist Arts Organisation",
+    "url": "https://www.taoistarts.org/wp-content/uploads/2012/08/interview_with_chee_soo.pdf",
+    "kind": "First-person historical testimony",
+    "date": "Interview April 1992; edited reprint © TAO 2005",
+    "note": "Page 2 states 140 movements and distinguishes the main form from Flying Hands. The lineage story is Chee Soo’s testimony, not independently verified ancestry. This edited reprint includes medical claims; those are not adopted by this archive.",
+    "accessNote": "The search reader supplied the two-page PDF text, but a direct fetch returned HTTP 404 on 24 October 2026."
+  },
+  "swanson": {
+    "title": "Tony Swanson on Lee-style taijiquan",
+    "author": "Tony Swanson interviewed by FFAEMC",
+    "url": "https://www.ffaemc.fr/yimag/tony-swanson-presente-le-taichi-chuan-style-li/",
+    "kind": "Later teacher interview",
+    "date": "2022 webpage",
+    "note": "Describes 42 sequences / 140 movements, with the first 15 sequences / 50 movements as the short portion. Discusses bodily coordination and the compact floor area. The French account is a later school’s explanation.",
+    "accessNote": "Article text was available in the search index; direct access redirected to the federation homepage on 24 October 2026."
+  },
+  "pearson": {
+    "title": "Carl Pearson · Questions about Lee history",
+    "author": "Carl Pearson",
+    "url": "https://carlpearson.org/faqs/",
+    "kind": "Practitioner historical commentary",
+    "date": "Undated webpage; checked 24 October 2026",
+    "note": "Discusses the lack of corroborating documentation for Chan Lee and the uncertainties of origin stories. This is a practitioner’s assessment; it neither proves nor disproves a proposed genealogy."
+  },
+  "archive-variant": {
+    "title": "Archived Taoist Arts Organisation · The Form",
+    "author": "Taoist Arts Organisation; mirror of telecentres.com material",
+    "url": "https://community.fortunecity.ws/westwood/carving/737/business/tao/taichi.htm",
+    "kind": "Conflicting archived count",
+    "date": "Original publication date unverified",
+    "note": "This page gives 142 movements / 41 sequences, unlike Chee Soo’s edited interview and later 140 / 42 descriptions. The count is recorded as unresolved, not silently normalised or used to renumber this catalogue."
+  },
+  "lute": {
+    "title": "Keith Ewers · Play the Lute",
+    "author": "Keith Ewers / LFIAA",
+    "url": "https://lfiaa.wordpress.com/2020/08/13/lfiaa-li-style-lishi-taijiquans-play-the-lute-posture/",
+    "kind": "Later teaching / explicit variant",
+    "date": "13 August 2020",
+    "note": "Contrasts palm orientations and arm levels between versions, and names martial force relationships. Links to the author’s illustrated page; no image reuse licence identified."
+  },
+  "weaving": {
+    "title": "Keith Ewers · Fair Lady Weaves the Shuttle",
+    "author": "Keith Ewers / LFIAA",
+    "url": "https://lfiaa.wordpress.com/2015/09/21/lfiaa-li-style-taijiquan-form-3rd-posture/",
+    "kind": "Later teaching",
+    "date": "21 September 2015",
+    "note": "Describes the third named passage through weight transfer and reversing arm circles."
+  },
+  "waist": {
+    "title": "Keith Ewers · Turning the waist and hips",
+    "author": "Keith Ewers / LFIAA",
+    "url": "https://lfiaa.wordpress.com/2019/11/24/lfiaa-li-style-lishi-taijiquan-square-yard-form-the-turning-of-the-waist-hip-methods-zhuan-yao-kua-fa/",
+    "kind": "Later teaching",
+    "date": "24 November 2019",
+    "note": "Uses Repulse the Monkey and Crane as examples of his waist/hip distinction. Read as his teaching account, not a prescription for forced spinal rotation."
+  },
+  "bump": {
+    "title": "Keith Ewers · The Bumping Method",
+    "author": "Keith Ewers / LFIAA",
+    "url": "https://lfiaa.wordpress.com/2018/07/14/lfiaa-lishi-taijiquan-the-bumping-method-kao-fa/",
+    "kind": "Later application interpretation",
+    "date": "14 July 2018",
+    "note": "Discusses an application within Crane and includes a later photograph of Ewers. Not evidence that every school teaches the same application."
+  },
+  "tiger": {
+    "title": "Keith Ewers · Drive Tiger Away to the Mountain",
+    "author": "Keith Ewers / LFIAA",
+    "url": "https://lfiaa.wordpress.com/2017/12/20/lfiaa-li-lee-style-taijiquan-drive-tiger-away-to-the-mountain-posture-po-hu-dui-shan-shi-eight-energies/",
+    "kind": "Later application interpretation",
+    "date": "20 December 2017",
+    "note": "Gives an advance, retreat and return interpretation and a partner application. A later school’s interpretation rather than a historical plate caption."
+  },
+  "bird": {
+    "title": "Keith Ewers · Grasp the Bird’s Tail",
+    "author": "Keith Ewers / LFIAA",
+    "url": "https://lfiaa.wordpress.com/2015/10/17/lfiaa-li-style-taijiquan-grasp-the-birds-tail-posture/",
+    "kind": "Later teaching",
+    "date": "17 October 2015",
+    "note": "Describes withdrawing to Cat stance and stepping right. The shared name does not establish identity with Yang Grasp Sparrow’s Tail."
+  },
+  "pluck": {
+    "title": "Keith Ewers · The Plucking Method",
+    "author": "Keith Ewers / LFIAA",
+    "url": "https://lfiaa.wordpress.com/2018/07/19/lfiaa-lishi-taijiquan-the-plucking-method-cai-fa/",
+    "kind": "Later application interpretation",
+    "date": "19 July 2018",
+    "note": "Names Single Whip and Grasp the Bird’s Tail as examples; also acknowledges differing finger arrangements between his current method and his recollection of earlier teaching."
+  },
+  "brush": {
+    "title": "Keith Ewers · Brush Knee and Side Step",
+    "author": "Keith Ewers / LFIAA",
+    "url": "https://lfiaa.wordpress.com/2019/09/11/lfiaa-li-style-lishi-tai-chi-square-yard-form-the-brush-knee-side-step-posture-both-hands-move-at-the-same-time/",
+    "kind": "Later teaching",
+    "date": "11 September 2019",
+    "note": "Stresses simultaneous hand movement and waist-led sweeps; explicitly disputes other versions."
+  },
+  "stork": {
+    "title": "Keith Ewers · The Stork Is Aroused",
+    "author": "Keith Ewers / LFIAA",
+    "url": "https://lfiaa.wordpress.com/2020/01/19/lfiaa-li-style-square-yard-tai-chi-the-eight-energies-of-the-stork-is-aroused-posture-guan-xin-dong-shi/",
+    "kind": "Later teaching and application interpretation",
+    "date": "19 January 2020",
+    "note": "Describes four phases and their force relationships. A useful later account rather than proof of the historical book’s exact execution."
+  },
+  "double": {
+    "title": "Keith Ewers · Double Whip variants",
+    "author": "Keith Ewers / LFIAA",
+    "url": "https://lfiaa.wordpress.com/2015/07/15/lishi-tai-chi-double-whip-posture/",
+    "kind": "Later recollection / explicit variant",
+    "date": "15 July 2015",
+    "note": "Recollects differences between earlier and later teaching, particularly upright versus downward-facing palms. The proposed chronology remains attributed testimony."
+  },
+  "double-practice": {
+    "title": "Keith Ewers · Double Whip practice",
+    "author": "Keith Ewers / LFIAA",
+    "url": "https://lfiaa.wordpress.com/2020/05/08/lfiaa-li-style-lishi-taiji-qigong-the-double-whip-posture-shuang-bian-shi/",
+    "kind": "Later teaching",
+    "date": "8 May 2020",
+    "note": "Discusses force relationships and different ways of practising the passage separately. Those exercises are not substituted for the main form here."
+  },
+  "cyclone": {
+    "title": "Keith Ewers · Edge of the Cyclone",
+    "author": "Keith Ewers / LFIAA",
+    "url": "https://lfiaa.wordpress.com/2020/09/16/lfiaa-li-style-lishi-taiji-qigong-edge-of-the-cyclone-posture-developing-a-quality-of-movement-to-improve-health-wellbeing/",
+    "kind": "Later teaching",
+    "date": "16 September 2020",
+    "note": "Focuses on connected circular movement; does not supply a numbered reconstruction of the historical form."
+  }
+}
