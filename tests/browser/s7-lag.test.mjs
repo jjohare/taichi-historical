@@ -90,6 +90,7 @@ browserTest('PE-65 an adjacent Next moves the pieces: lag active from the first 
     await page.quiet(1000);
     assert.equal(await page.evaluate('__explorer.state.renderCount'), settledCount, 'renderCount is fixed for 1 s after the window ends');
     assert.equal((await lagWrites(page)).length, writes.length, 'no piece is written after the window ends');
+    for (const n of NODES) assert.equal(writes.findLast(w => w.node === n)?.moved, false, `${n} was last written at its rest rotation (PE-59 extension)`);
     assert.ok(endIndex >= settledAt - 1);
   }));
 

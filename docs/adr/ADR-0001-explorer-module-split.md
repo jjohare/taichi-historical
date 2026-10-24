@@ -25,6 +25,6 @@ The site is static GitHub Pages, and it has a binding rule against a frontend bu
 
 *Amended by ADR-0007, 24 October 2026:* the PE-28 budget is now 56 KiB (57,344 B), not 48 KiB.
 
-*Amended by ADR-0008, 24 October 2026:* the PE-28 budget is now 60 KiB (61,440 B), and `lag.js` joins the pure modules.
+*Amended by ADR-0008, 24 October 2026:* the PE-28 budget is now 64 KiB (65,536 B; first 60 KiB, raised the same day once slice S3 landed), and `lag.js` joins the pure modules.
 
 *Amended by ADR-0008 (second amendment), 24 October 2026:* the PE-28 budget is now 64 KiB (65,536 B). Slice S3 (WebGL restore, the 5 s failure path and the no-WebGL still image, with their verbatim user-facing texts) was built after ADR-0008's forecast and took the modules to 59,312 B, leaving no room for `lag.js`. Comment density is low (66 comment lines across ten files), so the extra headroom is for behaviour, not prose.

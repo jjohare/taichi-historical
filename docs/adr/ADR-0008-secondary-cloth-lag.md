@@ -24,7 +24,7 @@ The budget is already tight. `wc -c assets/explorer/*.js` totals **56,060 B** ag
 - **Discovery from the GLB, not a sidecar file.** GLTFLoader strips `:` from object names, so lag nodes are found by the glTF name it keeps in `userData.name`. Their parameters come from `extras`. `build-report.json` mirrors the same values for a node check, and the page never fetches it (PE-60, PE-71). An avatar with no valid lag node turns S7 off silently (PE-61).
 - **Cloth is not pose.** Lag angles never enter a pose, a file, the retarget, the URL, storage or the hook's actions. Bones are never touched by `lag.js` (PE-69).
 - **Sliders stay lag-free.** They are diagnostics. A joint reading must not depend on the slider's history, lag on input would need a frame loop on every drag, and PE-51 already keeps sliders and transitions apart.
-- **Budget raised to 60 KiB (61,440 B).** `lag.js` gets ≤ 2,560 B, and the wiring in `main.js`, `rig.js` and `transition.js` gets ≤ 1,280 B (PE-71).
+- **Budget raised to 64 KiB (65,536 B).** First set at 60 KiB; raised the same day once slice S3 landed. `lag.js` gets ≤ 2,560 B (PE-71); the separate wiring sub-budget was withdrawn, the total governs.
 
 ## Consequences
 

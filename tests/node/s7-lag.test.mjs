@@ -275,3 +275,70 @@ test('PE-62 a lag node is written as restLocal · hinge about X, never as a repl
   const want = new Quaternion(...report[1].restLocal).multiply(new Quaternion(...aboutX(theta)));
   assert.ok(Math.abs(new Quaternion(...last.q).dot(want)) > 1 - 1e-9);
 });
+
+// ------------------------------------------------------------------------------------------------ PE-53 (amended) / PE-65: the driver's settle window on a fake clock
+const T = () => import('../../assets/explorer/transition.js');
+const bare = () => ({joints: {}, root: {translation: [0, 0, 0], rotation: IDENT}});
+/** A driver on a fake clock. Frames fire every 16 ms of fake time; `log` records order: frame requests and callbacks. */
+async function fakeDriver({onSettle, settleCapMs}) {
+  const {createDriver, routeTiming} = await T();
+  let time = 0, queue = [], handle = 0;
+  const log = [];
+  const driver = createDriver({
+    requestFrame: cb => { queue.push({id: ++handle, cb}); log.push({e: 'request', t: time}); return handle; },
+    cancelFrame: id => { queue = queue.filter(q => q.id !== id); },
+    now: () => time,
+    onFrame: () => log.push({e: 'frame', t: time}),
+    onArrive: () => log.push({e: 'arrive', t: time}),
+    onSettled: () => log.push({e: 'settled', t: time}),
+    ...(onSettle ? {onSettle: dt => { log.push({e: 'settle', t: time, dt}); return onSettle(dt); }} : {}),
+    settleCapMs,
+  });
+  const run = ms => { for (let end = time + ms; time < end;) { time += 16; const due = queue; queue = []; for (const q of due) q.cb(); } };
+  driver.start([bare(), bare()]);
+  return {driver, log, run, total: routeTiming(1).total, pending: () => queue.length};
+}
+const at = (log, e) => log.filter(x => x.e === e);
+
+test('PE-53 with no onSettle the driver requests no frame after onArrive', async () => {
+  const d = await fakeDriver({});
+  d.run(d.total + 3000);
+  assert.equal(at(d.log, 'arrive').length, 1);
+  const arriveAt = d.log.findIndex(x => x.e === 'arrive');
+  assert.equal(d.log.slice(arriveAt).filter(x => x.e === 'request').length, 0);
+  assert.equal(d.pending(), 0);
+});
+
+test('PE-53 an onSettle that returns false at once ends the window with one onSettled and no frame request', async () => {
+  const {SETTLE_CAP_MS} = await L();
+  const d = await fakeDriver({onSettle: () => false, settleCapMs: SETTLE_CAP_MS});
+  d.run(d.total + 3000);
+  const arriveAt = d.log.findIndex(x => x.e === 'arrive');
+  assert.equal(d.log.slice(arriveAt).filter(x => x.e === 'request').length, 0);
+  assert.equal(at(d.log, 'settled').length, 1);
+  assert.equal(d.pending(), 0);
+});
+
+test('PE-53/65 an onSettle that always returns true runs until settleCapMs on the driver clock, then onSettled fires once and nothing more is requested', async () => {
+  const {SETTLE_CAP_MS} = await L();
+  const d = await fakeDriver({onSettle: () => true, settleCapMs: SETTLE_CAP_MS});
+  d.run(d.total + SETTLE_CAP_MS + 3000);
+  const arrive = at(d.log, 'arrive')[0], settled = at(d.log, 'settled');
+  assert.equal(at(d.log, 'arrive').length, 1);
+  assert.equal(settled.length, 1, 'onSettled fires exactly once');
+  assert.ok(at(d.log, 'settle').length >= 5, 'the window ran for several ticks');
+  const requestsAfterArrival = d.log.slice(d.log.indexOf(arrive)).filter(x => x.e === 'request');
+  assert.ok(requestsAfterArrival.every(r => r.t < arrive.t + SETTLE_CAP_MS), 'the last requestFrame is before arrival + cap');
+  assert.ok(settled[0].t >= arrive.t + SETTLE_CAP_MS && settled[0].t < arrive.t + SETTLE_CAP_MS + 32, `ended at +${settled[0].t - arrive.t} ms`);
+  assert.equal(d.log.slice(d.log.indexOf(settled[0]) + 1).filter(x => x.e === 'request').length, 0, 'no requestFrame after onSettled');
+  assert.equal(d.pending(), 0);
+});
+
+test('PE-65 the first onSettle after arrival gets dt = 0 and later ones get the real frame time', async () => {
+  const {SETTLE_CAP_MS} = await L();
+  const d = await fakeDriver({onSettle: () => true, settleCapMs: SETTLE_CAP_MS});
+  d.run(d.total + SETTLE_CAP_MS + 100);
+  const settles = at(d.log, 'settle');
+  assert.equal(settles[0].dt, 0);
+  assert.ok(settles.slice(1).every(s => s.dt > 0 && s.dt <= 0.05));
+});
