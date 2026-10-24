@@ -19,6 +19,8 @@ The site is static GitHub Pages, and it has a binding rule against a frontend bu
 ## Consequences
 
 - Each module is small and has one job. Pure modules get fast `node:test` coverage with no browser.
-- Seven or eight extra HTTP requests on first load, served same-origin and cached. They are acceptable within the 48 KiB budget (PE-28); HTTP/2 on Pages multiplexes them.
+- Seven or eight extra HTTP requests on first load, served same-origin and cached. They are acceptable within the 56 KiB budget (PE-28); HTTP/2 on Pages multiplexes them.
 - Adding a module means adding an `import` line and nothing else. There is no bundler config to drift.
 - Contributors must keep pure modules free of `three` bare imports. A node static check enforces this.
+
+*Amended by ADR-0007, 24 October 2026:* the PE-28 budget is now 56 KiB (57,344 B), not 48 KiB.
