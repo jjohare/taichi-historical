@@ -1,17 +1,12 @@
 // Binds the page's buttons, selects and sliders to actions, and reflects state back into the DOM.
 // Receives an actions object rather than importing the scene or rig, so it can run against a stub.
 import {provenanceFor} from './provenance.js';
-import {JOINT_GROUPS, readoutText} from './joints.js';
 
 export function bindControls(doc, actions, getState) {
   const $ = id => doc.getElementById(id);
   const presets = [...doc.querySelectorAll('[data-preset]')], select = $('joint-select');
   for (const button of presets) button.onclick = () => actions.setPreset(button.dataset.preset);
-  for (const [group, joints] of JOINT_GROUPS) {
-    const optgroup = doc.createElement('optgroup'); optgroup.label = group;
-    for (const [name, label] of joints) { const option = doc.createElement('option'); option.value = name; option.textContent = label; optgroup.append(option); }
-    select.append(optgroup);
-  }
+  const label = name => select.querySelector(`option[value="${name}"]`)?.textContent;
   select.onchange = () => actions.selectJoint(select.value || null);
   $('orbit-left').onclick = () => actions.orbit(-Math.PI / 8);
   $('orbit-right').onclick = () => actions.orbit(Math.PI / 8);
@@ -24,8 +19,9 @@ export function bindControls(doc, actions, getState) {
   $('show-neutral').onchange = e => actions.setShowNeutral(e.target.checked);
   $('pose-file').onchange = e => { const file = e.target.files[0]; if (file) actions.openPoseFile(file); };
   return {
+    label,
     sync() {
-      const state = getState(), {checks, rig, pose, camera, selectedJoint} = state, {tag, text, detail} = provenanceFor(pose, {rig, imageLabel: pose.imageLabel});
+      const state = getState(), {checks, rig, pose, camera, selectedJoint} = state, {tag, text, detail} = provenanceFor(pose, {rig, imageLabel: pose.imageLabel, transition: state.transition});
       for (const button of presets) button.setAttribute('aria-pressed', String(button.dataset.preset === camera.preset));
       $('elbow-angle').value = checks.elbow; $('joint-value').textContent = `${checks.elbow}°`;
       $('stance-angle').value = checks.crouch; $('stance-value').textContent = `${checks.crouch}°`;
@@ -41,7 +37,7 @@ export function bindControls(doc, actions, getState) {
       // Only bones the current rig has can be inspected (the fallback rig names its joints differently).
       for (const option of select.options) option.disabled = option.value !== '' && !actions.hasJoint(option.value);
       const degrees = selectedJoint ? actions.jointAngle(selectedJoint) : null;
-      const readout = degrees === null ? '' : readoutText(selectedJoint, degrees);
+      const readout = degrees === null ? '' : `${label(selectedJoint)}: ${Math.round(degrees)}° from rest`;
       if ($('joint-readout').textContent !== readout) $('joint-readout').textContent = readout; // unchanged text must not re-announce
     },
   };

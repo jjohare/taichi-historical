@@ -5,18 +5,19 @@ import {createFallbackRig, loadAvatar} from './rig.js';
 import {bindControls} from './controls.js';
 import {bendQuaternion, jointAngleDegrees} from './retarget.js';
 import {presetPosition, detectPreset} from './presets.js';
-import {JOINT_LABELS} from './joints.js';
 import {TEXT} from './provenance.js';
 import {loadIndex, fetchEstimate, readLocalFile, validatePose} from './poses.js';
 import {applyPose, checkLeftRight} from './retarget.js';
+import {HOP_MS, CAP_MS, MAX_KEYFRAMES, keyframeSequence, sequenceIndexOf, planRoute, createDriver} from './transition.js';
 
 const host = document.getElementById('model-view'), status = document.getElementById('model-status');
 const css = getComputedStyle(document.documentElement), colour = name => css.getPropertyValue(name).trim();
 
+const idle = () => ({active: false, from: null, to: null, progress: 0, hopsTotal: 0, hopIndex: 0, skipped: 0, hopMs: HOP_MS, capMs: CAP_MS, maxKeyframes: MAX_KEYFRAMES});
 const state = {
   renderer: 'pending', rig: 'pending', camera: {preset: 'three-quarter'},
   checks: {elbow: 0, crouch: 0, skeleton: false}, selectedJoint: null,
-  displayedImage: null, availableEstimate: null, showNeutral: false, indexed: false, pose: {kind: 'neutral'}, poseError: null, renderCount: 0,
+  displayedImage: null, availableEstimate: null, showNeutral: false, indexed: false, pose: {kind: 'neutral'}, transition: idle(), poseError: null, renderCount: 0,
 };
 
 const view = createScene({
@@ -24,7 +25,7 @@ const view = createScene({
   onRender: () => { state.renderCount++; },
   onContextChange: kind => {
     if (kind !== 'lost') return;
-    state.renderer = 'lost'; status.hidden = false; status.textContent = TEXT.lost;
+    state.renderer = 'lost'; status.hidden = false; status.textContent = TEXT.lost; driver.finish(); // PE-56: complete to the target, no frames
   },
 });
 const {requestRender} = view;
@@ -45,6 +46,7 @@ let seq = 0;
 const $ = id => document.getElementById(id);
 const settle = () => { requestRender(); ui.sync(); };
 const toNeutral = () => {
+  endMotion();
   if (rig.kind === 'avatar') { rig.resetToRest(); state.checks.elbow = 0; state.checks.crouch = 0; }
   state.pose = {kind: 'neutral'};
 };
@@ -52,27 +54,82 @@ const reject = errors => {
   state.poseError = TEXT.rejected(errors[0].message); console.warn(state.poseError); settle();
   return {ok: false, errors};
 };
+const drive = file => { const {locals, rootTranslation} = applyPose(rig.rest, file); for (const [name, q] of locals) rig.setLocal(name, q); rig.setRootTranslation(rootTranslation); };
 function show(pose) {
-  const {locals, rootTranslation} = applyPose(rig.rest, pose.file);
-  rig.resetToRest(); for (const [name, q] of locals) rig.setLocal(name, q); rig.setRootTranslation(rootTranslation);
+  endMotion(); rig.resetToRest(); drive(pose.file);
   Object.assign(state.checks, {elbow: 0, crouch: 0}); state.pose = pose; state.poseError = null; settle();
+}
+// The S6 driver owns the only frame loop. `route` = {start, startId, from, fromMove, at, end} while a transition is pending or running.
+let route = null, estimates = null;
+const endMotion = () => { driver.cancel(); route = null; state.transition = idle(); };
+const driver = createDriver({
+  requestFrame: requestAnimationFrame.bind(window), cancelFrame: cancelAnimationFrame.bind(window), now: () => performance.now(),
+  onFrame: ({pose, hopIndex}, progress) => { drive(pose); Object.assign(state.transition, {progress, hopIndex}); requestRender(); }, // no ui.sync: aria-live stays quiet (PE-51)
+  onArrive: () => show(route.end),
+});
+async function estimate(id) {
+  if (!fetched.has(id)) fetched.set(id, fetchEstimate(undefined, estimates.get(id)));
+  const result = await fetched.get(id), errors = !result.ok ? result.errors : checkLeftRight(rig.rest, result.pose).errors;
+  if (errors.length) fetched.delete(id);
+  return {file: result.pose, errors};
 }
 // PE-19: a pose never outlives its image. The stale pose is dropped in the same task; the new one follows once its file is checked.
 async function refreshEstimate() {
   const ticket = ++seq, image = state.displayedImage;
   if (state.pose.kind !== 'neutral' && (state.showNeutral || state.pose.origin === 'local' || state.pose.imageId !== image?.imageId)) { toNeutral(); settle(); }
-  const {entries} = await indexPromise, entry = entries?.get(image?.imageId);
+  const {entries} = await indexPromise, entry = entries?.get(image?.imageId); estimates = entries;
   if (!state.indexed && entries?.size) { state.indexed = true; ui.sync(); }
   if (ticket !== seq) return;
   state.availableEstimate = entry ? image.imageId : null;
   if (!entry || state.showNeutral || rig.kind !== 'avatar') { if (state.pose.kind !== 'neutral') toNeutral(); return settle(); }
   if (state.pose.kind === 'estimate') return settle();
-  if (!fetched.has(image.imageId)) fetched.set(image.imageId, fetchEstimate(undefined, entry));
-  const result = await fetched.get(image.imageId);
+  const {file, errors} = await estimate(image.imageId);
   if (ticket !== seq) return;
-  const bad = !result.ok ? result.errors : checkLeftRight(rig.rest, result.pose).errors;
-  if (bad.length) { fetched.delete(image.imageId); return reject(bad); }
-  show({kind: 'estimate', origin: 'published', imageId: image.imageId, imageLabel: image.label, file: result.pose});
+  if (errors.length) return reject(errors);
+  show({kind: 'estimate', origin: 'published', imageId: image.imageId, imageLabel: image.label, file});
+}
+// A user navigation between two reviewed estimates (PE-45): fetch the route, then drive it. Anything else snaps through refreshEstimate.
+const catalogue = {};
+async function navigate(prev) {
+  const image = state.displayedImage, from = state.pose, live = driver.current();
+  if (state.showNeutral || rig.kind !== 'avatar' || !estimates?.has(image.imageId)
+    || !(from.kind === 'interpolated' || from.kind === 'estimate' && from.origin === 'published')) return refreshEstimate();
+  const ticket = ++seq, reduce = matchMedia('(prefers-reduced-motion: reduce)').matches; // reduced motion: same fetch and labels, but a snap (PE-49)
+  let r = route ?? {start: from.file, startId: from.imageId, fromMove: prev.moveId};
+  if (live) { // PE-52: carry on from the frame on screen, through the end of the current hop that lies nearer the new target
+    const cur = catalogue.sequence, h = live.hopIndex, a = h ? r.at[h - 1] : r.from, b = r.at[h], t = sequenceIndexOf(cur, image.moveId);
+    const e = Math.abs(t - b) <= Math.abs(t - a) ? b : a, d = Math.sign(t - e) || Math.sign(e - (e === b ? a : b));
+    r = {start: live.pose, from: e - d};
+  }
+  route = r; driver.cancel();
+  state.pose = {kind: 'interpolated', fromImageId: r.startId, toImageId: image.imageId};
+  state.transition = {...idle(), active: true, from: r.startId ?? state.transition.from, to: image.imageId};
+  ui.sync();
+  if (!reduce && catalogue.source !== image.source) {
+    try { catalogue.sequence = keyframeSequence(await (catalogue.data ??= fetch(new URL('../catalogue.json', import.meta.url)).then(x => x.json())), image.source); catalogue.source = image.source; }
+    catch (error) { console.warn(`Route unavailable: ${error.message}`); catalogue.source = null; }
+    if (ticket !== seq) return;
+    if (catalogue.source !== image.source) return refreshEstimate();
+  }
+  const sequence = catalogue.sequence, to = reduce ? 0 : sequenceIndexOf(sequence, image.moveId), at = r.from ?? (reduce ? 0 : sequenceIndexOf(sequence, r.fromMove));
+  const plan = reduce ? {keyframes: [image.imageId], skipped: 0} : planRoute(sequence, at, to, estimates, {startImageId: r.startId}), ids = plan.keyframes;
+  if (!ids.length) return refreshEstimate();
+  ids[ids.length - 1] = image.imageId; // arrival always uses the displayed image, whatever the keyframe rule says
+  const step = Math.sign(to - at); let i = at;
+  Object.assign(state.transition, {hopsTotal: ids.length, skipped: plan.skipped}); ui.sync();
+  const loaded = await Promise.all(ids.map(estimate));
+  if (ticket !== seq) return;
+  const last = loaded.length - 1, files = [];
+  r.at = []; r.from = at;
+  loaded.forEach(({file, errors}, k) => {
+    if (!reduce) do i += step; while (sequence[i].imageId !== ids[k] && i !== to);
+    if (!errors.length) { files.push(file); r.at.push(i); } else if (k < last) console.warn(`${ids[k]}: ${errors[0].message}`);
+  });
+  if (loaded[last].errors.length) { toNeutral(); return reject(loaded[last].errors); }
+  r.end = {kind: 'estimate', origin: 'published', imageId: image.imageId, imageLabel: image.label, file: files[files.length - 1]};
+  state.transition.hopsTotal = files.length; ui.sync();
+  driver.start([r.start, ...files]);
+  if (reduce || state.renderer !== 'webgl') driver.finish(); // context lost while loading: land on the target without frames
 }
 function loadResult(result, origin, imageLabel) {
   if (rig.kind !== 'avatar') return reject([{code: 'E_RIG', path: '', message: 'The avatar is not loaded.'}]);
@@ -85,13 +142,13 @@ function loadResult(result, origin, imageLabel) {
 }
 const onImage = detail => {
   if (!detail?.imageId) return;
-  const changed = state.displayedImage?.imageId !== detail.imageId;
-  state.displayedImage = {imageId: detail.imageId, label: detail.label, moveId: detail.moveId, ordinal: detail.ordinal};
-  if (changed) { state.poseError = null; refreshEstimate(); }
+  const prev = state.displayedImage, changed = prev?.imageId !== detail.imageId;
+  state.displayedImage = {imageId: detail.imageId, label: detail.label, moveId: detail.moveId, ordinal: detail.ordinal, source: detail.source};
+  if (changed) { state.poseError = null; if (prev && prev.moveId !== detail.moveId) navigate(prev); else refreshEstimate(); }
 };
 // site.js selects its first image before this module runs, so the first event is missed: read the DOM, then listen.
 document.addEventListener('yang:image-shown', event => onImage(event.detail));
-{ const d = $('pose-image').dataset; onImage(d.imageId && {imageId: d.imageId, label: d.label, moveId: Number(d.moveId), ordinal: Number(d.ordinal)}); }
+{ const d = $('pose-image').dataset; onImage(d.imageId && {imageId: d.imageId, label: d.label, moveId: Number(d.moveId), ordinal: Number(d.ordinal), source: d.source}); }
 
 const bendBoth = (names, degrees) => { for (const name of names) { const q = bendQuaternion(rig.rest, name, degrees); if (q) rig.setLocal(name, q); } };
 const actions = {
@@ -103,7 +160,7 @@ const actions = {
   zoom(factor) { view.zoom(factor); settlePreset(); },
   // Unknown names are ignored. A bone the current rig lacks stays selected, so the choice survives the avatar loading.
   selectJoint(name) {
-    if (name !== null && !Object.hasOwn(JOINT_LABELS, name)) return;
+    if (name !== null && !ui.label(name)) return;
     state.selectedJoint = name; rig.setMarker(name); requestRender(); ui.sync();
   },
   hasJoint: name => rig.rest.has(name),
