@@ -37,7 +37,8 @@ browserTest('PE-04 crouch slider at 30: hips −30, knees +60, ankles −30, pel
       same(snap[`${side}_ankle`].q, toArray(expectedBend(rest, `${side}_ankle`, -30)), `${side}_ankle`);
     }
     // Spec: pelvis local y = rest y − 0.8·(1 − cos 30°). Rest comes from the load-time snapshot, not a literal; the rig sits under an unrotated root, so the world drop equals the local drop.
-    const restLocalY = await page.evaluate("__explorer.rig.rest.get('pelvis').position[1]");
+    const restLocalY = rest.get('pelvis').position.y;   // from the GLB, independent of the page
+    assert.ok(Math.abs((await page.evaluate("__explorer.rig.rest.get('pelvis').position[1]")) - restLocalY) < 1e-6, 'the page captured the GLB rest position');
     assert.ok(Math.abs(restLocalY - 0.94) < 1e-4, `pelvis rest local y ${restLocalY}`);
     const drop = 0.8 * (1 - Math.cos(30 * Math.PI / 180));
     assert.ok(Math.abs(snap.pelvis.p[1] - (before.pelvis.p[1] - drop)) < 1e-4, `pelvis y ${snap.pelvis.p[1]} vs ${before.pelvis.p[1]} − ${drop}`);

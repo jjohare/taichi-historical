@@ -1,4 +1,4 @@
-// Minimal Chrome DevTools Protocol driver for the browsercontainer sidecar (Node 22 global WebSocket, no dependencies).
+// Minimal Chrome DevTools Protocol driver for a remote browser sidecar (Node 22 global WebSocket, no dependencies).
 // Env: CDP_HOST (default localhost), CDP_PORT (9223), SITE_URL (default http://localhost:8790/).
 // Internal hostnames stay out of the repository: set them in the environment, e.g.
 //   CDP_HOST=browsercontainer SITE_URL=http://agentbox:8790/ npm run test:browser
@@ -148,11 +148,13 @@ let hookMissing = null;
  * Open the site with `?explorer-test=1` and wait for the rig to settle. Memoises "hook absent" so a suite whose
  * implementation has not landed fails in seconds, once, rather than waiting per test.
  */
-export async function openExplorer({query = '?explorer-test=1', hash = '', block, timeout = 12000} = {}) {
+export async function openExplorer({query = '?explorer-test=1', hash = '', block, timeout = 12000, base = SITE_URL, init} = {}) {
   if (hookMissing) throw new Error(hookMissing);
   const page = await openPage({block});
   try {
-    await page.navigate(`${SITE_URL}${query}${hash}`);
+    // `init` is a script run before any page script (to observe events that fire during start-up); `base` serves a different site root.
+    if (init) await page.send('Page.addScriptToEvaluateOnNewDocument', {source: init});
+    await page.navigate(`${base}${query}${hash}`);
     if (!(await page.evaluate("!!document.getElementById('model-label')"))) {
       throw new Error(`the site at ${SITE_URL} did not load (no #model-label); is the static server running?`);
     }

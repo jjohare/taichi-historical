@@ -45,7 +45,7 @@ browserTest('PE-26/PE-29/PE-28 scripted S1 session: zero console errors, same-or
     const allowed = [
       /^(?:index\.html)?$/, /^favicon\.ico$/, /^assets\/(?:site\.css|site\.js|viewer\.js|catalogue\.json)$/,
       /^assets\/explorer\/[\w-]+\.js$/, /^assets\/vendor\/(?:three\.module|three\.core|OrbitControls|GLTFLoader|BufferGeometryUtils|SkeletonUtils)\.js$/,
-      /^assets\/vendor\/noto-serif-sc-subset\.ttf$/, /^assets\/model\/archive-avatar\.glb$/,
+      /^assets\/vendor\/noto-serif-sc-subset\.ttf$/, /^assets\/model\/archive-avatar\.glb$/, /^assets\/pose-estimates\/index\.json$/,
       /^extracted\/historical\/(?:yang|chen)-\d{3}\.png$/, /^poses\/[\w-]+\/montage-\d{3}\.png$/,
     ];
     const unexpected = paths.filter(p => !allowed.some(re => re.test(p)));
