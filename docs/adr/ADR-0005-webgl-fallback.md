@@ -1,6 +1,6 @@
 # ADR-0005: WebGL failure and fallback policy
 
-Status: proposed · 24 October 2026 · Spec: PE-22, PE-23, PE-24, PE-26
+Status: Accepted (2026-10-24) · 24 October 2026 · Spec: PE-22, PE-23, PE-24, PE-26
 
 ## Context
 

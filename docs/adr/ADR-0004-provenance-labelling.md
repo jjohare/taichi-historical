@@ -1,6 +1,6 @@
 # ADR-0004: Provenance labelling rules for the avatar
 
-Status: proposed · 24 October 2026 · Spec: PE-17–PE-21, PE-24, PE-36, PE-41 · Amended by [ADR-0007](ADR-0007-sequence-transitions.md): after the user opts in, navigation may carry reviewed estimates forward
+Status: Accepted (2026-10-24) · 24 October 2026 · Spec: PE-17–PE-21, PE-24, PE-36, PE-41 · Amended by [ADR-0007](ADR-0007-sequence-transitions.md): after the user opts in, navigation may carry reviewed estimates forward
 
 ## Context
 

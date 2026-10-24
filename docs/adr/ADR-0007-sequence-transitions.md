@@ -1,6 +1,6 @@
 # ADR-0007: Reviewed estimates by default, with labelled transitions along the sequence
 
-Status: proposed · 24 October 2026 · Amends ADR-0004 (explicit application only) · Spec: PE-42–PE-59; amends PE-08, PE-11, PE-16, PE-18, PE-19, PE-20, PE-26, PE-28, PE-35, PE-36 · Design §12
+Status: Accepted (2026-10-24) · 24 October 2026 · Amends ADR-0004 (explicit application only) · Spec: PE-42–PE-59; amends PE-08, PE-11, PE-16, PE-18, PE-19, PE-20, PE-26, PE-28, PE-35, PE-36 · Design §12
 
 ## Context
 

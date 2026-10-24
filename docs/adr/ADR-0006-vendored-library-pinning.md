@@ -1,6 +1,6 @@
 # ADR-0006: Vendored library pinning and integrity manifest
 
-Status: proposed · 24 October 2026 · Spec: PE-27, PE-28, PE-29
+Status: Accepted (2026-10-24) · 24 October 2026 · Spec: PE-27, PE-28, PE-29
 
 ## Context
 

@@ -1,6 +1,6 @@
 # ADR-0001: Split the explorer into ES modules with no bundler
 
-Status: proposed · 24 October 2026 · Spec: PE-01, PE-08, PE-28
+Status: Accepted (2026-10-24) · 24 October 2026 · Spec: PE-01, PE-08, PE-28
 
 ## Context
 

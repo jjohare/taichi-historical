@@ -1,6 +1,6 @@
 # ADR-0008: Secondary cloth lag on rigid hinge pieces, driven only by S6 transitions
 
-Status: proposed · 24 October 2026 · Builds on ADR-0007 · Spec: PE-60–PE-71; amends PE-08, PE-11, PE-28 and PE-53, and extends PE-59 · Design §13
+Status: Accepted (2026-10-24) · 24 October 2026 · Builds on ADR-0007 · Spec: PE-60–PE-71; amends PE-08, PE-11, PE-28 and PE-53, and extends PE-59 · Design §13
 
 ## Context
 

@@ -1,6 +1,6 @@
 # ADR-0003: Offline pose estimation with SAM 3D Body and MHR; no runtime GPU or ML; DPMesh abandoned
 
-Status: proposed · 24 October 2026 · Supersedes the DPMesh plan in `research/dpmesh/README.md` · Spec: PE-28, PE-29
+Status: Accepted (2026-10-24) · 24 October 2026 · Supersedes the DPMesh plan in `research/dpmesh/README.md` · Spec: PE-28, PE-29
 
 ## Context
 

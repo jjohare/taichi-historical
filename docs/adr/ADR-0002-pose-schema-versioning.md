@@ -1,6 +1,6 @@
 # ADR-0002: Versioned pose-estimate schema with mandatory provenance
 
-Status: proposed · 24 October 2026 · Spec: PE-30–PE-35, PE-41 · Design §8
+Status: Accepted (2026-10-24) · 24 October 2026 · Spec: PE-30–PE-35, PE-41 · Design §8
 
 ## Context
 
