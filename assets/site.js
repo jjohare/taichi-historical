@@ -17,8 +17,10 @@ function filterList(){
 function showImage(){
   const images=current.images.filter(im=>im.source===source), im=images[imageIndex];
   if(!im)return;
-  $('pose-image').src=im.src;$('pose-image').alt=`${current.name}: ${im.label}`;
+  const imageId=im.src.split('/').pop().replace(/\.png$/,'');
+  $('pose-image').src=im.src;$('pose-image').alt=`${current.name}: ${im.label}`;$('pose-image').dataset.imageId=imageId;$('pose-image').dataset.moveId=String(current.id);$('pose-image').dataset.ordinal=String(current.ordinal);$('pose-image').dataset.label=im.label;$('pose-image').dataset.source=im.source;
   $('full-image').href=im.src;$('image-caption').textContent=im.label;$('image-source').href=im.url;
+  document.dispatchEvent(new CustomEvent('yang:image-shown',{detail:{moveId:current.id,imageId,ordinal:current.ordinal,label:im.label,source:im.source}}));
   $('thumbnails').replaceChildren(...images.map((img,i)=>{const b=node('button');b.type='button';b.setAttribute('aria-label',`View ${img.label}`);b.setAttribute('aria-pressed',String(i===imageIndex));const thumb=node('img');thumb.src=img.src;thumb.alt='';thumb.loading='lazy';b.append(thumb);b.onclick=()=>{imageIndex=i;showImage();$('thumbnails').children[i].focus({preventScroll:true});};return b;}));
 }
 function showSources(){

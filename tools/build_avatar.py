@@ -1,16 +1,45 @@
 """Build the illustrative archive avatar in Blender; no estimated poses are used.
 
 Run through the Blender skill's headless job runner. Outputs go to BLENDER_JOB_DIR.
-Blender owns the geometry, armature, glTF export and diagnostic renders.
+Blender owns the geometry, armature, skin weights, glTF export and diagnostic renders.
+
+Construction (v2, "continuous skinned mesh"): the torso, arms and legs are one
+continuous surface. Smooth solids that follow the bones are fused by a voxel
+remesh, filleted, re-meshed to an even quad budget and cut along exact planes so
+that the garment zones (jacket, trousers, linen collar and cuffs, exposed skin)
+are materials on that one surface, not separate pieces. The head, the hands
+(palm, four fingers and thumb fused into one surface) and the shoes and soles
+stay separate named objects, because the explorer's skeleton view keeps exactly
+those visible. Body weights start from Blender's automatic (bone-heat) weights
+and are then corrected: no cross-side or thigh influence on the jacket, and the
+exposed wrists, ankles and neck follow the joint they cross, ending rigid with
+the hand, ankle and head bones where they meet the separate parts.
+
+Secondary cloth lag (slice S7): the linen sleeve and trouser cuffs and four jacket hem flaps
+are rigid, unskinned pieces, each under a plain `lag:*` node (never a skin joint)
+whose glTF extras give its hinge parameters; build-report.json repeats them.
+
+The 24-bone armature below is the retargeting contract and must not change.
+
+Optional script argument (after `--`): `--pose-tests` renders diagnostic bends
+AFTER the rest-pose GLB, blend file and preview have been written.
 """
 import bpy
+import bmesh
 import math
 import os
+import sys
 import json
-from mathutils import Vector
+import re
+import struct
+import zlib
+from mathutils import Vector, Quaternion, Matrix
+from mathutils.kdtree import KDTree
 
 out = os.environ.get("BLENDER_JOB_DIR", os.path.abspath("assets/model"))
 os.makedirs(out, exist_ok=True)
+argv = sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else []
+POSE_TESTS = '--pose-tests' in argv
 bpy.ops.object.select_all(action='SELECT')
 bpy.ops.object.delete(use_global=False)
 
@@ -30,6 +59,10 @@ sole = material('Pale soles', (.43,.40,.32))
 hair = material('Short dark hair', (.075,.07,.06))
 eye = material('Facial marks', (.045,.035,.03))
 
+# ---------------------------------------------------------------------------
+# Armature: unchanged from v1. Bone names, hierarchy, heads, tails and rolls are
+# the contract with assets/explorer/retarget.js and the pose fixtures.
+# ---------------------------------------------------------------------------
 # Standard SMPL-style names, with an independently authored rest shape.
 # Blender Z-up, forward -Y; glTF export converts to Y-up, forward +Z.
 points = {
@@ -62,116 +95,544 @@ bpy.ops.object.mode_set(mode='OBJECT')
 arm.select_set(False)
 meshes=[]
 
-def bind(obj,bone,mat):
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+P = lambda name: Vector(points[name])
+
+def smoothstep(a, b, x):
+    t = max(0.0, min(1.0, (x - a) / (b - a)))
+    return t * t * (3 - 2 * t)
+
+def activate(*objs):
+    bpy.ops.object.select_all(action='DESELECT')
+    for o in objs:
+        o.select_set(True)
+    bpy.context.view_layer.objects.active = objs[0]
+
+def new_object(name, verts, edges=(), faces=()):
+    # Object and mesh data share a name: GLTFLoader names multi-material child meshes
+    # after the mesh data, and the skeleton-view filter in rig.js tests those names.
+    data = bpy.data.meshes.new(name)
+    data.from_pydata([tuple(v) for v in verts], list(edges), list(faces))
+    data.update()
+    obj = bpy.data.objects.new(name, data)
+    bpy.context.collection.objects.link(obj)
+    return obj
+
+def apply_modifiers(obj):
+    activate(obj)
+    for mod in list(obj.modifiers):
+        bpy.ops.object.modifier_apply(modifier=mod.name)
+
+def ellipsoid(name, loc, scale, mat, segments=24, rings=12):
+    bpy.ops.mesh.primitive_uv_sphere_add(segments=segments, ring_count=rings, radius=1, location=loc)
+    obj = bpy.context.object
+    obj.name = name; obj.data.name = name; obj.scale = scale
+    activate(obj)
+    bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
     obj.data.materials.append(mat)
-    bpy.context.view_layer.objects.active=obj
-    obj.select_set(True)
-    bpy.ops.object.transform_apply(location=False,rotation=False,scale=True)
-    group=obj.vertex_groups.new(name=bone)
-    group.add(list(range(len(obj.data.vertices))),1,'REPLACE')
-    mod=obj.modifiers.new('Skin','ARMATURE');mod.object=arm
-    obj.parent=arm
-    obj.select_set(False)
-    for poly in obj.data.polygons:poly.use_smooth=True
+    return obj
+
+def tube(name, start, end, radii, mat, segments=12):
+    """Closed tube with several profile rings; used only as input to a fused (remeshed) part."""
+    start, end = Vector(start), Vector(end); axis = (end - start).normalized()
+    u = axis.cross(Vector((0, 1, 0))).normalized(); v = axis.cross(u).normalized()
+    verts = []; faces = []
+    for t, r in radii:
+        centre = start.lerp(end, t)
+        for j in range(segments):
+            theta = 2 * math.pi * j / segments
+            verts.append(centre + r * (math.cos(theta) * u + math.sin(theta) * v))
+    for row in range(len(radii) - 1):
+        for j in range(segments):
+            a = row * segments + j; b = row * segments + (j + 1) % segments
+            faces.append((a, b, b + segments, a + segments))
+    faces.append(tuple(reversed(range(segments))))
+    faces.append(tuple(range((len(radii) - 1) * segments, len(radii) * segments)))
+    obj = new_object(name, verts, (), faces)
+    obj.data.materials.append(mat)
+    return obj
+
+def join(target, others):
+    activate(target, *others)
+    bpy.ops.object.join()
+    return target
+
+def smooth_shading(obj):
+    for poly in obj.data.polygons:
+        poly.use_smooth = True
+
+def bind(obj):
+    """Parent to the armature with an Armature modifier (linear blend, as three.js skins)."""
+    mod = obj.modifiers.new('Skin', 'ARMATURE'); mod.object = arm
+    mod.use_deform_preserve_volume = False
+    obj.parent = arm
+    smooth_shading(obj)
     meshes.append(obj)
     return obj
 
-def ellipsoid(name,loc,scale,bone,mat,segments=24):
-    bpy.ops.mesh.primitive_uv_sphere_add(segments=segments,ring_count=12,radius=1,location=loc)
-    obj=bpy.context.object;obj.name=name;obj.scale=scale
-    return bind(obj,bone,mat)
+def set_weights(obj, weights):
+    """weights: list (per vertex) of {bone: weight}; normalised, at most four influences."""
+    obj.vertex_groups.clear()
+    groups = {name: obj.vertex_groups.new(name=name) for name in points}
+    for index, table in enumerate(weights):
+        items = sorted(((w, b) for b, w in table.items() if w > 1e-4), reverse=True)[:4]
+        total = sum(w for w, _ in items)
+        for w, b in items:
+            groups[b].add([index], w / total, 'REPLACE')
 
-def tube(name,start,end,radii,bone,mat,segments=16):
-    start,end=Vector(start),Vector(end);axis=(end-start).normalized()
-    u=axis.cross(Vector((0,1,0))).normalized();v=axis.cross(u).normalized()
-    verts=[];faces=[]
-    # Several rings give shoulders and cuffs a gentle fabric profile.
-    for t,r in radii:
-        centre=start.lerp(end,t)
-        for j in range(segments):
-            theta=2*math.pi*j/segments
-            verts.append(centre+r*(math.cos(theta)*u+math.sin(theta)*v))
-    for row in range(len(radii)-1):
-        for j in range(segments):
-            a=row*segments+j;b=row*segments+(j+1)%segments
-            faces.append((a,b,b+segments,a+segments))
-    faces.append(tuple(reversed(range(segments))))
-    faces.append(tuple(range((len(radii)-1)*segments,len(radii)*segments)))
-    data=bpy.data.meshes.new(name);data.from_pydata(verts,[],faces);data.update()
-    obj=bpy.data.objects.new(name,data);bpy.context.collection.objects.link(obj)
-    return bind(obj,bone,mat)
+def read_weights(obj):
+    names = {g.index: g.name for g in obj.vertex_groups}
+    return [{names[g.group]: g.weight for g in v.groups if g.weight > 0} for v in obj.data.vertices]
 
-# A short jacket, rather than the long hems seen in some historical plates,
-# deliberately leaves the hip crease and thighs free for deep flexion.
-verts=[];faces=[];rings=[(1.02,.245,.145),(1.08,.25,.15),(1.27,.24,.145),(1.42,.25,.13),(1.48,.17,.10)]
-for z,rx,ry in rings:
-    for j in range(24):
-        a=2*math.pi*j/24;verts.append((rx*math.cos(a),ry*math.sin(a),z))
-for row in range(len(rings)-1):
-    for j in range(24):faces.append((row*24+j,row*24+(j+1)%24,(row+1)*24+(j+1)%24,(row+1)*24+j))
-faces.extend([tuple(reversed(range(24))),tuple(range(96,120))])
-data=bpy.data.meshes.new('Short jacket');data.from_pydata(verts,[],faces);data.update()
-obj=bpy.data.objects.new('Hip-clear jacket',data);bpy.context.collection.objects.link(obj)
-bind(obj,'spine2',cloth)
-# Smooth torso weighting; garments stay within the body silhouette.
-obj.vertex_groups.clear()
-for name in ['spine1','spine2','spine3']:obj.vertex_groups.new(name=name)
-for vertex in obj.data.vertices:
-    z=vertex.co.z
-    if z<1.28:
-        t=max(0,min(1,(z-1.10)/.18));a,b='spine1','spine2'
-    else:t=max(0,min(1,(z-1.28)/.16));a,b='spine2','spine3'
-    obj.vertex_groups[a].add([vertex.index],1-t,'REPLACE');obj.vertex_groups[b].add([vertex.index],t,'REPLACE')
-ellipsoid('Trouser seat',(0,0,.94),(.23,.14,.13),'pelvis',trousers)
-tube('Standing collar',(0,0,1.45),(0,0,1.54),[(0,.095),(.75,.08),(1,.075)],'neck',trim)
-for z in [1.13,1.22,1.31,1.40]:
-    ellipsoid(f'Cloth fastening {z}',(.02,-.151,z),(.045,.009,.012),'spine2' if z<1.35 else 'spine3',trim,16)
-ellipsoid('Neck',(0,0,1.56),(.065,.065,.09),'neck',skin)
-ellipsoid('Head',(0,-.006,1.71),(.103,.096,.137),'head',skin)
-ellipsoid('Short hair',(0,.012,1.798),(.098,.092,.052),'head',hair)
-ellipsoid('Nose',(0,-.102,1.704),(.019,.025,.033),'head',skin,16)
-for sign in [-1,1]:
-    ellipsoid('Ear',(sign*.102,0,1.71),(.016,.022,.035),'head',skin,16)
-    ellipsoid('Eye',(sign*.037,-.094,1.735),(.012,.006,.006),'head',eye,12)
-ellipsoid('Mouth',(0,-.095,1.663),(.025,.005,.003),'head',eye,12)
+def segment_param(p, a, b):
+    ab = b - a
+    return max(0.0, min(1.0, (p - a).dot(ab) / ab.length_squared))
 
-for side,sign in [('left',1),('right',-1)]:
-    p=lambda part:Vector(points[f'{side}_{part}'])
-    ellipsoid(f'{side} shoulder fabric',p('shoulder'),(.108,.108,.105),f'{side}_shoulder',cloth)
-    tube(f'{side} upper sleeve',p('shoulder'),p('elbow'),[(0,.106),(.4,.101),(.85,.083),(1,.078)],f'{side}_shoulder',cloth)
-    ellipsoid(f'{side} elbow fabric',p('elbow'),(.079,.079,.079),f'{side}_elbow',cloth)
-    cuff_end=p('elbow').lerp(p('wrist'),.73)
-    tube(f'{side} lower sleeve',p('elbow'),cuff_end,[(0,.078),(.65,.075),(1,.065)],f'{side}_elbow',cloth)
-    tube(f'{side} cuff',p('elbow').lerp(p('wrist'),.65),cuff_end,[(0,.067),(1,.067)],f'{side}_elbow',trim)
-    tube(f'{side} exposed wrist',cuff_end,p('hand'),[(0,.033),(1,.029)],f'{side}_wrist',skin)
-    palm=ellipsoid(f'{side} palm',p('hand'),(.045,.025,.06),f'{side}_hand',skin)
-    # Four separated fingers plus an opposed thumb: no mitten hidden in a sleeve.
+# ---------------------------------------------------------------------------
+# Body: one continuous surface. Smooth solids that follow the bones (a lofted torso,
+# capsule chains for the neck, arms and legs) are fused by a voxel remesh, filleted by
+# volume-preserving smoothing, re-meshed coarser to an even quad budget, then cut along exact planes so that each garment
+# border (jacket hem, collar, sleeve cuffs, trouser cuffs) is a clean edge loop.
+BODY_VOXEL = .018                        # second remesh: about 12k body vertices
+# The skinned jacket ends 2 cm under the hem flaps' hinge, the sleeve 1.3 cm under the cuffs' hinge:
+# the rigid lag pieces overlap it at rest, and the closed body beneath means a swing never opens a hole.
+HEM_Z, COLLAR_Z, NECK_Z = 1.08, 1.50, 1.55
+SLEEVE_END = .63                         # along elbow -> wrist
+FLAP_TOP, FLAP_BOTTOM = 1.10, .985        # hinge line (spine1 height) and free edge of the hem flaps
+CUFF_TOP, CUFF_BOTTOM = .585, .765        # loose linen cuff along elbow -> wrist
+TROUSER_END = .72                        # along knee -> ankle
+TROUSER_TOP, TROUSER_BOTTOM = .70, .81    # loose linen trouser cuff along knee -> ankle
+
+def loft(name, rings, segments=40):
+    """Closed vertical loft through elliptical rings (z, half-width, half-depth)."""
+    verts = [(rx * math.cos(2 * math.pi * j / segments), ry * math.sin(2 * math.pi * j / segments), z)
+             for z, rx, ry in rings for j in range(segments)]
+    faces = [(r * segments + j, r * segments + (j + 1) % segments, (r + 1) * segments + (j + 1) % segments, (r + 1) * segments + j)
+             for r in range(len(rings) - 1) for j in range(segments)]
+    faces += [tuple(reversed(range(segments))), tuple(range((len(rings) - 1) * segments, len(rings) * segments))]
+    return new_object(name, verts, (), faces)
+
+def capsule_chain(name, stops, segments=24):
+    """Spheres at each stop joined by truncated cones: a smooth limb of varying radius."""
+    parts = []
+    for i, (point, radius) in enumerate(stops):
+        bpy.ops.mesh.primitive_uv_sphere_add(segments=segments, ring_count=segments // 2, radius=radius, location=point)
+        parts.append(bpy.context.object)
+        if i:
+            parts.append(tube(f'{name} {i}', stops[i - 1][0], point, [(0, stops[i - 1][1]), (1, radius)], skin, segments))
+    return parts
+
+volumes = [loft('Torso volume', [(.86, .16, .105), (.90, .2, .128), (.95, .213, .134), (1.0, .222, .139),
+                                 (HEM_Z, .238, .148), (1.07, .238, .147), (1.27, .232, .143), (1.37, .236, .135),
+                                 (1.43, .22, .122), (1.462, .165, .102), (1.482, .1, .085)])]
+volumes += capsule_chain('Neck volume', [((0, 0, 1.46), .09), ((0, 0, 1.545), .088), ((0, 0, 1.568), .064), ((0, 0, 1.665), .056)])
+for side, sign in [('left', 1), ('right', -1)]:
+    p = lambda part: P(f'{side}_{part}')
+    shoulder, elbow, wrist, hand, knee, ankle = p('shoulder'), p('elbow'), p('wrist'), p('hand'), p('knee'), p('ankle')
+    # Loose sleeve ending under the (separate, rigid) linen cuff; exposed forearm and wrist running into the palm.
+    volumes += capsule_chain(f'{side} arm volume', [
+        (Vector((sign * .17, 0, 1.425)), .1), (shoulder, .1), (shoulder.lerp(elbow, .45), .09), (elbow, .075),
+        (elbow.lerp(wrist, .5), .07), (elbow.lerp(wrist, SLEEVE_END - .03), .066), (elbow.lerp(wrist, SLEEVE_END + .04), .045),
+        (elbow.lerp(wrist, .78), .036), (wrist, .031), (hand.lerp(wrist, .15), .028)])
+    # Trouser seat into the thigh, ending under the (separate, rigid) linen trouser cuff; exposed ankle into the shoe.
+    volumes += capsule_chain(f'{side} leg volume', [
+        (Vector((sign * .125, 0, .93)), .12), (p('hip').lerp(knee, .3), .118), (knee, .093), (knee.lerp(ankle, .4), .095),
+        (knee.lerp(ankle, TROUSER_END - .03), .074), (knee.lerp(ankle, TROUSER_END + .05), .046),
+        (knee.lerp(ankle, .86), .038), (ankle, .035), (ankle + Vector((0, -.012, -.04)), .034)])
+body = join(volumes[0], volumes[1:])
+body.name = body.data.name = 'Archive avatar body'
+body.data.remesh_voxel_size = .008
+activate(body)
+bpy.ops.object.voxel_remesh()
+fillet = body.modifiers.new('Fillet', 'LAPLACIANSMOOTH')
+fillet.iterations = 12; fillet.lambda_factor = .6; fillet.use_volume_preserve = True; fillet.use_normalized = True
+apply_modifiers(body)
+
+def keep_outer_shell(obj):
+    """Merge coincident vertices, drop every shell but the largest (internal cavities of the union), fix normals."""
+    bm = bmesh.new(); bm.from_mesh(obj.data)
+    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=1e-5)
+    bm.faces.ensure_lookup_table()
+    seen = set(); shells = []
+    for face in bm.faces:
+        if face.index in seen:
+            continue
+        stack = [face]; shell = []; seen.add(face.index)
+        while stack:
+            f = stack.pop(); shell.append(f)
+            for edge in f.edges:
+                for other in edge.link_faces:
+                    if other.index not in seen:
+                        seen.add(other.index); stack.append(other)
+        shells.append(shell)
+    shells.sort(key=len, reverse=True)
+    doomed = [f for shell in shells[1:] for f in shell]
+    bmesh.ops.delete(bm, geom=doomed, context='FACES')
+    bmesh.ops.delete(bm, geom=[v for v in bm.verts if not v.link_faces], context='VERTS')
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    non_manifold = sum(1 for e in bm.edges if not e.is_manifold)
+    bm.to_mesh(obj.data); bm.free(); obj.data.update()
+    print(obj.name, 'shells', len(shells), 'non-manifold edges', non_manifold)
+    return non_manifold
+
+keep_outer_shell(body)
+# Even quads at the vertex budget: a second, coarser voxel pass over the already filleted shape.
+body.data.remesh_voxel_size = BODY_VOXEL
+activate(body)
+bpy.ops.object.voxel_remesh()
+keep_outer_shell(body)
+print('body vertices after coarse remesh', len(body.data.vertices))
+relax = body.modifiers.new('Relax', 'LAPLACIANSMOOTH')
+relax.iterations = 2; relax.lambda_factor = .3; relax.use_volume_preserve = True; relax.use_normalized = True
+apply_modifiers(body)
+
+def nearest_on(point, a, b):
+    return a.lerp(b, segment_param(point, a, b))
+
+cuts = [((0, 0, HEM_Z), (0, 0, 1), lambda c: abs(c.x) < .32 and abs(c.z - HEM_Z) < .06),
+        ((0, 0, COLLAR_Z), (0, 0, 1), lambda c: math.hypot(c.x, c.y) < .115 and abs(c.z - COLLAR_Z) < .03),
+        ((0, 0, NECK_Z), (0, 0, 1), lambda c: math.hypot(c.x, c.y) < .12 and abs(c.z - NECK_Z) < .05)]
+for side in ('left', 'right'):
+    elbow, wrist, knee, ankle = P(f'{side}_elbow'), P(f'{side}_wrist'), P(f'{side}_knee'), P(f'{side}_ankle')
+    for t in (SLEEVE_END,):
+        centre = elbow.lerp(wrist, t)
+        cuts.append((centre, wrist - elbow, lambda c, centre=centre: (c - centre).length < .12))
+    for t in (TROUSER_END,):
+        centre = knee.lerp(ankle, t)
+        cuts.append((centre, ankle - knee, lambda c, centre=centre: (c - centre).length < .13))
+bm = bmesh.new(); bm.from_mesh(body.data)
+for co, normal, near in cuts:
+    faces = [f for f in bm.faces if near(f.calc_center_median())]
+    geom = list({e for f in faces for e in f.edges}) + faces + list({v for f in faces for v in f.verts})
+    bmesh.ops.bisect_plane(bm, geom=geom, plane_co=Vector(co), plane_no=Vector(normal).normalized())
+bm.to_mesh(body.data); bm.free()
+
+def zone(c):
+    """Garment zone of a point on the body, using the same planes as the cuts."""
+    side = 'left' if c.x > 0 else 'right'
+    elbow, wrist, knee, ankle = (P(f'{side}_{part}') for part in ('elbow', 'wrist', 'knee', 'ankle'))
+    if (c - nearest_on(c, elbow, wrist)).length < .1 and abs(c.x) > .4:
+        if (c - wrist).dot(wrist - elbow) > 0:
+            return 'skin'
+        t = segment_param(c, elbow, wrist)
+        return 'skin' if t >= SLEEVE_END else 'jacket'
+    if c.z < knee.z and (c - nearest_on(c, knee, ankle)).length < .12:
+        t = segment_param(c, knee, ankle)
+        return 'skin' if t >= TROUSER_END else 'trousers'
+    if math.hypot(c.x, c.y) < .115 and c.z >= COLLAR_Z:
+        return 'skin' if c.z >= NECK_Z else 'trim'
+    return 'jacket' if c.z >= HEM_Z else 'trousers'
+
+zone_material = {'jacket': cloth, 'trousers': trousers, 'skin': skin, 'trim': trim}
+body.data.materials.clear()
+slots = list(zone_material.values())
+for mat in slots:
+    body.data.materials.append(mat)
+for poly in body.data.polygons:
+    poly.material_index = slots.index(zone_material[zone(poly.center)])
+smooth_shading(body)
+
+# ---------------------------------------------------------------------------
+# Separate, rigid parts kept visible in skeleton view.
+# ---------------------------------------------------------------------------
+head_parts = [ellipsoid('Head', (0, -.006, 1.71), (.103, .096, .137), skin, 32, 16),
+              ellipsoid('Short hair', (0, .012, 1.798), (.098, .092, .052), hair, 32, 12),
+              ellipsoid('Nose', (0, -.102, 1.704), (.019, .025, .033), skin, 16, 8),
+              ellipsoid('Mouth', (0, -.095, 1.663), (.025, .005, .003), eye, 12, 6)]
+for sign in [-1, 1]:
+    head_parts.append(ellipsoid('Ear', (sign * .102, 0, 1.71), (.016, .022, .035), skin, 16, 8))
+    head_parts.append(ellipsoid('Eye', (sign * .037, -.094, 1.735), (.012, .006, .006), eye, 12, 6))
+head = join(head_parts[0], head_parts[1:])
+head.name = 'Head'; head.data.name = 'Head'
+
+hands = {}
+shoes = {}
+for side, sign in [('left', 1), ('right', -1)]:
+    hand = P(f'{side}_hand')
+    # Palm, four separated fingers and an opposed thumb, fused into one surface by a voxel remesh.
+    parts = [ellipsoid(f'{side} palm part', hand, (.045, .025, .06), skin)]
     for finger in range(4):
-        start=p('hand')+Vector(((finger-1.5)*.019,0,-.038))
-        end=start+Vector((sign*.015,0,-(.061-abs(finger-1.5)*.007)))
-        tube(f'{side} finger {finger+1}',start,end,[(0,.009),(1,.007)],f'{side}_hand',skin,8)
-        ellipsoid(f'{side} fingertip {finger+1}',end,(.007,.008,.009),f'{side}_hand',skin,12)
-    tube(f'{side} thumb',p('hand')+Vector((-sign*.031,-.005,.01)),p('hand')+Vector((-sign*.06,-.01,-.036)),[(0,.013),(1,.01)],f'{side}_hand',skin,10)
-    tube(f'{side} thigh trousers',p('hip'),p('knee'),[(0,.125),(.3,.127),(.8,.108),(1,.096)],f'{side}_hip',trousers)
-    ellipsoid(f'{side} knee fabric',p('knee'),(.096,.096,.096),f'{side}_knee',trousers)
-    trouser_end=p('knee').lerp(p('ankle'),.79)
-    tube(f'{side} lower trousers',p('knee'),trouser_end,[(0,.096),(.4,.10),(1,.066)],f'{side}_knee',trousers)
-    tube(f'{side} trouser cuff',p('knee').lerp(p('ankle'),.73),trouser_end,[(0,.067),(1,.067)],f'{side}_knee',trim)
-    tube(f'{side} exposed ankle',trouser_end,p('ankle'),[(0,.036),(1,.035)],f'{side}_ankle',skin)
-    ellipsoid(f'{side} distinct cloth shoe',(sign*.15,-.063,.055),(.063,.135,.048),f'{side}_foot',shoe)
-    ellipsoid(f'{side} shoe sole',(sign*.15,-.063,.022),(.065,.138,.014),f'{side}_foot',sole)
+        spread = finger - 1.5
+        start = hand + Vector((spread * .019, 0, -.038))
+        end = start + Vector((sign * .015 + spread * .005, 0, -(.061 - abs(spread) * .007)))
+        parts.append(tube(f'{side} finger {finger + 1}', start, end, [(0, .0095), (.5, .0085), (1, .0075)], skin, 10))
+        parts.append(ellipsoid(f'{side} fingertip {finger + 1}', end, (.0075, .0085, .0095), skin, 12, 6))
+    t0 = hand + Vector((-sign * .031, -.005, .01)); t1 = hand + Vector((-sign * .06, -.012, -.036))
+    parts.append(tube(f'{side} thumb part', t0, t1, [(0, .014), (.6, .011), (1, .0105)], skin, 10))
+    parts.append(ellipsoid(f'{side} thumb tip', t1, (.0105, .0105, .0105), skin, 12, 6))
+    fused = join(parts[0], parts[1:])
+    fused.name = fused.data.name = f'{side} palm with four fingers and thumb'
+    fused.data.remesh_voxel_size = .0022
+    activate(fused)
+    bpy.ops.object.voxel_remesh()
+    decimate = fused.modifiers.new('Reduce', 'DECIMATE'); decimate.ratio = min(1.0, 800 / len(fused.data.vertices))
+    smooth = fused.modifiers.new('Soften', 'CORRECTIVE_SMOOTH'); smooth.iterations = 3; smooth.use_only_smooth = True
+    apply_modifiers(fused)
+    if not fused.data.materials:
+        fused.data.materials.append(skin)
+    hands[side] = fused
+
+    # Distinct cloth shoe and pale sole, lightly bevelled.
+    upper = ellipsoid(f'{side} distinct cloth shoe', (sign * .15, -.063, .058), (.063, .135, .05), shoe, 32, 16)
+    for v in upper.data.vertices:
+        if v.co.z < .035:  # flatten the underside onto the sole
+            v.co.z = .035 - (.035 - v.co.z) * .25
+    bpy.ops.mesh.primitive_cylinder_add(vertices=40, radius=1, depth=1, location=(sign * .15, -.063, .021))
+    base = bpy.context.object
+    base.name = base.data.name = f'{side} shoe sole'
+    base.scale = (.066, .14, .02)
+    activate(base); bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
+    base.data.materials.append(sole)
+    bevel = base.modifiers.new('Rounded edge', 'BEVEL'); bevel.width = .006; bevel.segments = 3
+    apply_modifiers(base)
+    shoes[side] = (upper, base)
+
+# Linen fastenings, seated on the jacket front by casting onto the continuous body.
+fastenings = []
+for z in [1.13, 1.22, 1.31, 1.40]:
+    hit, location, _, _ = body.ray_cast(Vector((.02, -1, z)), Vector((0, 1, 0)))
+    y = location.y if hit else -.15
+    fastenings.append(ellipsoid(f'Cloth fastening {z}', (.02, y - .002, z), (.045, .009, .012), trim, 16, 8))
+
+# ---------------------------------------------------------------------------
+# Weights: automatic (bone heat), then corrected.
+# ---------------------------------------------------------------------------
+# The leaf bones (hands, feet, head) have tails pointing up into the limb they end, which
+# would steal the wrists, ankles and neck. Exclude them from the automatic pass only.
+leaf_bones = [f'{s}_{part}' for s in ('left', 'right') for part in ('hand', 'foot')] + ['head']
+for name in leaf_bones:
+    arm_data.bones[name].use_deform = False
+activate(body, arm)
+bpy.context.view_layer.objects.active = arm
+bpy.ops.object.parent_set(type='ARMATURE_AUTO')
+for name in leaf_bones:
+    arm_data.bones[name].use_deform = True
+assert all(b.use_deform for b in arm_data.bones), 'every bone must deform again before export'
+heat = read_weights(body)
+# Keep only the weights; the modifier and parent are re-made by bind() after the fastenings join.
+for mod in list(body.modifiers):
+    body.modifiers.remove(mod)
+body.parent = None
+assert sum(1 for w in heat if w) > .95 * len(heat), 'automatic weighting failed for part of the body'
+
+def limb_blend(a, b, t, t0, t1):
+    """Blend from bone `a` to bone `b` as t runs t0..t1 (smoothstep)."""
+    s = smoothstep(t0, t1, t)
+    return {a: 1 - s, b: s} if a != b else {a: 1.0}
+
+corrected = []
+for index, vertex in enumerate(body.data.vertices):
+    co = vertex.co; table = dict(heat[index])
+    # 1. No influence from the opposite side's limbs (bone heat bleeds across the crotch and chest).
+    if co.x > .015:
+        table = {b: w for b, w in table.items() if not b.startswith('right_')}
+    elif co.x < -.015:
+        table = {b: w for b, w in table.items() if not b.startswith('left_')}
+    # The jacket hangs from the spine: no thigh influence above the hem (it crumples the front in a crouch).
+    if co.z > HEM_Z and abs(co.x) < .3:
+        table = {b: w for b, w in table.items() if not b.endswith('_hip')}
+    side = 'left' if co.x > 0 else 'right'
+    s = lambda part: f'{side}_{part}'
+    elbow, wrist, hand = P(s('elbow')), P(s('wrist')), P(s('hand'))
+    knee, ankle = P(s('knee')), P(s('ankle'))
+    # 2. Forearm, exposed wrist and the ring that enters the palm (elbow -> wrist -> hand).
+    forearm_t = segment_param(co, elbow, wrist); hand_u = segment_param(co, wrist, hand)
+    near_forearm = (co - elbow.lerp(wrist, forearm_t)).length < .1 or (co - wrist.lerp(hand, hand_u)).length < .07
+    if abs(co.x) > .40 and co.z < elbow.z + .02 and near_forearm:
+        if (co - wrist).dot(wrist - elbow) > 0:
+            table = limb_blend(s('wrist'), s('hand'), hand_u, .45, .8)
+        elif forearm_t > .55:
+            table = limb_blend(s('elbow'), s('wrist'), forearm_t, .88, 1.0)
+    # 3. Shin, exposed ankle and the ring inside the shoe.
+    shin_t = segment_param(co, knee, ankle)
+    if abs(co.x) > .05 and co.z < knee.z - .1 and (co - knee.lerp(ankle, shin_t)).length < .11:
+        if co.z <= ankle.z:
+            table = {s('ankle'): 1.0}
+        elif shin_t > .6:
+            table = limb_blend(s('knee'), s('ankle'), shin_t, .9, 1.0)
+    # 4. Neck into the head: the top of the neck is rigid with the head.
+    if abs(co.x) < .1 and co.z > 1.53:
+        if co.z >= 1.62:
+            table = {'head': 1.0}
+        elif co.z > 1.555:
+            table = limb_blend('neck', 'head', co.z, 1.575, 1.62)
+        else:
+            table = limb_blend('spine3', 'neck', co.z, 1.51, 1.555)
+    if not table:
+        table = {'pelvis': 1.0}
+    corrected.append(table)
+set_weights(body, corrected)
+activate(body)
+bpy.ops.object.mode_set(mode='WEIGHT_PAINT')
+bpy.ops.object.vertex_group_smooth(group_select_mode='ALL', factor=.5, repeat=6)
+bpy.ops.object.vertex_group_limit_total(group_select_mode='ALL', limit=4)
+bpy.ops.object.vertex_group_normalize_all(group_select_mode='ALL', lock_active=False)
+bpy.ops.object.mode_set(mode='OBJECT')
+# Re-pin the junction rings after smoothing, so nothing gaps against the rigid parts.
+final = read_weights(body)
+for index, vertex in enumerate(body.data.vertices):
+    co = vertex.co; side = 'left' if co.x > 0 else 'right'
+    if abs(co.x) < .1 and co.z >= 1.62:
+        final[index] = {'head': 1.0}
+    elif abs(co.x) > .05 and co.z <= points[f'{side}_ankle'][2] + .005 and co.z < .3:
+        final[index] = {f'{side}_ankle': 1.0}
+    elif abs(co.x) > .5 and segment_param(co, P(f'{side}_wrist'), P(f'{side}_hand')) > .8:
+        final[index] = {f'{side}_hand': 1.0}
+set_weights(body, final)
+
+# Fastenings follow the nearest body vertex.
+body_tree = KDTree(len(body.data.vertices))
+for v in body.data.vertices:
+    body_tree.insert(v.co, v.index)
+body_tree.balance()
+for f in fastenings:
+    centre = sum((v.co for v in f.data.vertices), Vector()) / len(f.data.vertices)
+    _, nearest, _ = body_tree.find(centre)
+    set_weights(f, [dict(final[nearest]) for _ in f.data.vertices])
+join(body, fastenings)
+body.name = body.data.name = 'Archive avatar body'
+bind(body)
+
+set_weights(head, [{'head': 1.0} for _ in head.data.vertices]); bind(head)
+for side, fused in hands.items():
+    set_weights(fused, [{f'{side}_hand': 1.0} for _ in fused.data.vertices]); bind(fused)
+for side, parts in shoes.items():
+    foot_y = points[f'{side}_foot'][1]
+    for part in parts:
+        # Heel with the ankle bone, toe with the foot bone, blended across the ball of the foot.
+        part_weights = []
+        for v in part.data.vertices:
+            toe = smoothstep(foot_y + .03, foot_y - .03, v.co.y)
+            part_weights.append({f'{side}_ankle': 1 - toe, f'{side}_foot': toe})
+        set_weights(part, part_weights); bind(part)
+
+
+# ---------------------------------------------------------------------------
+# Secondary cloth lag (slice S7, ADR-0008): rigid loose-cloth pieces, each on a plain `lag:*`
+# node that is a direct child of one skin joint. They are never joints and never skinned; the
+# page swings them about the node's local +X (spec section J).
+# glTF frame of a lag node: +X along the hinge, -Y from the hinge to the free edge, +Z away from
+# the body, so a negative rotation about +X flares the piece outwards. In Blender (Z-up) that is
+# X = hinge, Y = towards the body, Z = from the free edge to the hinge; the exporter's Y-up
+# conversion maps one onto the other.
+# ---------------------------------------------------------------------------
+lag_report, lag_pieces = [], []
+depsgraph = bpy.context.evaluated_depsgraph_get()
+
+def body_radius(origin, direction, fallback):
+    hit, location, _, _ = body.ray_cast(origin, direction, depsgraph=depsgraph)
+    return (location - origin).length if hit else fallback
+
+def lag_node(name, parent_bone, origin, up, outward, extras):
+    y = -outward.normalized()
+    z = (up - y * up.dot(y)).normalized()
+    x = y.cross(z)
+    frame = Matrix((x, y, z)).transposed().to_4x4(); frame.translation = origin
+    empty = bpy.data.objects.new(name, None)
+    empty.empty_display_type = 'ARROWS'; empty.empty_display_size = .05
+    bpy.context.collection.objects.link(empty)
+    empty.parent = arm; empty.parent_type = 'BONE'; empty.parent_bone = parent_bone
+    bpy.context.view_layer.update()
+    empty.matrix_world = frame
+    bpy.context.view_layer.update()
+    assert max(abs(a - b) for ra, rb in zip(empty.matrix_world, frame) for a, b in zip(ra, rb)) < 1e-5, name
+    for key, value in extras.items():
+        empty[key] = value
+    lag_report.append({'node': name, 'parent': parent_bone, **extras})
+    return empty
+
+def lag_piece(empty, name, rows, columns, point, mat, closed=False, thickness=.003):
+    """A thin rigid cloth shell from a grid of points (rows run hinge -> free edge), in the lag node's frame."""
+    verts = [point(i, j) for i in range(rows) for j in range(columns)]
+    span = columns if closed else columns - 1
+    faces = [(i * columns + j, i * columns + (j + 1) % columns, (i + 1) * columns + (j + 1) % columns, (i + 1) * columns + j)
+             for i in range(rows - 1) for j in range(span)]
+    obj = new_object(name, verts, (), faces)
+    obj.data.materials.append(mat)
+    cloth_thickness = obj.modifiers.new('Cloth thickness', 'SOLIDIFY'); cloth_thickness.thickness = thickness; cloth_thickness.offset = 0
+    apply_modifiers(obj)
+    bm = bmesh.new(); bm.from_mesh(obj.data)
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)   # a closed shell: normals outwards
+    bm.to_mesh(obj.data); bm.free()
+    obj.data.transform(empty.matrix_world.inverted())     # vertices in the hinge frame; the node carries the placement
+    obj.parent = empty; obj.matrix_parent_inverse.identity(); obj.matrix_basis.identity()
+    smooth_shading(obj)
+    lag_pieces.append(obj)
+    return obj
+
+# Jacket hem as four flaps split at the side seams (1 degree apart), hinged on spine1 at its own height.
+ROWS = 7
+for part, centre, half in [('front', -90, 49), ('back', 90, 49), ('left', 0, 40), ('right', 180, 40)]:
+    columns = round(half / 3) * 2 + 1
+    angles = [math.radians(centre - half + 2 * half * j / (columns - 1)) for j in range(columns)]
+    def point(i, j, angles=angles):
+        z = FLAP_TOP + (FLAP_BOTTOM - FLAP_TOP) * i / (ROWS - 1)
+        direction = Vector((math.cos(angles[j]), math.sin(angles[j]), 0))
+        flare = .003 + .012 * i / (ROWS - 1)            # 3 mm proud at the hinge, a slight A-line below
+        return Vector((0, 0, z)) + direction * (body_radius(Vector((0, 0, z)), direction, .23) + flare)
+    outward = Vector((math.cos(math.radians(centre)), math.sin(math.radians(centre)), 0))
+    origin = Vector((0, 0, FLAP_TOP)) + outward * (body_radius(Vector((0, 0, FLAP_TOP)), outward, .23) + .003)
+    node = lag_node(f'lag:hem_{part}', 'spine1', origin, Vector((0, 0, 1)), outward,
+                    {'hinge_axis': [1, 0, 0], 'max_degrees': 25, 'inward_degrees': 6, 'drop': True})
+    lag_piece(node, f'Jacket hem {part} flap', ROWS, columns, point, cloth)
+
+# Loose linen cuffs on the sleeves and trousers, hinged across the limb at their top ring,
+# swinging forwards and back (local +Z is the character's front).
+def limb_cuff(side, joint, start, end, top_t, bottom_t, label, max_degrees, fallback):
+    a, b = P(start), P(end)
+    axis = (b - a).normalized(); forward = Vector((0, -1, 0)); across = axis.cross(forward)
+    top = a.lerp(b, top_t)
+    ring = [math.radians(360 * j / 24) for j in range(24)]
+    fit = [body_radius(top, math.cos(r) * forward + math.sin(r) * across, fallback) + .003 for r in ring]
+    def point(i, j):
+        s = i / 5
+        centre = a.lerp(b, top_t + (bottom_t - top_t) * s)
+        return centre + (math.cos(ring[j]) * forward + math.sin(ring[j]) * across) * (fit[j] + .008 * s)
+    node = lag_node(f'lag:{side}_{label}', joint, top, -axis, forward, {'hinge_axis': [1, 0, 0], 'max_degrees': max_degrees})
+    lag_piece(node, f'{side} loose {"sleeve" if label == "cuff" else "trouser"} cuff', 6, 24, point, trim, closed=True)
+
+for side in ('left', 'right'):
+    limb_cuff(side, f'{side}_elbow', f'{side}_elbow', f'{side}_wrist', CUFF_TOP, CUFF_BOTTOM, 'cuff', 35, .068)
+for side in ('left', 'right'):
+    limb_cuff(side, f'{side}_knee', f'{side}_knee', f'{side}_ankle', TROUSER_TOP, TROUSER_BOTTOM, 'trouser', 20, .074)
 
 arm['description']='Illustrative training avatar inspired by archive clothing; not a portrait, scan or DPMesh estimate.'
 arm['pose_binding']='none'
 arm['clearance']='Sleeves end before wrists; trouser cuffs before ankles; jacket above hip crease.'
+for obj in meshes:
+    obj.matrix_parent_inverse.identity()
+for obj in meshes + lag_pieces:
+    assert obj.name == obj.data.name, obj.name
+    assert not re.search(r'palm|finger|thumb|shoe|Head', obj.name) or obj in meshes, obj.name
 bpy.context.view_layer.update()
-bpy.ops.export_scene.gltf(filepath=os.path.join(out,'archive-avatar.glb'),export_format='GLB',export_animations=False,export_extras=True)
+bpy.ops.export_scene.gltf(filepath=os.path.join(out,'archive-avatar.glb'),export_format='GLB',export_animations=False,
+                          export_extras=True,export_texcoords=False,export_tangents=False)
 bpy.ops.wm.save_as_mainfile(filepath=os.path.join(out,'archive-avatar.blend'))
 
+# ---------------------------------------------------------------------------
 # Document a reproducible diagnostic view; no catalogue pose is used.
+# ---------------------------------------------------------------------------
+def strip_png_text(path):
+    """Rewrite a PNG without tEXt/iTXt/zTXt chunks (Blender stores the source file path in them)."""
+    with open(path, 'rb') as f:
+        data = f.read()
+    assert data[:8] == b'\x89PNG\r\n\x1a\n'
+    kept = [data[:8]]; pos = 8
+    while pos < len(data):
+        length, kind = struct.unpack('>I4s', data[pos:pos + 8])
+        chunk = data[pos:pos + 12 + length]
+        if kind not in (b'tEXt', b'iTXt', b'zTXt'):
+            kept.append(chunk)
+        pos += 12 + length
+    with open(path, 'wb') as f:
+        f.write(b''.join(kept))
+
 scene=bpy.context.scene
 scene.render.engine='BLENDER_EEVEE'
 scene.render.resolution_x=800;scene.render.resolution_y=900;scene.render.resolution_percentage=100
+scene.render.use_stamp=False
 scene.world.color=(.65,.65,.60)
 for name,location,power,size in [('Key',(3,-4,5),450,4),('Fill',(-3,-2,3),300,3)]:
     bpy.ops.object.light_add(type='AREA',location=location);lamp=bpy.context.object;lamp.name=name;lamp.data.energy=power;lamp.data.shape='DISK';lamp.data.size=size;lamp.rotation_euler=(Vector((0,0,1))-lamp.location).to_track_quat('-Z','Y').to_euler()
@@ -179,6 +640,65 @@ bpy.ops.object.camera_add(location=(2.8,-4.5,2.25));camera=bpy.context.object
 camera.rotation_euler=(Vector((0,0,.95))-camera.location).to_track_quat('-Z','Y').to_euler();camera.data.type='ORTHO';camera.data.ortho_scale=2.15;scene.camera=camera
 scene.render.image_settings.file_format='PNG';scene.render.film_transparent=True
 scene.render.filepath=os.path.join(out,'avatar-neutral.png');bpy.ops.render.render(write_still=True)
-report={'bones':len(arm.data.bones),'meshes':len(meshes),'vertices':sum(len(o.data.vertices) for o in meshes),'source':'Original illustrative model; historic clothing reference only','pose_estimates':0,'binding':'none'}
+strip_png_text(os.path.join(out,'avatar-neutral.png'))
+for obj in meshes + lag_pieces:
+    print('mesh', obj.name, len(obj.data.vertices))
+report={'bones':len(arm.data.bones),'meshes':len(meshes + lag_pieces),'vertices':sum(len(o.data.vertices) for o in meshes + lag_pieces),
+        'source':'Original illustrative model; historic clothing reference only','pose_estimates':0,'binding':'none',
+        'build':'continuous skinned mesh v2','blender':bpy.app.version_string,
+        'skinned_meshes':len(meshes),'lag_meshes':len(lag_pieces),'lag':lag_report}
 with open(os.path.join(out,'build-report.json'),'w') as f:json.dump(report,f,indent=2)
 print(json.dumps(report))
+
+# ---------------------------------------------------------------------------
+# Optional pose tests. Everything above is already written at rest; nothing is saved below.
+# Bends follow the explorer's rule: a rotation about the rest-world +X axis in the bone's frame.
+# ---------------------------------------------------------------------------
+if POSE_TESTS:
+    def bend(name, degrees):
+        pose_bone = arm.pose.bones[name]
+        axis = arm_data.bones[name].matrix_local.to_3x3().inverted() @ Vector((1, 0, 0))
+        pose_bone.rotation_mode = 'QUATERNION'
+        pose_bone.rotation_quaternion = Quaternion(axis.normalized(), math.radians(degrees))
+    lag_rest = {o.name: o.matrix_basis.copy() for o in bpy.data.objects if o.name.startswith('lag:')}
+    def swing(which):
+        # 'out': every piece at -max_degrees (flared outwards / forwards); 'in': at +inward_degrees.
+        for name, basis in lag_rest.items():
+            node = bpy.data.objects[name]
+            degrees = 0 if which is None else -node['max_degrees'] if which == 'out' else node.get('inward_degrees', node['max_degrees'])
+            node.matrix_basis = basis @ Matrix.Rotation(math.radians(degrees), 4, 'X')
+    def rest():
+        swing(None)
+        for pose_bone in arm.pose.bones:
+            pose_bone.rotation_mode = 'QUATERNION'; pose_bone.rotation_quaternion = (1, 0, 0, 0)
+    views = {'front': (0, -3.3015, 1.45), 'side': (3.3015, 0, 1.45), 'three-quarter': (2.8, -4.5, 2.25)}
+    def shoot(label):
+        for view, location in views.items():
+            camera.location = location
+            camera.rotation_euler = (Vector((0, 0, .95)) - camera.location).to_track_quat('-Z', 'Y').to_euler()
+            path = os.path.join(out, f'pose-{label}-{view}.png')
+            scene.render.filepath = path
+            bpy.ops.render.render(write_still=True)
+            strip_png_text(path)
+    tests = {
+        'rest': {},
+        'elbows40-crouch30': {'left_elbow': -40, 'right_elbow': -40, 'left_hip': -30, 'right_hip': -30,
+                              'left_knee': 60, 'right_knee': 60, 'left_ankle': -30, 'right_ankle': -30},
+        'left-elbow60-deep-crouch': {'left_elbow': -60, 'left_hip': -60, 'right_hip': -60,
+                                     'left_knee': 120, 'right_knee': 120, 'left_ankle': -45, 'right_ankle': -45},
+        'twist': {'left_shoulder': 50, 'right_shoulder': -50, 'neck': 20, 'head': -20, 'left_wrist': 40, 'left_foot': 30},
+        'lag-out-elbows40-crouch30': {'left_elbow': -40, 'right_elbow': -40, 'left_hip': -30, 'right_hip': -30,
+                                      'left_knee': 60, 'right_knee': 60, 'left_ankle': -30, 'right_ankle': -30, 'lag': 'out'},
+        'lag-in-rest': {'lag': 'in'},
+        'lag-out-rest': {'lag': 'out'},
+    }
+    for label, bends in tests.items():
+        rest()
+        for name, degrees in bends.items():
+            if name == 'lag':
+                swing(degrees)
+            else:
+                bend(name, degrees)
+        bpy.context.view_layer.update()
+        shoot(label)
+    rest()

@@ -1,3 +1,6 @@
 /tools/catalogue/target/
 /.preview/
 /node_modules/
+.claude/
+.claude-flow/
+.swarm/

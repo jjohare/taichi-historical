@@ -1,0 +1,1816 @@
+{
+  "checked": "2026-10-24",
+  "entries": [
+    {
+      "application": {
+        "kind": "Evidence limit",
+        "source": null,
+        "text": "No sequence-specific historical application has been verified here. The linked lesson supplies movement context; any partner interpretation needs its own teacher and source."
+      },
+      "attention": {
+        "kind": "Editorial observation prompt",
+        "text": "Watch the relationship between the closing step and the start of the arm circle."
+      },
+      "comparison": null,
+      "directory": "poses/lee-01",
+      "end": 3,
+      "historicalMatch": "unverified",
+      "id": "lee-01",
+      "name": "Gather Celestial Energy",
+      "next": "lee-02",
+      "ordinal": 1,
+      "pdfPage": 24,
+      "position": {
+        "kind": "Later teaching",
+        "source": "gibbon",
+        "text": "Gibbon’s photographs show the feet closing, the arms rising overhead and the hands returning low."
+      },
+      "previous": null,
+      "rangeLabel": "1–3",
+      "sequenceSource": "wy",
+      "start": 1,
+      "teachingUrl": "https://taichiworkshops.co.uk/product/tai-chi-set-1-tai-chi-course-gather-celestial-energy/",
+      "video": "6Kp7KnYNo8g"
+    },
+    {
+      "application": {
+        "kind": "Later interpretation",
+        "source": "lute",
+        "text": "Ewers reads the sequence through ward-off, yielding, squeezing and pressing. This is his later teaching interpretation."
+      },
+      "attention": {
+        "kind": "Editorial observation prompt",
+        "text": "Compare the palms in the photograph manual with Ewers’s description; keep each teacher’s version intact."
+      },
+      "comparison": "lute",
+      "directory": "poses/lee-02",
+      "end": 6,
+      "historicalMatch": "unverified",
+      "id": "lee-02",
+      "name": "Play the Guitar",
+      "next": "lee-03",
+      "ordinal": 2,
+      "pdfPage": 26,
+      "position": {
+        "kind": "Later teaching",
+        "source": "gibbon",
+        "text": "Gibbon shows an advance, withdrawal and quarter-turn, with rounded forearm actions."
+      },
+      "previous": "lee-01",
+      "rangeLabel": "4–6",
+      "sequenceSource": "wy",
+      "start": 4,
+      "teachingUrl": "https://taichiworkshops.co.uk/product/set-2-tai-chi-workshops-play-the-guitar/",
+      "video": "AJaQVpslsXo"
+    },
+    {
+      "application": {
+        "kind": "Later interpretation",
+        "source": "weaving",
+        "text": "Ewers describes linked receiving and forward palm actions. His account does not establish a single compulsory fighting application."
+      },
+      "attention": {
+        "kind": "Editorial observation prompt",
+        "text": "Follow one full cycle of returning and advancing before comparing the next cycle."
+      },
+      "comparison": "weaving",
+      "directory": "poses/lee-03",
+      "end": 11,
+      "historicalMatch": "unverified",
+      "id": "lee-03",
+      "name": "Fair Lady Weaving",
+      "next": "lee-04",
+      "ordinal": 3,
+      "pdfPage": 28,
+      "position": {
+        "kind": "Later teaching",
+        "source": "gibbon",
+        "text": "Gibbon’s plates alternate forward and rear-weighted positions as the hands circle."
+      },
+      "previous": "lee-02",
+      "rangeLabel": "7–11",
+      "sequenceSource": "wy",
+      "start": 7,
+      "teachingUrl": "https://taichiworkshops.co.uk/product/set-3-tai-chi-workshops-fair-lady-weaving/",
+      "video": "q_JpFRLqVc0"
+    },
+    {
+      "application": {
+        "kind": "Later interpretation",
+        "source": "bump",
+        "text": "Ewers identifies a body-bumping possibility in the folding and weight transfer of his Crane sequence."
+      },
+      "attention": {
+        "kind": "Editorial observation prompt",
+        "text": "Notice that this named sequence contains several different shapes; a single crane photograph cannot represent it all."
+      },
+      "comparison": "waist",
+      "directory": "poses/lee-04",
+      "end": 17,
+      "historicalMatch": "unverified",
+      "id": "lee-04",
+      "name": "The Crane Exercises its Wings",
+      "next": "lee-05",
+      "ordinal": 4,
+      "pdfPage": 30,
+      "position": {
+        "kind": "Later teaching",
+        "source": "gibbon",
+        "text": "Gibbon includes wide standing, side weighting, feet together and overhead arm positions in this six-movement passage."
+      },
+      "previous": "lee-03",
+      "rangeLabel": "12–17",
+      "sequenceSource": "wy",
+      "start": 12,
+      "teachingUrl": "https://taichiworkshops.co.uk/product/set-4-tai-chi-workshops-the-crane-exercises-its-wings/",
+      "video": "wj78A4jvMPY"
+    },
+    {
+      "application": {
+        "kind": "Later interpretation",
+        "source": "tiger",
+        "text": "Ewers interprets the advance–retreat–advance through receiving, turning and returning force. His partner example is a later interpretation, not a recovered instruction from a Chee Soo plate."
+      },
+      "attention": {
+        "kind": "Editorial observation prompt",
+        "text": "Keep the change of supporting leg visible when reading the turning hands."
+      },
+      "comparison": "tiger",
+      "directory": "poses/lee-05",
+      "end": 20,
+      "historicalMatch": "unverified",
+      "id": "lee-05",
+      "name": "Drive the Tiger Away",
+      "next": "lee-06",
+      "ordinal": 5,
+      "pdfPage": 32,
+      "position": {
+        "kind": "Later teaching",
+        "source": "gibbon",
+        "text": "Gibbon labels the three photographed phases Dragon, Duck and Dragon."
+      },
+      "previous": "lee-04",
+      "rangeLabel": "18–20",
+      "sequenceSource": "wy",
+      "start": 18,
+      "teachingUrl": "https://taichiworkshops.co.uk/product/set-5-tai-chi-workshops-drive-the-tiger-away/",
+      "video": "-XtXrEg9dMs"
+    },
+    {
+      "application": {
+        "kind": "Later interpretation",
+        "source": "pluck",
+        "text": "Ewers discusses grasping in relation to this named posture in his later account of the plucking method."
+      },
+      "attention": {
+        "kind": "Editorial observation prompt",
+        "text": "Follow the fist and the supporting elbow separately, then consider how they travel together."
+      },
+      "comparison": null,
+      "directory": "poses/lee-06",
+      "end": 22,
+      "historicalMatch": "unverified",
+      "id": "lee-06",
+      "name": "Grasp the Bird's Tail",
+      "next": "lee-07",
+      "ordinal": 6,
+      "pdfPage": null,
+      "position": {
+        "kind": "Later teaching",
+        "source": "bird",
+        "text": "Ewers describes drawing the right fist beneath the opposite elbow while withdrawing, then stepping right and opening the right arm across the body."
+      },
+      "previous": "lee-05",
+      "rangeLabel": "21–22",
+      "sequenceSource": "wy",
+      "start": 21,
+      "teachingUrl": "https://taichiworkshops.co.uk/product/set-6-tai-chi-workshops-grasp-the-birds-tail/",
+      "video": "ea0N8MqePjw"
+    },
+    {
+      "application": {
+        "kind": "Evidence limit",
+        "source": null,
+        "text": "A name shared with Yang practice does not identify the same application. Compare the Lee lesson’s actual hand path before proposing a partner exercise."
+      },
+      "attention": {
+        "kind": "Editorial observation prompt",
+        "text": "Watch the less prominent hand as closely as the hand passing the knee."
+      },
+      "comparison": null,
+      "directory": "poses/lee-07",
+      "end": 24,
+      "historicalMatch": "unverified",
+      "id": "lee-07",
+      "name": "Brush Knee and Side Step",
+      "next": "lee-08",
+      "ordinal": 7,
+      "pdfPage": null,
+      "position": {
+        "kind": "Later teaching",
+        "source": "brush",
+        "text": "Ewers emphasises the shared timing of both hands and the waist-led sideways sweep. He criticises versions in which one hand becomes still."
+      },
+      "previous": "lee-06",
+      "rangeLabel": "23–24",
+      "sequenceSource": "wy",
+      "start": 23,
+      "teachingUrl": "https://taichiworkshops.co.uk/product/tai-chi-set-07-brush-knee-side-step/",
+      "video": "_dv_zGPWZpw"
+    },
+    {
+      "application": {
+        "kind": "Evidence limit",
+        "source": null,
+        "text": "No sequence-specific historical application has been verified here. The linked lesson supplies movement context; any partner interpretation needs its own teacher and source."
+      },
+      "attention": {
+        "kind": "Editorial observation prompt",
+        "text": "Distinguish a change of the shoulders from a change in the direction of the feet."
+      },
+      "comparison": null,
+      "directory": "poses/lee-08",
+      "end": 26,
+      "historicalMatch": "unverified",
+      "id": "lee-08",
+      "name": "Repulse the Monkey",
+      "next": "lee-09",
+      "ordinal": 8,
+      "pdfPage": null,
+      "position": {
+        "kind": "Later teaching",
+        "source": "waist",
+        "text": "Ewers uses Repulse the Monkey to illustrate rotation of the waist while the hips remain facing forward in his version."
+      },
+      "previous": "lee-07",
+      "rangeLabel": "25–26",
+      "sequenceSource": "wy",
+      "start": 25,
+      "teachingUrl": "https://taichiworkshops.co.uk/product/set-8-tai-chi-workshops-repulse-the-monkey/",
+      "video": "dgJtNeF2A7A"
+    },
+    {
+      "application": {
+        "kind": "Later interpretation",
+        "source": "stork",
+        "text": "Ewers assigns receiving, ward-off and other force relationships to both the arms and the lifted leg. This is an interpretation of the whole moving sequence."
+      },
+      "attention": {
+        "kind": "Editorial observation prompt",
+        "text": "Look for the moment of renewed heel contact rather than judging balance from the raised-leg photograph alone."
+      },
+      "comparison": null,
+      "directory": "poses/lee-09",
+      "end": 30,
+      "historicalMatch": "unverified",
+      "id": "lee-09",
+      "name": "The Stork is Aroused",
+      "next": "lee-10",
+      "ordinal": 9,
+      "pdfPage": null,
+      "position": {
+        "kind": "Later teaching",
+        "source": "stork",
+        "text": "Ewers describes four actions: the first two on one leg, then a return to ground contact and a forward step. The raised foot extends before returning."
+      },
+      "previous": "lee-08",
+      "rangeLabel": "27–30",
+      "sequenceSource": "wy",
+      "start": 27,
+      "teachingUrl": "https://taichiworkshops.co.uk/product/set-9-tai-chi-workshops-the-stalk-is-aroused/",
+      "video": "S2AaycxL1bs"
+    },
+    {
+      "application": {
+        "kind": "Later interpretation",
+        "source": "double-practice",
+        "text": "His later Double Whip article discusses several force methods within the sequence; its name does not prescribe one isolated strike."
+      },
+      "attention": {
+        "kind": "Editorial observation prompt",
+        "text": "Record palm direction and stance together when comparing demonstrations."
+      },
+      "comparison": "double",
+      "directory": "poses/lee-10",
+      "end": 32,
+      "historicalMatch": "unverified",
+      "id": "lee-10",
+      "name": "The Double Whip",
+      "next": "lee-11",
+      "ordinal": 10,
+      "pdfPage": null,
+      "position": {
+        "kind": "Later teaching",
+        "source": "double",
+        "text": "Ewers records a version with upright palms and contrasts it with a later version with palms facing down. His chronology is personal testimony."
+      },
+      "previous": "lee-09",
+      "rangeLabel": "31–32",
+      "sequenceSource": "wy",
+      "start": 31,
+      "teachingUrl": "https://taichiworkshops.co.uk/product/set-10-tai-chi-workshops-the-double-whip/",
+      "video": "i6AC35WUk9s"
+    },
+    {
+      "application": {
+        "kind": "Evidence limit",
+        "source": null,
+        "text": "No sequence-specific historical application has been verified here. The linked lesson supplies movement context; any partner interpretation needs its own teacher and source."
+      },
+      "attention": {
+        "kind": "Editorial observation prompt",
+        "text": "Use the numbered lesson to identify the turn and exit; do not substitute a similarly named snake posture."
+      },
+      "comparison": null,
+      "directory": "poses/lee-11",
+      "end": 36,
+      "historicalMatch": "unverified",
+      "id": "lee-11",
+      "name": "The Cobra Unwinds",
+      "next": "lee-12",
+      "ordinal": 11,
+      "pdfPage": null,
+      "position": {
+        "kind": "Evidence gap",
+        "source": "wy",
+        "text": "The named lesson covers movements 33–36. Ewers also discusses a Large Snake Unwinds posture, but an exact equivalence with this numbered Cobra passage has not been established here."
+      },
+      "previous": "lee-10",
+      "rangeLabel": "33–36",
+      "sequenceSource": "wy",
+      "start": 33,
+      "teachingUrl": "https://taichiworkshops.co.uk/product/set-11-tai-chi-workshops-the-cobra-unwinds/",
+      "video": "RnnwhTjvCLc"
+    },
+    {
+      "application": {
+        "kind": "Evidence limit",
+        "source": null,
+        "text": "No sequence-specific historical application has been verified here. The linked lesson supplies movement context; any partner interpretation needs its own teacher and source."
+      },
+      "attention": {
+        "kind": "Editorial observation prompt",
+        "text": "In the lesson, trace the supporting foot through the passage and record each change of facing before comparing any still image."
+      },
+      "comparison": null,
+      "directory": "poses/lee-12",
+      "end": 40,
+      "historicalMatch": "unverified",
+      "id": "lee-12",
+      "name": "The Wild Dog Retaliates",
+      "next": "lee-13",
+      "ordinal": 12,
+      "pdfPage": null,
+      "position": {
+        "kind": "Evidence gap",
+        "source": "wy",
+        "text": "The named video lesson covers movements 37–40. A sufficiently detailed written account of these four phases has not been verified in the sources reviewed."
+      },
+      "previous": "lee-11",
+      "rangeLabel": "37–40",
+      "sequenceSource": "wy",
+      "start": 37,
+      "teachingUrl": "https://taichiworkshops.co.uk/product/set-12-tai-chi-workshops-the-wild-dog-retaliates/",
+      "video": "c-35UmaI3-w"
+    },
+    {
+      "application": {
+        "kind": "Evidence limit",
+        "source": null,
+        "text": "No sequence-specific historical application has been verified here. The linked lesson supplies movement context; any partner interpretation needs its own teacher and source."
+      },
+      "attention": {
+        "kind": "Editorial observation prompt",
+        "text": "Observe the order in which the arms open and return; avoid selecting a still simply because its silhouette suggests a tail."
+      },
+      "comparison": null,
+      "directory": "poses/lee-13",
+      "end": 44,
+      "historicalMatch": "unverified",
+      "id": "lee-13",
+      "name": "The Tail of the Peacock",
+      "next": "lee-14",
+      "ordinal": 13,
+      "pdfPage": null,
+      "position": {
+        "kind": "Evidence gap",
+        "source": "wy",
+        "text": "The named video lesson covers movements 41–44. The peacock name alone does not establish the hand shape, stance or martial use."
+      },
+      "previous": "lee-12",
+      "rangeLabel": "41–44",
+      "sequenceSource": "wy",
+      "start": 41,
+      "teachingUrl": "https://taichiworkshops.co.uk/product/set-13-tai-chi-workshops-the-tail-of-the-peacock/",
+      "video": "g7mdg_SDfj0"
+    },
+    {
+      "application": {
+        "kind": "Evidence limit",
+        "source": null,
+        "text": "No sequence-specific historical application has been verified here. The linked lesson supplies movement context; any partner interpretation needs its own teacher and source."
+      },
+      "attention": {
+        "kind": "Editorial observation prompt",
+        "text": "Compare its entry with set 7 before assuming the repeated name means an identical transition."
+      },
+      "comparison": null,
+      "directory": "poses/lee-14",
+      "end": 46,
+      "historicalMatch": "unverified",
+      "id": "lee-14",
+      "name": "Brush Knee and Side Step",
+      "next": "lee-15",
+      "ordinal": 14,
+      "pdfPage": null,
+      "position": {
+        "kind": "Later teaching",
+        "source": "brush",
+        "text": "This second Brush Knee passage occupies movements 45–46. Ewers’s general discussion of the posture stresses that both hands continue to move together."
+      },
+      "previous": "lee-13",
+      "rangeLabel": "45–46",
+      "sequenceSource": "wy",
+      "start": 45,
+      "teachingUrl": "https://taichiworkshops.co.uk/product/set-14-tai-chi-workshops-brush-knee-side-step/",
+      "video": "cDOIgmXonAA"
+    },
+    {
+      "application": {
+        "kind": "Evidence limit",
+        "source": null,
+        "text": "No sequence-specific historical application has been verified here. The linked lesson supplies movement context; any partner interpretation needs its own teacher and source."
+      },
+      "attention": {
+        "kind": "Editorial observation prompt",
+        "text": "Watch the exit from movement 50 as well as the circular arm action; the complete form continues beyond this teaching division."
+      },
+      "comparison": null,
+      "directory": "poses/lee-15",
+      "end": 50,
+      "historicalMatch": "unverified",
+      "id": "lee-15",
+      "name": "The Edge of the Cyclone",
+      "next": "lee-16",
+      "ordinal": 15,
+      "pdfPage": null,
+      "position": {
+        "kind": "Later teaching",
+        "source": "cyclone",
+        "text": "This passage ends the first 50 movements. Ewers’s separate Cyclone practice stresses continuous circular movement and coordination of legs, torso, arms, breath and attention."
+      },
+      "previous": "lee-14",
+      "rangeLabel": "47–50",
+      "sequenceSource": "wy",
+      "start": 47,
+      "teachingUrl": "https://taichiworkshops.co.uk/product/set-15-tai-chi-workshops-the-edge-of-the-cyclone/",
+      "video": "H2bRVEom1KU"
+    },
+    {
+      "application": {
+        "kind": "Evidence limit",
+        "source": null,
+        "text": "No sequence-specific historical application has been verified here. The linked lesson supplies movement context; any partner interpretation needs its own teacher and source."
+      },
+      "attention": {
+        "kind": "Editorial observation prompt",
+        "text": "Compare the entry from Edge of the Cyclone with the exit into Double Whip; avoid importing the Yang Single Whip shape."
+      },
+      "comparison": null,
+      "directory": "poses/lee-16",
+      "end": 52,
+      "historicalMatch": "unverified",
+      "id": "lee-16",
+      "name": "Single Whip Unleashed",
+      "next": "lee-17",
+      "ordinal": 16,
+      "pdfPage": null,
+      "position": {
+        "kind": "Evidence gap",
+        "source": "wy",
+        "text": "The linked lesson identifies Single Whip Unleashed as movements 51–52. A phase-by-phase written description has not been verified here."
+      },
+      "previous": "lee-15",
+      "rangeLabel": "51–52",
+      "sequenceSource": "wy",
+      "start": 51,
+      "video": "mUJ6ZYkRaiY"
+    },
+    {
+      "application": {
+        "kind": "Evidence limit",
+        "source": null,
+        "text": "No sequence-specific historical application has been verified here. The linked lesson supplies movement context; any partner interpretation needs its own teacher and source."
+      },
+      "attention": {
+        "kind": "Editorial observation prompt",
+        "text": "Compare this return of Double Whip with set 10 without assuming the entry direction is the same."
+      },
+      "comparison": "double",
+      "directory": "poses/lee-17",
+      "end": 54,
+      "historicalMatch": "unverified",
+      "id": "lee-17",
+      "name": "The Double Whip",
+      "next": "lee-18",
+      "ordinal": 17,
+      "pdfPage": null,
+      "position": {
+        "kind": "Later teaching",
+        "source": "teacher-17",
+        "text": "Wood describes gathering towards the body followed by an outward, rounded expansion."
+      },
+      "previous": "lee-16",
+      "rangeLabel": "53–54",
+      "sequenceSource": "wy",
+      "start": 53,
+      "teachingUrl": "https://taichiworkshops.co.uk/product/tai-chi-set-17-the-double-whip/",
+      "video": "OaS4X6A0QRA"
+    },
+    {
+      "application": {
+        "kind": "Evidence limit",
+        "source": null,
+        "text": "No sequence-specific historical application has been verified here. The linked lesson supplies movement context; any partner interpretation needs its own teacher and source."
+      },
+      "attention": {
+        "kind": "Editorial observation prompt",
+        "text": "Distinguish the overall direction of travel from the smaller rise and fall of the hands."
+      },
+      "comparison": null,
+      "directory": "poses/lee-18",
+      "end": 58,
+      "historicalMatch": "unverified",
+      "id": "lee-18",
+      "name": "The Playful Dog",
+      "next": "lee-19",
+      "ordinal": 18,
+      "pdfPage": null,
+      "position": {
+        "kind": "Later teaching",
+        "source": "teacher-18",
+        "text": "Wood describes a sweep towards the east followed by movement to the right, forward, upward and downward."
+      },
+      "previous": "lee-17",
+      "rangeLabel": "55–58",
+      "sequenceSource": "wy",
+      "start": 55,
+      "teachingUrl": "https://taichiworkshops.co.uk/product/tai-chi-set-18-the-playful-dog/",
+      "video": "UQDVFAlcbI0"
+    },
+    {
+      "application": {
+        "kind": "Evidence limit",
+        "source": null,
+        "text": "No sequence-specific historical application has been verified here. The linked lesson supplies movement context; any partner interpretation needs its own teacher and source."
+      },
+      "attention": {
+        "kind": "Editorial observation prompt",
+        "text": "Follow the sequence of gathering and releasing; the animal name is a memory aid, not evidence of origin."
+      },
+      "comparison": null,
+      "directory": "poses/lee-19",
+      "end": 62,
+      "historicalMatch": "unverified",
+      "id": "lee-19",
+      "name": "Catching the Chickens",
+      "next": "lee-20",
+      "ordinal": 19,
+      "pdfPage": null,
+      "position": {
+        "kind": "Later teaching",
+        "source": "teacher-19",
+        "text": "Wood’s outline moves from gathering inward to a chopping action, another collection and a closing action."
+      },
+      "previous": "lee-18",
+      "rangeLabel": "59–62",
+      "sequenceSource": "wy",
+      "start": 59,
+      "teachingUrl": "https://taichiworkshops.co.uk/product/tai-chi-set-19-catching-the-chickens/",
+      "video": "AYRIfX8_vEQ"
+    },
+    {
+      "application": {
+        "kind": "Evidence limit",
+        "source": null,
+        "text": "No sequence-specific historical application has been verified here. The linked lesson supplies movement context; any partner interpretation needs its own teacher and source."
+      },
+      "attention": {
+        "kind": "Editorial observation prompt",
+        "text": "Use the lesson to establish which hand leads. An archer name does not determine left and right on its own."
+      },
+      "comparison": null,
+      "directory": "poses/lee-20",
+      "end": 65,
+      "historicalMatch": "unverified",
+      "id": "lee-20",
+      "name": "The Archer Prepares",
+      "next": "lee-21",
+      "ordinal": 20,
+      "pdfPage": null,
+      "position": {
+        "kind": "Later teaching",
+        "source": "teacher-20",
+        "text": "Wood’s short description identifies a step left and an aiming action."
+      },
+      "previous": "lee-19",
+      "rangeLabel": "63–65",
+      "sequenceSource": "wy",
+      "start": 63,
+      "teachingUrl": "https://taichiworkshops.co.uk/product/tai-chi-set-20-the-archer-prepares/",
+      "video": "YEIH4c3r8us"
+    },
+    {
+      "application": {
+        "kind": "Evidence limit",
+        "source": null,
+        "text": "No sequence-specific historical application has been verified here. The linked lesson supplies movement context; any partner interpretation needs its own teacher and source."
+      },
+      "attention": {
+        "kind": "Editorial observation prompt",
+        "text": "Follow the reversals of direction through the feet as well as the hands."
+      },
+      "comparison": null,
+      "directory": "poses/lee-21",
+      "end": 69,
+      "historicalMatch": "unverified",
+      "id": "lee-21",
+      "name": "Mount the Wild Horse",
+      "next": "lee-22",
+      "ordinal": 21,
+      "pdfPage": null,
+      "position": {
+        "kind": "Later teaching",
+        "source": "teacher-21",
+        "text": "Wood describes turning right, then left, followed by a drawing-in action through the imagery of controlling a horse."
+      },
+      "previous": "lee-20",
+      "rangeLabel": "66–69",
+      "sequenceSource": "wy",
+      "start": 66,
+      "teachingUrl": "https://taichiworkshops.co.uk/product/tai-chi-set-21-mount-the-wild-horse/",
+      "video": "dDO4AA8BTh8"
+    },
+    {
+      "application": {
+        "kind": "Evidence limit",
+        "source": null,
+        "text": "No sequence-specific historical application has been verified here. The linked lesson supplies movement context; any partner interpretation needs its own teacher and source."
+      },
+      "attention": {
+        "kind": "Editorial observation prompt",
+        "text": "Distinguish this three-movement passage from Single Whip Unleashed at set 16."
+      },
+      "comparison": null,
+      "directory": "poses/lee-22",
+      "end": 72,
+      "historicalMatch": "unverified",
+      "id": "lee-22",
+      "name": "Flexing of the Single Whip",
+      "next": "lee-23",
+      "ordinal": 22,
+      "pdfPage": null,
+      "position": {
+        "kind": "Later teaching",
+        "source": "teacher-22",
+        "text": "Wood outlines a rightward sweep followed by a return to the left, using the whip image for the action."
+      },
+      "previous": "lee-21",
+      "rangeLabel": "70–72",
+      "sequenceSource": "wy",
+      "start": 70,
+      "teachingUrl": "https://taichiworkshops.co.uk/product/tai-chi-set-22-flexing-of-the-single-whip/",
+      "video": "ZECgVRczlew"
+    },
+    {
+      "application": {
+        "kind": "Evidence limit",
+        "source": null,
+        "text": "No sequence-specific historical application has been verified here. The linked lesson supplies movement context; any partner interpretation needs its own teacher and source."
+      },
+      "attention": {
+        "kind": "Editorial observation prompt",
+        "text": "Compare this longer return of Repulse the Monkey with the two-movement passage at set 8."
+      },
+      "comparison": null,
+      "directory": "poses/lee-23",
+      "end": 76,
+      "historicalMatch": "unverified",
+      "id": "lee-23",
+      "name": "Repulse the Monkey",
+      "next": "lee-24",
+      "ordinal": 23,
+      "pdfPage": null,
+      "position": {
+        "kind": "Later teaching",
+        "source": "teacher-23",
+        "text": "Wood describes a rightward sweep and inward return, followed by an outward action to the right and then the left."
+      },
+      "previous": "lee-22",
+      "rangeLabel": "73–76",
+      "sequenceSource": "wy",
+      "start": 73,
+      "teachingUrl": "https://taichiworkshops.co.uk/product/tai-chi-set-23-repulse-the-monkey/",
+      "video": "kWmq_b5cd8o"
+    },
+    {
+      "application": {
+        "kind": "Evidence limit",
+        "source": null,
+        "text": "No sequence-specific historical application has been verified here. The linked lesson supplies movement context; any partner interpretation needs its own teacher and source."
+      },
+      "attention": {
+        "kind": "Editorial observation prompt",
+        "text": "Treat the directional language as a cue to examine the demonstration, not a complete stepping diagram."
+      },
+      "comparison": null,
+      "directory": "poses/lee-24",
+      "end": 78,
+      "historicalMatch": "unverified",
+      "id": "lee-24",
+      "name": "Encompass the East and West",
+      "next": "lee-25",
+      "ordinal": 24,
+      "pdfPage": null,
+      "position": {
+        "kind": "Later teaching",
+        "source": "teacher-24",
+        "text": "Wood describes an encircling action linking east and west. Her public outline does not specify each foot placement."
+      },
+      "previous": "lee-23",
+      "rangeLabel": "77–78",
+      "sequenceSource": "wy",
+      "start": 77,
+      "teachingUrl": "https://taichiworkshops.co.uk/product/tai-chi-set-23-repulse-the-monkey-copy/",
+      "video": "v2wvjkWjSIk"
+    },
+    {
+      "application": {
+        "kind": "Evidence limit",
+        "source": null,
+        "text": "No sequence-specific historical application has been verified here. The linked lesson supplies movement context; any partner interpretation needs its own teacher and source."
+      },
+      "attention": {
+        "kind": "Editorial observation prompt",
+        "text": "Watch how the upper and lower limbs exchange roles when the leg rises."
+      },
+      "comparison": null,
+      "directory": "poses/lee-25",
+      "end": 80,
+      "historicalMatch": "unverified",
+      "id": "lee-25",
+      "name": "The Dog Awakens",
+      "next": "lee-26",
+      "ordinal": 25,
+      "pdfPage": null,
+      "position": {
+        "kind": "Later teaching",
+        "source": "teacher-25",
+        "text": "Wood describes opposing downward and upward actions, followed by a warding action with the right arm and raised right leg."
+      },
+      "previous": "lee-24",
+      "rangeLabel": "79–80",
+      "sequenceSource": "wy",
+      "start": 79,
+      "teachingUrl": "https://taichiworkshops.co.uk/product/tai-chi-set-25-the-dog-awakens/",
+      "video": "SnmU29DEC5Y"
+    },
+    {
+      "application": {
+        "kind": "Evidence limit",
+        "source": null,
+        "text": "No sequence-specific historical application has been verified here. The linked lesson supplies movement context; any partner interpretation needs its own teacher and source."
+      },
+      "attention": {
+        "kind": "Editorial observation prompt",
+        "text": "Follow the backward step before considering the final reach; an endpoint photograph would omit that preparation."
+      },
+      "comparison": null,
+      "directory": "poses/lee-26",
+      "end": 82,
+      "historicalMatch": "unverified",
+      "id": "lee-26",
+      "name": "Roll and Stretch",
+      "next": "lee-27",
+      "ordinal": 26,
+      "pdfPage": null,
+      "position": {
+        "kind": "Later teaching",
+        "source": "teacher-26",
+        "text": "Wood outlines a leftward roll, a backward step and rightward draw, then an extension and cutting action."
+      },
+      "previous": "lee-25",
+      "rangeLabel": "81–82",
+      "sequenceSource": "wy",
+      "start": 81,
+      "teachingUrl": "https://taichiworkshops.co.uk/product/tai-chi-set-26-roll-and-stretch/",
+      "video": "DATmQrVJQfY"
+    },
+    {
+      "application": {
+        "kind": "Evidence limit",
+        "source": null,
+        "text": "No sequence-specific historical application has been verified here. The linked lesson supplies movement context; any partner interpretation needs its own teacher and source."
+      },
+      "attention": {
+        "kind": "Editorial observation prompt",
+        "text": "Identify the five numbered phases in the lesson. No organ, element or breathing correspondence is assigned here without a specific source."
+      },
+      "comparison": null,
+      "directory": "poses/lee-27",
+      "end": 87,
+      "historicalMatch": "unverified",
+      "id": "lee-27",
+      "name": "The Five Elements",
+      "next": "lee-28",
+      "ordinal": 27,
+      "pdfPage": null,
+      "position": {
+        "kind": "Evidence gap",
+        "source": "wy",
+        "text": "The linked lesson covers movements 83–87. Wood’s public listing confirms the title but supplies no movement description."
+      },
+      "previous": "lee-26",
+      "rangeLabel": "83–87",
+      "sequenceSource": "wy",
+      "start": 83,
+      "teachingUrl": "https://taichiworkshops.co.uk/product/tai-chi-set-27-the-five-elements/",
+      "video": "HOXto_A8ujI"
+    },
+    {
+      "application": {
+        "kind": "Evidence limit",
+        "source": null,
+        "text": "No sequence-specific historical application has been verified here. The linked lesson supplies movement context; any partner interpretation needs its own teacher and source."
+      },
+      "attention": {
+        "kind": "Editorial observation prompt",
+        "text": "Compare the direction changes with the earlier Double Whip passages; repeated titles retain separate entries."
+      },
+      "comparison": "double",
+      "directory": "poses/lee-28",
+      "end": 89,
+      "historicalMatch": "unverified",
+      "id": "lee-28",
+      "name": "The Double Whip",
+      "next": "lee-29",
+      "ordinal": 28,
+      "pdfPage": null,
+      "position": {
+        "kind": "Later teaching",
+        "source": "teacher-28",
+        "text": "Wood describes turning towards the south and then the east in this return of Double Whip."
+      },
+      "previous": "lee-27",
+      "rangeLabel": "88–89",
+      "sequenceSource": "wy",
+      "start": 88,
+      "teachingUrl": "https://taichiworkshops.co.uk/product/tai-chi-set-28-the-double-whip/",
+      "video": "oHMP_p4T07o"
+    },
+    {
+      "application": {
+        "kind": "Evidence limit",
+        "source": null,
+        "text": "No sequence-specific historical application has been verified here. The linked lesson supplies movement context; any partner interpretation needs its own teacher and source."
+      },
+      "attention": {
+        "kind": "Editorial observation prompt",
+        "text": "This Lee passage includes actions not implied by the familiar Cloud Hands name. Follow the linked Lee lesson rather than substituting a Yang pattern."
+      },
+      "comparison": null,
+      "directory": "poses/lee-29",
+      "end": 93,
+      "historicalMatch": "unverified",
+      "id": "lee-29",
+      "name": "Waving the Hands in the Clouds",
+      "next": "lee-30",
+      "ordinal": 29,
+      "pdfPage": null,
+      "position": {
+        "kind": "Later teaching",
+        "source": "teacher-29",
+        "text": "Wood’s outline includes a kick with opposing warding actions, a backward step, a forward action and a return to the centre."
+      },
+      "previous": "lee-28",
+      "rangeLabel": "90–93",
+      "sequenceSource": "wy",
+      "start": 90,
+      "teachingUrl": "https://taichiworkshops.co.uk/product/tai-chi-set-29-waving-the-hands-in-the-clouds/",
+      "video": "WKmbnbxh5_4"
+    },
+    {
+      "application": {
+        "kind": "Evidence limit",
+        "source": null,
+        "text": "No sequence-specific historical application has been verified here. The linked lesson supplies movement context; any partner interpretation needs its own teacher and source."
+      },
+      "attention": {
+        "kind": "Editorial observation prompt",
+        "text": "Track the relationship between the sweep and the retreat; avoid fixing the meaning of the wind image to one technique."
+      },
+      "comparison": null,
+      "directory": "poses/lee-30",
+      "end": 97,
+      "historicalMatch": "unverified",
+      "id": "lee-30",
+      "name": "Consoling the North Wind",
+      "next": "lee-31",
+      "ordinal": 30,
+      "pdfPage": null,
+      "position": {
+        "kind": "Later teaching",
+        "source": "teacher-30",
+        "text": "Wood describes clearing to the right and front, sweeping right, covering the front and withdrawing."
+      },
+      "previous": "lee-29",
+      "rangeLabel": "94–97",
+      "sequenceSource": "wy",
+      "start": 94,
+      "teachingUrl": "https://taichiworkshops.co.uk/product/tai-chi-set-30-consoling-the-north-wind/",
+      "video": "j53irS7Mcwk"
+    },
+    {
+      "application": {
+        "kind": "Evidence limit",
+        "source": null,
+        "text": "No sequence-specific historical application has been verified here. The linked lesson supplies movement context; any partner interpretation needs its own teacher and source."
+      },
+      "attention": {
+        "kind": "Editorial observation prompt",
+        "text": "Follow the sequence of facing changes before studying the animal imagery."
+      },
+      "comparison": null,
+      "directory": "poses/lee-31",
+      "end": 102,
+      "historicalMatch": "unverified",
+      "id": "lee-31",
+      "name": "The Leopard Shows its Teeth",
+      "next": "lee-32",
+      "ordinal": 31,
+      "pdfPage": null,
+      "position": {
+        "kind": "Later teaching",
+        "source": "teacher-31",
+        "text": "Wood describes a step right, a turn forward, a right kick, and a step and turn left."
+      },
+      "previous": "lee-30",
+      "rangeLabel": "98–102",
+      "sequenceSource": "wy",
+      "start": 98,
+      "teachingUrl": "https://taichiworkshops.co.uk/product/tai-chi-set-31-the-leopard-shows-its-teeth/",
+      "video": "knrWwNbmwF8"
+    },
+    {
+      "application": {
+        "kind": "Evidence limit",
+        "source": null,
+        "text": "No sequence-specific historical application has been verified here. The linked lesson supplies movement context; any partner interpretation needs its own teacher and source."
+      },
+      "attention": {
+        "kind": "Editorial observation prompt",
+        "text": "Notice the change from lowering to lifting. The scissors image does not itself establish a joint lock."
+      },
+      "comparison": null,
+      "directory": "poses/lee-32",
+      "end": 105,
+      "historicalMatch": "unverified",
+      "id": "lee-32",
+      "name": "The Scissors Cut the Silk",
+      "next": "lee-33",
+      "ordinal": 32,
+      "pdfPage": null,
+      "position": {
+        "kind": "Later teaching",
+        "source": "teacher-32",
+        "text": "Wood outlines a draw towards the centre, a right turn and downward press, followed by a lift outward to the right."
+      },
+      "previous": "lee-31",
+      "rangeLabel": "103–105",
+      "sequenceSource": "wy",
+      "start": 103,
+      "teachingUrl": "https://taichiworkshops.co.uk/product/tai-chi-set-32-the-scissors-cut-the-silk/",
+      "video": "r0CcnHQ5XwQ"
+    },
+    {
+      "application": {
+        "kind": "Evidence limit",
+        "source": null,
+        "text": "No sequence-specific historical application has been verified here. The linked lesson supplies movement context; any partner interpretation needs its own teacher and source."
+      },
+      "attention": {
+        "kind": "Editorial observation prompt",
+        "text": "Compare this release with the preparation imagery at set 20, while keeping their different places in the form clear."
+      },
+      "comparison": null,
+      "directory": "poses/lee-33",
+      "end": 108,
+      "historicalMatch": "unverified",
+      "id": "lee-33",
+      "name": "The Archer Releases His Arrow",
+      "next": "lee-34",
+      "ordinal": 33,
+      "pdfPage": null,
+      "position": {
+        "kind": "Later teaching",
+        "source": "teacher-33",
+        "text": "Wood describes turning into a mounted stance, drawing inward and expanding towards an intended direction."
+      },
+      "previous": "lee-32",
+      "rangeLabel": "106–108",
+      "sequenceSource": "wy",
+      "start": 106,
+      "teachingUrl": "https://taichiworkshops.co.uk/product/tai-chi-set-33-the-archer-releases-his-arrow/",
+      "video": "NOFTvIht6m0"
+    },
+    {
+      "application": {
+        "kind": "Evidence limit",
+        "source": null,
+        "text": "No sequence-specific historical application has been verified here. The linked lesson supplies movement context; any partner interpretation needs its own teacher and source."
+      },
+      "attention": {
+        "kind": "Editorial observation prompt",
+        "text": "Compare this third Brush Knee entry with sets 7 and 14; note what the previous sequence changes."
+      },
+      "comparison": null,
+      "directory": "poses/lee-34",
+      "end": 110,
+      "historicalMatch": "unverified",
+      "id": "lee-34",
+      "name": "Brush Knee and Side Step",
+      "next": "lee-35",
+      "ordinal": 34,
+      "pdfPage": null,
+      "position": {
+        "kind": "Later teaching",
+        "source": "teacher-34",
+        "text": "Wood describes an inward and downward action followed by a backward step and an action to the right."
+      },
+      "previous": "lee-33",
+      "rangeLabel": "109–110",
+      "sequenceSource": "wy",
+      "start": 109,
+      "teachingUrl": "https://taichiworkshops.co.uk/product/tai-chi-set-34-brush-knee-side-step/",
+      "video": "NxJ7qwG7Beg"
+    },
+    {
+      "application": {
+        "kind": "Evidence limit",
+        "source": null,
+        "text": "No sequence-specific historical application has been verified here. The linked lesson supplies movement context; any partner interpretation needs its own teacher and source."
+      },
+      "attention": {
+        "kind": "Editorial observation prompt",
+        "text": "Follow the reversals through the middle of the passage, not just the larger circles suggested by the title."
+      },
+      "comparison": null,
+      "directory": "poses/lee-35",
+      "end": 114,
+      "historicalMatch": "unverified",
+      "id": "lee-35",
+      "name": "Within the Cyclone",
+      "next": "lee-36",
+      "ordinal": 35,
+      "pdfPage": null,
+      "position": {
+        "kind": "Later teaching",
+        "source": "teacher-35",
+        "text": "Wood outlines a right turn and lift, a circle and downward press, then a left sweep, downward chop and rightward backhand action."
+      },
+      "previous": "lee-34",
+      "rangeLabel": "111–114",
+      "sequenceSource": "wy",
+      "start": 111,
+      "teachingUrl": "https://taichiworkshops.co.uk/product/tai-chi-set-35-within-the-cyclone/",
+      "video": "JsuwVxFjvB4"
+    },
+    {
+      "application": {
+        "kind": "Evidence limit",
+        "source": null,
+        "text": "No sequence-specific historical application has been verified here. The linked lesson supplies movement context; any partner interpretation needs its own teacher and source."
+      },
+      "attention": {
+        "kind": "Editorial observation prompt",
+        "text": "Compare the drawing actions with Mount the Wild Horse at set 21 without treating the two passages as interchangeable."
+      },
+      "comparison": null,
+      "directory": "poses/lee-36",
+      "end": 118,
+      "historicalMatch": "unverified",
+      "id": "lee-36",
+      "name": "The Wild Horse Resists",
+      "next": "lee-37",
+      "ordinal": 36,
+      "pdfPage": null,
+      "position": {
+        "kind": "Later teaching",
+        "source": "teacher-36",
+        "text": "Wood describes a left turn and repeated drawing-in actions using the image of restraining and mounting a wild horse."
+      },
+      "previous": "lee-35",
+      "rangeLabel": "115–118",
+      "sequenceSource": "wy",
+      "start": 115,
+      "teachingUrl": "https://taichiworkshops.co.uk/product/tai-chi-set-36-the-wild-horse-resists/",
+      "video": "th2mrgCWNX8"
+    },
+    {
+      "application": {
+        "kind": "Evidence limit",
+        "source": null,
+        "text": "No sequence-specific historical application has been verified here. The linked lesson supplies movement context; any partner interpretation needs its own teacher and source."
+      },
+      "attention": {
+        "kind": "Editorial observation prompt",
+        "text": "Separate this Playful Monkey passage from the earlier Repulse the Monkey sequences."
+      },
+      "comparison": null,
+      "directory": "poses/lee-37",
+      "end": 122,
+      "historicalMatch": "unverified",
+      "id": "lee-37",
+      "name": "The Playful Monkey",
+      "next": "lee-38",
+      "ordinal": 37,
+      "pdfPage": null,
+      "position": {
+        "kind": "Later teaching",
+        "source": "teacher-37",
+        "text": "Wood’s outline begins with a backward step and inward draw, followed by pushing away and leftward warding with opposing actions."
+      },
+      "previous": "lee-36",
+      "rangeLabel": "119–122",
+      "sequenceSource": "wy",
+      "start": 119,
+      "teachingUrl": "https://taichiworkshops.co.uk/product/tai-chi-set-37-the-playful-monkey/",
+      "video": "MX8wSAgDdH4"
+    },
+    {
+      "application": {
+        "kind": "Evidence limit",
+        "source": null,
+        "text": "No sequence-specific historical application has been verified here. The linked lesson supplies movement context; any partner interpretation needs its own teacher and source."
+      },
+      "attention": {
+        "kind": "Editorial observation prompt",
+        "text": "Watch the preparation for the kick before following the turn; do not infer a high kick from the title."
+      },
+      "comparison": null,
+      "directory": "poses/lee-38",
+      "end": 126,
+      "historicalMatch": "unverified",
+      "id": "lee-38",
+      "name": "The Chickens Become Excited",
+      "next": "lee-39",
+      "ordinal": 38,
+      "pdfPage": null,
+      "position": {
+        "kind": "Later teaching",
+        "source": "teacher-38",
+        "text": "Wood describes left and right warding, a lift and kick, then a right turn and outward expansion."
+      },
+      "previous": "lee-37",
+      "rangeLabel": "123–126",
+      "sequenceSource": "wy",
+      "start": 123,
+      "teachingUrl": "https://taichiworkshops.co.uk/product/tai-chi-set-38-the-chickens-become-excited/",
+      "video": "XsnmscJ4OfA"
+    },
+    {
+      "application": {
+        "kind": "Evidence limit",
+        "source": null,
+        "text": "No sequence-specific historical application has been verified here. The linked lesson supplies movement context; any partner interpretation needs its own teacher and source."
+      },
+      "attention": {
+        "kind": "Editorial observation prompt",
+        "text": "This is a named part of the Lee main form. It is not identified here with an independent Eight Brocades qigong routine."
+      },
+      "comparison": null,
+      "directory": "poses/lee-39",
+      "end": 134,
+      "historicalMatch": "unverified",
+      "id": "lee-39",
+      "name": "Eight Strands of the Brocade",
+      "next": "lee-40",
+      "ordinal": 39,
+      "pdfPage": null,
+      "position": {
+        "kind": "Later teaching",
+        "source": "teacher-39",
+        "text": "Wood’s outline alternates stepping, turns, drawing inward, outward actions and a rising sweep across this eight-movement passage."
+      },
+      "previous": "lee-38",
+      "rangeLabel": "127–134",
+      "sequenceSource": "wy",
+      "start": 127,
+      "teachingUrl": "https://taichiworkshops.co.uk/product/tai-chi-set-39-the-eight-strands-of-the-brocade/",
+      "video": "Um6PlEqV6nU"
+    },
+    {
+      "application": {
+        "kind": "Evidence limit",
+        "source": null,
+        "text": "No sequence-specific historical application has been verified here. The linked lesson supplies movement context; any partner interpretation needs its own teacher and source."
+      },
+      "attention": {
+        "kind": "Editorial observation prompt",
+        "text": "Treat inner-orbit language as traditional imagery. The catalogue does not prescribe an internal circulation exercise."
+      },
+      "comparison": null,
+      "directory": "poses/lee-40",
+      "end": 137,
+      "historicalMatch": "unverified",
+      "id": "lee-40",
+      "name": "Enclose the Inner Chi Orbit",
+      "next": "lee-41",
+      "ordinal": 40,
+      "pdfPage": null,
+      "position": {
+        "kind": "Later teaching",
+        "source": "teacher-40",
+        "text": "Wood describes drawing back and inward with a right turn, then lowering, expanding forward and returning towards the chest."
+      },
+      "previous": "lee-39",
+      "rangeLabel": "135–137",
+      "sequenceSource": "wy",
+      "start": 135,
+      "teachingUrl": "https://taichiworkshops.co.uk/product/tai-chi-set-40-enclose-the-inner-chi-orbit/",
+      "video": "nzSsWpOYR1Y"
+    },
+    {
+      "application": {
+        "kind": "Evidence limit",
+        "source": null,
+        "text": "No sequence-specific historical application has been verified here. The linked lesson supplies movement context; any partner interpretation needs its own teacher and source."
+      },
+      "attention": {
+        "kind": "Editorial observation prompt",
+        "text": "Compare the closing gathering with the opening set. The available video groups this passage and Finish within movements 138–140."
+      },
+      "comparison": null,
+      "directory": "poses/lee-41",
+      "end": 140,
+      "historicalMatch": "unverified",
+      "id": "lee-41",
+      "name": "Gather Earth's Energy",
+      "next": "lee-42",
+      "ordinal": 41,
+      "pdfPage": null,
+      "position": {
+        "kind": "Later teaching",
+        "source": "teacher-41",
+        "text": "Wood describes a downward-to-upward expansion, opening to the sides and folding back inward."
+      },
+      "previous": "lee-40",
+      "rangeLabel": "138–140 · shared closing passage",
+      "sequenceSource": "wy",
+      "sharedRange": true,
+      "start": 138,
+      "teachingUrl": "https://taichiworkshops.co.uk/product/tai-chi-set-41-gather-earths-energy/",
+      "video": "u7psfF9bxSI"
+    },
+    {
+      "application": {
+        "kind": "Evidence limit",
+        "source": null,
+        "text": "No sequence-specific historical application has been verified here. The linked lesson supplies movement context; any partner interpretation needs its own teacher and source."
+      },
+      "attention": {
+        "kind": "Editorial observation prompt",
+        "text": "Allow the ending to remain part of the sequence. The precise numbered boundary between sets 41 and 42 is unresolved in the checked sources."
+      },
+      "comparison": null,
+      "directory": "poses/lee-42",
+      "end": 140,
+      "historicalMatch": "unverified",
+      "id": "lee-42",
+      "name": "Finish",
+      "next": null,
+      "ordinal": 42,
+      "pdfPage": null,
+      "position": {
+        "kind": "Later teaching",
+        "source": "teacher-42",
+        "text": "Wood identifies Finish as its own set and describes relaxing after completing the long hand form."
+      },
+      "previous": "lee-41",
+      "rangeLabel": "138–140 · shared closing passage",
+      "sequenceSource": "wy",
+      "sharedRange": true,
+      "start": 138,
+      "teachingUrl": "https://taichiworkshops.co.uk/product/tai-chi-set-42-finish/",
+      "video": "u7psfF9bxSI"
+    }
+  ],
+  "movementCount": 140,
+  "schemaVersion": 1,
+  "sequenceCount": 42,
+  "sources": {
+    "angie": {
+      "author": "Angie Wood",
+      "date": "Current course listings; checked 24 October 2026",
+      "kind": "Later teaching",
+      "note": "Names corroborate the sequence structure. Public summaries supply brief later teaching descriptions, not a transcription of Chee Soo’s book. Set 9 is spelt ‘Stalk’ on this site; the video index and Gibbon tradition use ‘Stork’. Sets 41 and 42 are separate listings, without an exact numbered boundary.",
+      "title": "Angie Wood · 42-set course index",
+      "url": "https://taichiworkshops.co.uk/tai-chi-shop/"
+    },
+    "archive-variant": {
+      "author": "Taoist Arts Organisation; mirror of telecentres.com material",
+      "date": "Original publication date unverified",
+      "kind": "Conflicting archived count",
+      "note": "This page gives 142 movements / 41 sequences, unlike Chee Soo’s edited interview and later 140 / 42 descriptions. The count is recorded as unresolved, not silently normalised or used to renumber this catalogue.",
+      "title": "Archived Taoist Arts Organisation · The Form",
+      "url": "https://community.fortunecity.ws/westwood/carving/737/business/tao/taichi.htm"
+    },
+    "bibliography": {
+      "accessNote": "Direct fetch returned HTTP 503 on 24 October 2026; bibliography read through the indexed page.",
+      "archiveUrl": "https://web.archive.org/web/20260105142505/https://www.seahorsebooks.co.uk/chee-soo-biography/",
+      "author": "Seahorse Books",
+      "date": "Undated webpage; checked 24 October 2026",
+      "kind": "Publisher biography",
+      "note": "Lists 1976 Gordon and Cremonesi ISBN 0860330370, 1984 Aquarian Press ISBN 0850303877, and 2003 Seahorse ISBN 9780954524401. Publisher testimony about early lineage is not independent corroboration. The pictured archer-like pose is explicitly captioned as the Tai Chi dance.",
+      "title": "Seahorse Books · Chee Soo bibliography and life story",
+      "url": "https://seahorsebooks.co.uk/chee-soo-biography/"
+    },
+    "bird": {
+      "author": "Keith Ewers / LFIAA",
+      "date": "17 October 2015",
+      "kind": "Later teaching",
+      "note": "Describes withdrawing to Cat stance and stepping right. The shared name does not establish identity with Yang Grasp Sparrow’s Tail.",
+      "title": "Keith Ewers · Grasp the Bird’s Tail",
+      "url": "https://lfiaa.wordpress.com/2015/10/17/lfiaa-li-style-taijiquan-grasp-the-birds-tail-posture/"
+    },
+    "book": {
+      "accessNote": "Direct fetch returned HTTP 503 on 24 October 2026; description read through the indexed publisher page.",
+      "author": "Chee Soo; current publisher Seahorse Books",
+      "date": "1976; Aquarian Press 1984; Seahorse Books 2003",
+      "kind": "Historical manual / publisher record",
+      "note": "Publisher describes photographs of all 140 movements and says its reprint retains the Aquarian edition’s text, photographs and pagination. ISBN 9780954524401. Full plates were not directly inspected in this research; no historical image-to-movement matches are asserted. Publisher pages were intermittently unavailable.",
+      "title": "Chee Soo · The Chinese Art of T’ai Chi Ch’uan",
+      "url": "https://www.seahorsebooks.co.uk/product/the-chinese-art-of-tai-chi-chuan-by-chee-soo/"
+    },
+    "brush": {
+      "author": "Keith Ewers / LFIAA",
+      "date": "11 September 2019",
+      "kind": "Later teaching",
+      "note": "Stresses simultaneous hand movement and waist-led sweeps; explicitly disputes other versions.",
+      "title": "Keith Ewers · Brush Knee and Side Step",
+      "url": "https://lfiaa.wordpress.com/2019/09/11/lfiaa-li-style-lishi-tai-chi-square-yard-form-the-brush-knee-side-step-posture-both-hands-move-at-the-same-time/"
+    },
+    "bump": {
+      "author": "Keith Ewers / LFIAA",
+      "date": "14 July 2018",
+      "kind": "Later application interpretation",
+      "note": "Discusses an application within Crane and includes a later photograph of Ewers. Not evidence that every school teaches the same application.",
+      "title": "Keith Ewers · The Bumping Method",
+      "url": "https://lfiaa.wordpress.com/2018/07/14/lfiaa-lishi-taijiquan-the-bumping-method-kao-fa/"
+    },
+    "cyclone": {
+      "author": "Keith Ewers / LFIAA",
+      "date": "16 September 2020",
+      "kind": "Later teaching",
+      "note": "Focuses on connected circular movement; does not supply a numbered reconstruction of the historical form.",
+      "title": "Keith Ewers · Edge of the Cyclone",
+      "url": "https://lfiaa.wordpress.com/2020/09/16/lfiaa-li-style-lishi-taiji-qigong-edge-of-the-cyclone-posture-developing-a-quality-of-movement-to-improve-health-wellbeing/"
+    },
+    "double": {
+      "author": "Keith Ewers / LFIAA",
+      "date": "15 July 2015",
+      "kind": "Later recollection / explicit variant",
+      "note": "Recollects differences between earlier and later teaching, particularly upright versus downward-facing palms. The proposed chronology remains attributed testimony.",
+      "title": "Keith Ewers · Double Whip variants",
+      "url": "https://lfiaa.wordpress.com/2015/07/15/lishi-tai-chi-double-whip-posture/"
+    },
+    "double-practice": {
+      "author": "Keith Ewers / LFIAA",
+      "date": "8 May 2020",
+      "kind": "Later teaching",
+      "note": "Discusses force relationships and different ways of practising the passage separately. Those exercises are not substituted for the main form here.",
+      "title": "Keith Ewers · Double Whip practice",
+      "url": "https://lfiaa.wordpress.com/2020/05/08/lfiaa-li-style-lishi-taiji-qigong-the-double-whip-posture-shuang-bian-shi/"
+    },
+    "gibbon": {
+      "author": "Howard Gibbon / East–West Publications",
+      "date": "Edition undated; checked 24 October 2026",
+      "kind": "Later photographic manual",
+      "local": "sources/gibbon-first-five-sets.pdf",
+      "note": "37-page PDF. Opening photographs: printed/PDF pages 24, 26, 28, 30 and 32. Text faces them on the preceding page. Copyright notice on page 3 permits electronic distribution without alteration or sale and prohibits printing. The local copy is byte-for-byte unchanged. Photographs show Gibbon’s teaching material, not Chee Soo in the 1970s.",
+      "title": "Howard Gibbon · The First Five Sets",
+      "url": "https://taichionlinetraining.com/wp-content/uploads/Free-Tai-Chi-eBook-Download.pdf"
+    },
+    "interview": {
+      "accessNote": "The search reader supplied the two-page PDF text, but a direct fetch returned HTTP 404 on 24 October 2026.",
+      "author": "Chee Soo / John R. Jones; edited by Taoist Arts Organisation",
+      "date": "Interview April 1992; edited reprint © TAO 2005",
+      "kind": "First-person historical testimony",
+      "note": "Page 2 states 140 movements and distinguishes the main form from Flying Hands. The lineage story is Chee Soo’s testimony, not independently verified ancestry. This edited reprint includes medical claims; those are not adopted by this archive.",
+      "title": "Chee Soo interviewed by John R. Jones, April 1992",
+      "url": "https://www.taoistarts.org/wp-content/uploads/2012/08/interview_with_chee_soo.pdf"
+    },
+    "lute": {
+      "author": "Keith Ewers / LFIAA",
+      "date": "13 August 2020",
+      "kind": "Later teaching / explicit variant",
+      "note": "Contrasts palm orientations and arm levels between versions, and names martial force relationships. Links to the author’s illustrated page; no image reuse licence identified.",
+      "title": "Keith Ewers · Play the Lute",
+      "url": "https://lfiaa.wordpress.com/2020/08/13/lfiaa-li-style-lishi-taijiquans-play-the-lute-posture/"
+    },
+    "pearson": {
+      "author": "Carl Pearson",
+      "date": "Undated webpage; checked 24 October 2026",
+      "kind": "Practitioner historical commentary",
+      "note": "Discusses the lack of corroborating documentation for Chan Lee and the uncertainties of origin stories. This is a practitioner’s assessment; it neither proves nor disproves a proposed genealogy.",
+      "title": "Carl Pearson · Questions about Lee history",
+      "url": "https://carlpearson.org/faqs/"
+    },
+    "pluck": {
+      "author": "Keith Ewers / LFIAA",
+      "date": "19 July 2018",
+      "kind": "Later application interpretation",
+      "note": "Names Single Whip and Grasp the Bird’s Tail as examples; also acknowledges differing finger arrangements between his current method and his recollection of earlier teaching.",
+      "title": "Keith Ewers · The Plucking Method",
+      "url": "https://lfiaa.wordpress.com/2018/07/19/lfiaa-lishi-taijiquan-the-plucking-method-cai-fa/"
+    },
+    "stork": {
+      "author": "Keith Ewers / LFIAA",
+      "date": "19 January 2020",
+      "kind": "Later teaching and application interpretation",
+      "note": "Describes four phases and their force relationships. A useful later account rather than proof of the historical book’s exact execution.",
+      "title": "Keith Ewers · The Stork Is Aroused",
+      "url": "https://lfiaa.wordpress.com/2020/01/19/lfiaa-li-style-square-yard-tai-chi-the-eight-energies-of-the-stork-is-aroused-posture-guan-xin-dong-shi/"
+    },
+    "swanson": {
+      "accessNote": "Article text was available in the search index; direct access redirected to the federation homepage on 24 October 2026.",
+      "author": "Tony Swanson interviewed by FFAEMC",
+      "date": "2022 webpage",
+      "kind": "Later teacher interview",
+      "note": "Describes 42 sequences / 140 movements, with the first 15 sequences / 50 movements as the short portion. Discusses bodily coordination and the compact floor area. The French account is a later school’s explanation.",
+      "title": "Tony Swanson on Lee-style taijiquan",
+      "url": "https://www.ffaemc.fr/yimag/tony-swanson-presente-le-taichi-chuan-style-li/"
+    },
+    "teacher-01": {
+      "author": "Angie Wood",
+      "date": "Course page checked 24 October 2026",
+      "kind": "Later teaching",
+      "note": "Brief public course outline. Detailed paid lessons were not accessed; no historical date or complete footwork is inferred from the outline.",
+      "title": "Angie Wood · set 1",
+      "url": "https://taichiworkshops.co.uk/product/tai-chi-set-1-tai-chi-course-gather-celestial-energy/"
+    },
+    "teacher-02": {
+      "author": "Angie Wood",
+      "date": "Course page checked 24 October 2026",
+      "kind": "Later teaching",
+      "note": "Brief public course outline. Detailed paid lessons were not accessed; no historical date or complete footwork is inferred from the outline.",
+      "title": "Angie Wood · set 2",
+      "url": "https://taichiworkshops.co.uk/product/set-2-tai-chi-workshops-play-the-guitar/"
+    },
+    "teacher-03": {
+      "author": "Angie Wood",
+      "date": "Course page checked 24 October 2026",
+      "kind": "Later teaching",
+      "note": "Brief public course outline. Detailed paid lessons were not accessed; no historical date or complete footwork is inferred from the outline.",
+      "title": "Angie Wood · set 3",
+      "url": "https://taichiworkshops.co.uk/product/set-3-tai-chi-workshops-fair-lady-weaving/"
+    },
+    "teacher-04": {
+      "author": "Angie Wood",
+      "date": "Course page checked 24 October 2026",
+      "kind": "Later teaching",
+      "note": "Brief public course outline. Detailed paid lessons were not accessed; no historical date or complete footwork is inferred from the outline.",
+      "title": "Angie Wood · set 4",
+      "url": "https://taichiworkshops.co.uk/product/set-4-tai-chi-workshops-the-crane-exercises-its-wings/"
+    },
+    "teacher-05": {
+      "author": "Angie Wood",
+      "date": "Course page checked 24 October 2026",
+      "kind": "Later teaching",
+      "note": "Brief public course outline. Detailed paid lessons were not accessed; no historical date or complete footwork is inferred from the outline.",
+      "title": "Angie Wood · set 5",
+      "url": "https://taichiworkshops.co.uk/product/set-5-tai-chi-workshops-drive-the-tiger-away/"
+    },
+    "teacher-06": {
+      "author": "Angie Wood",
+      "date": "Course page checked 24 October 2026",
+      "kind": "Later teaching",
+      "note": "Brief public course outline. Detailed paid lessons were not accessed; no historical date or complete footwork is inferred from the outline.",
+      "title": "Angie Wood · set 6",
+      "url": "https://taichiworkshops.co.uk/product/set-6-tai-chi-workshops-grasp-the-birds-tail/"
+    },
+    "teacher-07": {
+      "author": "Angie Wood",
+      "date": "Course page checked 24 October 2026",
+      "kind": "Later teaching",
+      "note": "Brief public course outline. Detailed paid lessons were not accessed; no historical date or complete footwork is inferred from the outline.",
+      "title": "Angie Wood · set 7",
+      "url": "https://taichiworkshops.co.uk/product/tai-chi-set-07-brush-knee-side-step/"
+    },
+    "teacher-08": {
+      "author": "Angie Wood",
+      "date": "Course page checked 24 October 2026",
+      "kind": "Later teaching",
+      "note": "Brief public course outline. Detailed paid lessons were not accessed; no historical date or complete footwork is inferred from the outline.",
+      "title": "Angie Wood · set 8",
+      "url": "https://taichiworkshops.co.uk/product/set-8-tai-chi-workshops-repulse-the-monkey/"
+    },
+    "teacher-09": {
+      "author": "Angie Wood",
+      "date": "Course page checked 24 October 2026",
+      "kind": "Later teaching",
+      "note": "Brief public course outline. Detailed paid lessons were not accessed; no historical date or complete footwork is inferred from the outline.",
+      "title": "Angie Wood · set 9",
+      "url": "https://taichiworkshops.co.uk/product/set-9-tai-chi-workshops-the-stalk-is-aroused/"
+    },
+    "teacher-10": {
+      "author": "Angie Wood",
+      "date": "Course page checked 24 October 2026",
+      "kind": "Later teaching",
+      "note": "Brief public course outline. Detailed paid lessons were not accessed; no historical date or complete footwork is inferred from the outline.",
+      "title": "Angie Wood · set 10",
+      "url": "https://taichiworkshops.co.uk/product/set-10-tai-chi-workshops-the-double-whip/"
+    },
+    "teacher-11": {
+      "author": "Angie Wood",
+      "date": "Course page checked 24 October 2026",
+      "kind": "Later teaching",
+      "note": "Brief public course outline. Detailed paid lessons were not accessed; no historical date or complete footwork is inferred from the outline.",
+      "title": "Angie Wood · set 11",
+      "url": "https://taichiworkshops.co.uk/product/set-11-tai-chi-workshops-the-cobra-unwinds/"
+    },
+    "teacher-12": {
+      "author": "Angie Wood",
+      "date": "Course page checked 24 October 2026",
+      "kind": "Later teaching",
+      "note": "Brief public course outline. Detailed paid lessons were not accessed; no historical date or complete footwork is inferred from the outline.",
+      "title": "Angie Wood · set 12",
+      "url": "https://taichiworkshops.co.uk/product/set-12-tai-chi-workshops-the-wild-dog-retaliates/"
+    },
+    "teacher-13": {
+      "author": "Angie Wood",
+      "date": "Course page checked 24 October 2026",
+      "kind": "Later teaching",
+      "note": "Brief public course outline. Detailed paid lessons were not accessed; no historical date or complete footwork is inferred from the outline.",
+      "title": "Angie Wood · set 13",
+      "url": "https://taichiworkshops.co.uk/product/set-13-tai-chi-workshops-the-tail-of-the-peacock/"
+    },
+    "teacher-14": {
+      "author": "Angie Wood",
+      "date": "Course page checked 24 October 2026",
+      "kind": "Later teaching",
+      "note": "Brief public course outline. Detailed paid lessons were not accessed; no historical date or complete footwork is inferred from the outline.",
+      "title": "Angie Wood · set 14",
+      "url": "https://taichiworkshops.co.uk/product/set-14-tai-chi-workshops-brush-knee-side-step/"
+    },
+    "teacher-15": {
+      "author": "Angie Wood",
+      "date": "Course page checked 24 October 2026",
+      "kind": "Later teaching",
+      "note": "Brief public course outline. Detailed paid lessons were not accessed; no historical date or complete footwork is inferred from the outline.",
+      "title": "Angie Wood · set 15",
+      "url": "https://taichiworkshops.co.uk/product/set-15-tai-chi-workshops-the-edge-of-the-cyclone/"
+    },
+    "teacher-17": {
+      "author": "Angie Wood",
+      "date": "Course page checked 24 October 2026",
+      "kind": "Later teaching",
+      "note": "Brief public course outline. Detailed paid lessons were not accessed; no historical date or complete footwork is inferred from the outline.",
+      "title": "Angie Wood · set 17",
+      "url": "https://taichiworkshops.co.uk/product/tai-chi-set-17-the-double-whip/"
+    },
+    "teacher-18": {
+      "author": "Angie Wood",
+      "date": "Course page checked 24 October 2026",
+      "kind": "Later teaching",
+      "note": "Brief public course outline. Detailed paid lessons were not accessed; no historical date or complete footwork is inferred from the outline.",
+      "title": "Angie Wood · set 18",
+      "url": "https://taichiworkshops.co.uk/product/tai-chi-set-18-the-playful-dog/"
+    },
+    "teacher-19": {
+      "author": "Angie Wood",
+      "date": "Course page checked 24 October 2026",
+      "kind": "Later teaching",
+      "note": "Brief public course outline. Detailed paid lessons were not accessed; no historical date or complete footwork is inferred from the outline.",
+      "title": "Angie Wood · set 19",
+      "url": "https://taichiworkshops.co.uk/product/tai-chi-set-19-catching-the-chickens/"
+    },
+    "teacher-20": {
+      "author": "Angie Wood",
+      "date": "Course page checked 24 October 2026",
+      "kind": "Later teaching",
+      "note": "Brief public course outline. Detailed paid lessons were not accessed; no historical date or complete footwork is inferred from the outline.",
+      "title": "Angie Wood · set 20",
+      "url": "https://taichiworkshops.co.uk/product/tai-chi-set-20-the-archer-prepares/"
+    },
+    "teacher-21": {
+      "author": "Angie Wood",
+      "date": "Course page checked 24 October 2026",
+      "kind": "Later teaching",
+      "note": "Brief public course outline. Detailed paid lessons were not accessed; no historical date or complete footwork is inferred from the outline.",
+      "title": "Angie Wood · set 21",
+      "url": "https://taichiworkshops.co.uk/product/tai-chi-set-21-mount-the-wild-horse/"
+    },
+    "teacher-22": {
+      "author": "Angie Wood",
+      "date": "Course page checked 24 October 2026",
+      "kind": "Later teaching",
+      "note": "Brief public course outline. Detailed paid lessons were not accessed; no historical date or complete footwork is inferred from the outline.",
+      "title": "Angie Wood · set 22",
+      "url": "https://taichiworkshops.co.uk/product/tai-chi-set-22-flexing-of-the-single-whip/"
+    },
+    "teacher-23": {
+      "author": "Angie Wood",
+      "date": "Course page checked 24 October 2026",
+      "kind": "Later teaching",
+      "note": "Brief public course outline. Detailed paid lessons were not accessed; no historical date or complete footwork is inferred from the outline.",
+      "title": "Angie Wood · set 23",
+      "url": "https://taichiworkshops.co.uk/product/tai-chi-set-23-repulse-the-monkey/"
+    },
+    "teacher-24": {
+      "author": "Angie Wood",
+      "date": "Course page checked 24 October 2026",
+      "kind": "Later teaching",
+      "note": "Brief public course outline. Detailed paid lessons were not accessed; no historical date or complete footwork is inferred from the outline.",
+      "title": "Angie Wood · set 24",
+      "url": "https://taichiworkshops.co.uk/product/tai-chi-set-23-repulse-the-monkey-copy/"
+    },
+    "teacher-25": {
+      "author": "Angie Wood",
+      "date": "Course page checked 24 October 2026",
+      "kind": "Later teaching",
+      "note": "Brief public course outline. Detailed paid lessons were not accessed; no historical date or complete footwork is inferred from the outline.",
+      "title": "Angie Wood · set 25",
+      "url": "https://taichiworkshops.co.uk/product/tai-chi-set-25-the-dog-awakens/"
+    },
+    "teacher-26": {
+      "author": "Angie Wood",
+      "date": "Course page checked 24 October 2026",
+      "kind": "Later teaching",
+      "note": "Brief public course outline. Detailed paid lessons were not accessed; no historical date or complete footwork is inferred from the outline.",
+      "title": "Angie Wood · set 26",
+      "url": "https://taichiworkshops.co.uk/product/tai-chi-set-26-roll-and-stretch/"
+    },
+    "teacher-27": {
+      "author": "Angie Wood",
+      "date": "Course page checked 24 October 2026",
+      "kind": "Later teaching",
+      "note": "Brief public course outline. Detailed paid lessons were not accessed; no historical date or complete footwork is inferred from the outline.",
+      "title": "Angie Wood · set 27",
+      "url": "https://taichiworkshops.co.uk/product/tai-chi-set-27-the-five-elements/"
+    },
+    "teacher-28": {
+      "author": "Angie Wood",
+      "date": "Course page checked 24 October 2026",
+      "kind": "Later teaching",
+      "note": "Brief public course outline. Detailed paid lessons were not accessed; no historical date or complete footwork is inferred from the outline.",
+      "title": "Angie Wood · set 28",
+      "url": "https://taichiworkshops.co.uk/product/tai-chi-set-28-the-double-whip/"
+    },
+    "teacher-29": {
+      "author": "Angie Wood",
+      "date": "Course page checked 24 October 2026",
+      "kind": "Later teaching",
+      "note": "Brief public course outline. Detailed paid lessons were not accessed; no historical date or complete footwork is inferred from the outline.",
+      "title": "Angie Wood · set 29",
+      "url": "https://taichiworkshops.co.uk/product/tai-chi-set-29-waving-the-hands-in-the-clouds/"
+    },
+    "teacher-30": {
+      "author": "Angie Wood",
+      "date": "Course page checked 24 October 2026",
+      "kind": "Later teaching",
+      "note": "Brief public course outline. Detailed paid lessons were not accessed; no historical date or complete footwork is inferred from the outline.",
+      "title": "Angie Wood · set 30",
+      "url": "https://taichiworkshops.co.uk/product/tai-chi-set-30-consoling-the-north-wind/"
+    },
+    "teacher-31": {
+      "author": "Angie Wood",
+      "date": "Course page checked 24 October 2026",
+      "kind": "Later teaching",
+      "note": "Brief public course outline. Detailed paid lessons were not accessed; no historical date or complete footwork is inferred from the outline.",
+      "title": "Angie Wood · set 31",
+      "url": "https://taichiworkshops.co.uk/product/tai-chi-set-31-the-leopard-shows-its-teeth/"
+    },
+    "teacher-32": {
+      "author": "Angie Wood",
+      "date": "Course page checked 24 October 2026",
+      "kind": "Later teaching",
+      "note": "Brief public course outline. Detailed paid lessons were not accessed; no historical date or complete footwork is inferred from the outline.",
+      "title": "Angie Wood · set 32",
+      "url": "https://taichiworkshops.co.uk/product/tai-chi-set-32-the-scissors-cut-the-silk/"
+    },
+    "teacher-33": {
+      "author": "Angie Wood",
+      "date": "Course page checked 24 October 2026",
+      "kind": "Later teaching",
+      "note": "Brief public course outline. Detailed paid lessons were not accessed; no historical date or complete footwork is inferred from the outline.",
+      "title": "Angie Wood · set 33",
+      "url": "https://taichiworkshops.co.uk/product/tai-chi-set-33-the-archer-releases-his-arrow/"
+    },
+    "teacher-34": {
+      "author": "Angie Wood",
+      "date": "Course page checked 24 October 2026",
+      "kind": "Later teaching",
+      "note": "Brief public course outline. Detailed paid lessons were not accessed; no historical date or complete footwork is inferred from the outline.",
+      "title": "Angie Wood · set 34",
+      "url": "https://taichiworkshops.co.uk/product/tai-chi-set-34-brush-knee-side-step/"
+    },
+    "teacher-35": {
+      "author": "Angie Wood",
+      "date": "Course page checked 24 October 2026",
+      "kind": "Later teaching",
+      "note": "Brief public course outline. Detailed paid lessons were not accessed; no historical date or complete footwork is inferred from the outline.",
+      "title": "Angie Wood · set 35",
+      "url": "https://taichiworkshops.co.uk/product/tai-chi-set-35-within-the-cyclone/"
+    },
+    "teacher-36": {
+      "author": "Angie Wood",
+      "date": "Course page checked 24 October 2026",
+      "kind": "Later teaching",
+      "note": "Brief public course outline. Detailed paid lessons were not accessed; no historical date or complete footwork is inferred from the outline.",
+      "title": "Angie Wood · set 36",
+      "url": "https://taichiworkshops.co.uk/product/tai-chi-set-36-the-wild-horse-resists/"
+    },
+    "teacher-37": {
+      "author": "Angie Wood",
+      "date": "Course page checked 24 October 2026",
+      "kind": "Later teaching",
+      "note": "Brief public course outline. Detailed paid lessons were not accessed; no historical date or complete footwork is inferred from the outline.",
+      "title": "Angie Wood · set 37",
+      "url": "https://taichiworkshops.co.uk/product/tai-chi-set-37-the-playful-monkey/"
+    },
+    "teacher-38": {
+      "author": "Angie Wood",
+      "date": "Course page checked 24 October 2026",
+      "kind": "Later teaching",
+      "note": "Brief public course outline. Detailed paid lessons were not accessed; no historical date or complete footwork is inferred from the outline.",
+      "title": "Angie Wood · set 38",
+      "url": "https://taichiworkshops.co.uk/product/tai-chi-set-38-the-chickens-become-excited/"
+    },
+    "teacher-39": {
+      "author": "Angie Wood",
+      "date": "Course page checked 24 October 2026",
+      "kind": "Later teaching",
+      "note": "Brief public course outline. Detailed paid lessons were not accessed; no historical date or complete footwork is inferred from the outline.",
+      "title": "Angie Wood · set 39",
+      "url": "https://taichiworkshops.co.uk/product/tai-chi-set-39-the-eight-strands-of-the-brocade/"
+    },
+    "teacher-40": {
+      "author": "Angie Wood",
+      "date": "Course page checked 24 October 2026",
+      "kind": "Later teaching",
+      "note": "Brief public course outline. Detailed paid lessons were not accessed; no historical date or complete footwork is inferred from the outline.",
+      "title": "Angie Wood · set 40",
+      "url": "https://taichiworkshops.co.uk/product/tai-chi-set-40-enclose-the-inner-chi-orbit/"
+    },
+    "teacher-41": {
+      "author": "Angie Wood",
+      "date": "Course page checked 24 October 2026",
+      "kind": "Later teaching",
+      "note": "Brief public course outline. Detailed paid lessons were not accessed; no historical date or complete footwork is inferred from the outline.",
+      "title": "Angie Wood · set 41",
+      "url": "https://taichiworkshops.co.uk/product/tai-chi-set-41-gather-earths-energy/"
+    },
+    "teacher-42": {
+      "author": "Angie Wood",
+      "date": "Course page checked 24 October 2026",
+      "kind": "Later teaching",
+      "note": "Brief public course outline. Detailed paid lessons were not accessed; no historical date or complete footwork is inferred from the outline.",
+      "title": "Angie Wood · set 42",
+      "url": "https://taichiworkshops.co.uk/product/tai-chi-set-42-finish/"
+    },
+    "tiger": {
+      "author": "Keith Ewers / LFIAA",
+      "date": "20 December 2017",
+      "kind": "Later application interpretation",
+      "note": "Gives an advance, retreat and return interpretation and a partner application. A later school’s interpretation rather than a historical plate caption.",
+      "title": "Keith Ewers · Drive Tiger Away to the Mountain",
+      "url": "https://lfiaa.wordpress.com/2017/12/20/lfiaa-li-lee-style-taijiquan-drive-tiger-away-to-the-mountain-posture-po-hu-dui-shan-shi-eight-energies/"
+    },
+    "waist": {
+      "author": "Keith Ewers / LFIAA",
+      "date": "24 November 2019",
+      "kind": "Later teaching",
+      "note": "Uses Repulse the Monkey and Crane as examples of his waist/hip distinction. Read as his teaching account, not a prescription for forced spinal rotation.",
+      "title": "Keith Ewers · Turning the waist and hips",
+      "url": "https://lfiaa.wordpress.com/2019/11/24/lfiaa-li-style-lishi-taijiquan-square-yard-form-the-turning-of-the-waist-hip-methods-zhuan-yao-kua-fa/"
+    },
+    "weaving": {
+      "author": "Keith Ewers / LFIAA",
+      "date": "21 September 2015",
+      "kind": "Later teaching",
+      "note": "Describes the third named passage through weight transfer and reversing arm circles.",
+      "title": "Keith Ewers · Fair Lady Weaves the Shuttle",
+      "url": "https://lfiaa.wordpress.com/2015/09/21/lfiaa-li-style-taijiquan-form-3rd-posture/"
+    },
+    "wy": {
+      "author": "Mark and Kate Popplewell / West Yorkshire Tai Chi",
+      "date": "Undated webpage; checked 24 October 2026",
+      "kind": "Later teaching",
+      "note": "41 lesson links cover movements 1–140. The last lesson combines gathering and finishing. Names and movement ranges are factual catalogue metadata. Videos remain with their publisher; their descriptions are not a frame-by-frame visual audit.",
+      "title": "West Yorkshire Tai Chi · main-form video index",
+      "url": "https://westyorkshiretaichi.weebly.com/videos.html"
+    }
+  },
+  "style": "Chee Soo / Lee main hand form"
+}

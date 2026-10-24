@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Explore Chee Soo’s Lee main hand form: 42 named sequences, 140 movements, historical records and attributed later teaching.">
+  <meta name="theme-color" content="#33594d">
+  <title>The Lee main form — Taichi historical archive</title>
+  <link rel="stylesheet" href="../assets/site.css">
+  <link rel="stylesheet" href="../assets/traditions.css">
+  <link rel="stylesheet" href="lee.css">
+  <script type="module" src="lee.js"></script>
+</head>
+<body>
+  <a class="skip" href="#explore">Skip to the sequences</a>
+  <header class="masthead wrap">
+    <a class="brand" href="#top"><span class="seal" aria-hidden="true">李</span><span>THE LEE FORM<span class="brand-sub">Chee Soo · the main hand form</span></span></a>
+    <nav aria-label="Main navigation"><a href="#explore">Explore the form</a><a href="#history">History &amp; evidence</a><a href="#sources">Sources</a></nav>
+  </header>
+  <nav class="tradition-nav wrap" aria-label="Form archives"><a href="../">Yang long form <span>1930s image records</span></a><a href="./" aria-current="page">Lee main form <span>Chee Soo &amp; later teaching</span></a></nav>
+  <main id="top">
+    <section class="lee-hero wrap" data-od-id="lee-introduction" aria-labelledby="hero-title">
+      <div><p class="eyebrow">LEE FAMILY TAIJIQUAN · THE MAIN HAND FORM</p><h1 id="hero-title">A form. <br>Many records.</h1><p class="lead">Explore the sequence taught by Chee Soo through its published history and the teaching of those who followed him.</p><a class="primary" href="#set=1">Begin the sequence <span aria-hidden="true">→</span></a><p class="small">42 named sets · 140 movements · a separate Lee archive</p></div>
+      <div class="form-map" aria-label="Structure of the Lee main form"><p class="eyebrow">READING THE SEQUENCE</p><div class="form-count"><strong>140</strong><span>movements<br>in 42 named sets</span></div><div id="sequence-map" class="sequence-map"></div><p class="small">Sets 1–15 contain the first 50 movements. The form continues through the closing sets. <a href="sequence.html">Open the complete index →</a></p></div>
+    </section>
+    <section class="scope wrap" data-od-id="lee-historical-scope" aria-labelledby="scope-title">
+      <h2 id="scope-title">Read each record <br>in its own time.</h2>
+      <div><p>This is a historical source study, grounded in records of Chee Soo’s form and clearly attributed later teaching. <strong>Modern practice may differ as the art continues to evolve.</strong> A later demonstration helps explain a sequence; it does not establish precisely how Chee Soo performed every movement in an earlier edition.</p><p>The main hand form has its own sequence and numbering. Similar names and silhouettes do not establish a match with the Yang archive. This section covers the main form only.</p></div>
+    </section>
+    <section id="explore" class="archive wrap" data-od-id="lee-explorer" aria-labelledby="explore-title">
+      <div class="section-heading"><div><p class="eyebrow">THE MAIN FORM</p><h2 id="explore-title">Explore the 42 sets</h2></div><a href="sequence.html">Plain sequence index ↗</a></div>
+      <div class="explorer">
+        <aside class="index" aria-label="Sequence index">
+          <label for="search">Find a set or movement</label><input id="search" type="search" placeholder="Name, set 9, or move 27…" autocomplete="off">
+          <label for="section-filter">Part of the form</label><select id="section-filter"><option value="all">Whole main form</option><option value="opening">Sets 1–15 · movements 1–50</option><option value="continuation">Sets 16–42 · continuation</option><option value="photographs">With photograph manual</option></select>
+          <p id="result-count" class="small" role="status">Loading the source index…</p><nav id="position-list" aria-label="Lee main-form sets"></nav>
+          <p class="index-note">A set is a named passage containing several numbered movements. Closing sets 41–42 share a documented range; their precise boundary remains open.</p>
+        </aside>
+        <article id="study" aria-labelledby="move-title" aria-busy="true">
+          <div class="move-heading"><div><p id="move-number" class="eyebrow"></p><h3 id="move-title" tabindex="-1">Loading the form</h3></div><div class="step-controls"><button id="previous" aria-label="Previous set" disabled>←</button><button id="next" aria-label="Next set" disabled>→</button></div></div>
+          <p id="route-status" class="small" role="status"></p>
+          <div class="evidence"><span class="tag">LATER TEACHING · HISTORICAL POSE MATCH UNVERIFIED</span><p id="evidence-note">The lessons and photographs below retain their own authorship. They have not been matched to Chee Soo’s historical plates.</p></div>
+          <section class="source-view" data-od-id="lee-source-viewer" aria-labelledby="media-title">
+            <div class="media-heading"><h4 id="media-title">See the movement</h4><div class="segmented" role="group" aria-label="Reference format"><button id="video-tab" aria-pressed="true">Video lesson</button><button id="photo-tab" aria-pressed="false" hidden>Photograph manual</button></div></div>
+            <div id="media" class="media-stage"></div><p id="media-caption" class="small"></p>
+          </section>
+          <div class="reading-grid">
+            <section data-od-id="lee-movement-notes"><p id="position-kind" class="eyebrow">LATER TEACHING</p><h4>Position &amp; movement</h4><p id="position-note"></p><p id="position-source" class="small"></p><h4>Entering &amp; leaving</h4><p id="transition-note"></p><p id="transition-links" class="small"></p></section>
+            <section data-od-id="lee-application-notes"><p id="application-kind" class="eyebrow"></p><h4>Application study</h4><p id="application-note"></p><p id="application-source" class="small"></p><div id="comparison"></div></section>
+            <section data-od-id="lee-attention-notes"><p class="eyebrow">EDITORIAL OBSERVATION PROMPT</p><h4>Mind &amp; attention</h4><p id="attention-note"></p><h4>Breathing</h4><p>Read the <a href="#principles">attributed breathing notes</a> alongside this passage. A pose name or photograph alone cannot establish the timing of a breath.</p></section>
+            <section data-od-id="lee-entry-sources"><p class="eyebrow">TRACE THE RECORD</p><h4>Sources for this set</h4><ul id="entry-sources"></ul><a id="entry-notes">Open the static entry →</a></section>
+          </div>
+        </article>
+      </div>
+      <noscript><p>The interactive explorer needs JavaScript. All 42 entries remain available through the <a href="sequence.html">complete static index</a>, with links to their source lessons and notes.</p></noscript>
+    </section>
+    <section id="principles" class="wrap principles" data-od-id="lee-practice-context" aria-labelledby="principles-title">
+      <p class="eyebrow">READING MOVEMENT, BREATH &amp; INTENTION</p><h2 id="principles-title">The joins matter.</h2>
+      <div class="principle-grid">
+        <section><h3>Transitions</h3><p>In his later account, Tony Swanson describes coordination between shoulders and hips, elbows and knees, wrists and ankles. He distinguishes the first 50 movements from the more dynamic joins later in the form. <a href="https://www.ffaemc.fr/yimag/tony-swanson-presente-le-taichi-chuan-style-li/">Read the interview →</a></p><p class="small">Editorial study cue: compare the end of one lesson with the beginning of the next. Separately taught passages can conceal the linking movement.</p></section>
+        <section><h3>Breath</h3><p>Gibbon recommends natural breathing for beginners. Once the movements are familiar, his manual pairs inhalation with odd numbers and exhalation with even numbers, without forcing the breath. This is an attributed teaching convention, not a rule inferred from Chee Soo’s photographs. <a href="sources/gibbon-first-five-sets.pdf#page=16">Manual, pp. 16–17 →</a></p></section>
+        <section><h3>Intention</h3><p>The animal and landscape names can focus attention, but they are not anatomical instructions. Editorial prompts in this explorer ask you to look closely at timing, direction and support. They are our reading aids, separate from a teacher’s explanation of qi or an application.</p><p class="small">Application notes identify their teacher. Where the evidence is missing, that limit stays visible.</p></section>
+      </div>
+    </section>
+    <section id="history" class="scope wrap history" data-od-id="lee-history" aria-labelledby="history-title">
+      <div><p class="eyebrow">HISTORY &amp; PROVENANCE</p><h2 id="history-title">What can be dated? <br>What is testimony?</h2></div>
+      <div><ol class="timeline">
+        <li><strong>1976</strong><div><h3>The published manual</h3><p>Seahorse’s bibliography dates Chee Soo’s first English edition to 1976, published by Gordon and Cremonesi. This is a publication anchor; it does not date every photographed exposure. <a href="https://seahorsebooks.co.uk/chee-soo-biography/">Publisher bibliography →</a></p></div></li>
+        <li><strong>1984 / 2003</strong><div><h3>Later editions</h3><p>Aquarian Press issued the 1984 edition. Seahorse’s 2003 reprint is described by the publisher as retaining that edition’s photographs, text and page numbering. <a href="https://www.seahorsebooks.co.uk/product/the-chinese-art-of-tai-chi-chuan-by-chee-soo/">Edition record →</a></p></div></li>
+        <li><strong>1992</strong><div><h3>Chee Soo’s own account</h3><p>An edited interview with John R. Jones describes a 140-movement main form and distinguishes it from Flying Hands. It also records Chee Soo’s account of learning from Chan Lee. The surviving PDF is a 2005 edited reprint. <a href="https://www.taoistarts.org/wp-content/uploads/2012/08/interview_with_chee_soo.pdf">Read the interview →</a></p></div></li>
+        <li><strong>Later teaching</strong><div><h3>A living, varied practice</h3><p>Gibbon, Wood, Popplewell, Swanson and Ewers provide later records. Ewers explicitly recalls changes in Double Whip hand shapes and disputes some current methods. Those accounts remain attributed; they are not merged into one reconstructed pose. <a href="https://lfiaa.wordpress.com/2015/07/15/lishi-tai-chi-double-whip-posture/">Read the comparison →</a></p></div></li>
+      </ol><details><summary>Early lineage claims and conflicting counts</summary><p>Stories of an ancient Lee family transmission and Chee Soo’s meeting with Chan Lee belong to the tradition’s accounts of itself. Independent corroboration of the earliest genealogy has not been established here. <a href="https://carlpearson.org/faqs/">Carl Pearson discusses the documentary gaps</a>.</p><p>An <a href="https://community.fortunecity.ws/westwood/carving/737/business/tao/taichi.htm">archived TAO page</a> gives 142 movements in 41 sequences. Its date and the reason for that difference are unresolved. This explorer follows the explicitly attributed 140-movement index, corroborated by Chee Soo’s edited interview and later teaching records.</p><p>The last video combines movements 138–140 under gathering and finishing. Wood lists those as two sets. We retain both names and their shared range rather than invent a numerical boundary.</p></details></div>
+    </section>
+    <section id="sources" class="sources wrap" data-od-id="lee-source-ledger" aria-labelledby="sources-title">
+      <div><p class="eyebrow">SOURCES &amp; IMAGE RIGHTS</p><h2 id="sources-title">Keep the source <br>beside the claim.</h2><p>Photographs for the first five sets can be viewed in Gibbon’s complete PDF, with its original captions and proportions. Later video lessons remain on their publisher’s platform. Neither is labelled as a historical photograph of Chee Soo.</p><p>Chee Soo’s manual is the central historical image lead. Its full plates have not been inspected or licensed for this website. The commonly reproduced dance photograph is excluded from main-form matching.</p><p><a href="research/README.md">Research findings &amp; open questions</a><br><a href="catalogue.json">Catalogue and source ledger · JSON</a><br><a href="sources/README.md">PDF permission, checksum &amp; visual checks</a></p></div>
+      <ol id="source-list" class="source-list"><li><span>HISTORICAL MANUAL</span><a href="https://www.seahorsebooks.co.uk/product/the-chinese-art-of-tai-chi-chuan-by-chee-soo/">Chee Soo · The Chinese Art of T’ai Chi Ch’uan</a><p>The publisher’s edition record.</p></li><li><span>LATER PHOTOGRAPHIC MANUAL</span><a href="sources/gibbon-first-five-sets.pdf">Howard Gibbon · The First Five Sets</a><p>Complete, unaltered PDF, distributed under its page 3 notice.</p></li></ol>
+    </section>
+  </main>
+  <footer class="wrap"><span>The Lee main form · Historical source study</span><span><a href="../">Yang archive</a> · <a href="https://github.com/jjohare/taichi-historical">Repository</a> · Sources checked 24 October 2026</span></footer>
+</body>
+</html>

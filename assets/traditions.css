@@ -1,0 +1,6 @@
+.tradition-nav{display:flex;gap:8px;padding-block:12px}
+.tradition-nav a{display:block;text-decoration:none;padding:10px 18px;border:1px solid var(--border-strong);border-radius:2px;min-height:44px;font-size:14px}
+.tradition-nav a span{display:block;font-size:12px;color:var(--muted)}
+.tradition-nav a:hover{background:var(--floor)}
+.tradition-nav a[aria-current=page]{background:var(--surface);border-color:var(--border);border-bottom:3px solid var(--jade);color:var(--fg)}
+@media(max-width:600px){.tradition-nav a{padding:10px 12px;flex:1;font-size:14px}.tradition-nav a span{font-size:12px}}
