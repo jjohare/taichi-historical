@@ -27,6 +27,7 @@ browserTest('PE-03 no other bone moves when only the elbow slider moves', () =>
 
 browserTest('PE-04 crouch slider at 30: hips −30, knees +60, ankles −30, pelvis lowered, output 30°', () =>
   withExplorer({}, async page => {
+    const before = await page.evaluate(SNAPSHOT);
     await page.evaluate(setSlider('stance-angle', 30));
     assert.equal(await page.evaluate(text('stance-value')), '30°');
     const snap = await page.evaluate(SNAPSHOT);
@@ -35,8 +36,11 @@ browserTest('PE-04 crouch slider at 30: hips −30, knees +60, ankles −30, pel
       same(snap[`${side}_knee`].q, toArray(expectedBend(rest, `${side}_knee`, 60)), `${side}_knee`);
       same(snap[`${side}_ankle`].q, toArray(expectedBend(rest, `${side}_ankle`, -30)), `${side}_ankle`);
     }
-    const wantY = 0.94 - 0.8 * (1 - Math.cos(30 * Math.PI / 180));
-    assert.ok(Math.abs(snap.pelvis.p[1] - wantY) < 1e-4, `pelvis y ${snap.pelvis.p[1]} vs ${wantY}`);
+    // Spec: pelvis local y = rest y − 0.8·(1 − cos 30°). Rest comes from the load-time snapshot, not a literal; the rig sits under an unrotated root, so the world drop equals the local drop.
+    const restLocalY = await page.evaluate("__explorer.rig.rest.get('pelvis').position[1]");
+    assert.ok(Math.abs(restLocalY - 0.94) < 1e-4, `pelvis rest local y ${restLocalY}`);
+    const drop = 0.8 * (1 - Math.cos(30 * Math.PI / 180));
+    assert.ok(Math.abs(snap.pelvis.p[1] - (before.pelvis.p[1] - drop)) < 1e-4, `pelvis y ${snap.pelvis.p[1]} vs ${before.pelvis.p[1]} − ${drop}`);
   }));
 
 browserTest('PE-05 skeleton toggle shows the helper and keeps only palm/finger/thumb/shoe/Head meshes; unchecking restores all', () =>

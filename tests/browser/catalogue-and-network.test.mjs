@@ -41,6 +41,13 @@ browserTest('PE-26/PE-29/PE-28 scripted S1 session: zero console errors, same-or
     assert.ok(paths.some(p => p === 'assets/explorer/main.js'), 'the explorer entry module should be requested');
     assert.ok(!paths.some(p => p.includes('avatar-neutral')), 'PE-28: the still image must not be fetched on a normal load');
     assert.ok(!paths.some(p => p.startsWith('assets/pose-estimates/') && !p.endsWith('index.json')), 'PE-28: no pose file fetched');
-    const unexpected = paths.filter(p => !/^(?:$|index\.html$|favicon\.ico$|(?:assets|extracted|poses)\/)/.test(p));
-    assert.deepEqual(unexpected, [], 'PE-28: requests outside the existing site layout');
+    // PE-28: no new requests compared with the pre-explorer page, apart from explorer/*.js. Explicit allowlist, nothing wildcarded but the selected entry's images.
+    const allowed = [
+      /^(?:index\.html)?$/, /^favicon\.ico$/, /^assets\/(?:site\.css|site\.js|viewer\.js|catalogue\.json)$/,
+      /^assets\/explorer\/[\w-]+\.js$/, /^assets\/vendor\/(?:three\.module|three\.core|OrbitControls|GLTFLoader|BufferGeometryUtils|SkeletonUtils)\.js$/,
+      /^assets\/vendor\/noto-serif-sc-subset\.ttf$/, /^assets\/model\/archive-avatar\.glb$/,
+      /^extracted\/historical\/(?:yang|chen)-\d{3}\.png$/, /^poses\/[\w-]+\/montage-\d{3}\.png$/,
+    ];
+    const unexpected = paths.filter(p => !allowed.some(re => re.test(p)));
+    assert.deepEqual(unexpected, [], 'PE-28: requests outside the pre-explorer request set');
   }));

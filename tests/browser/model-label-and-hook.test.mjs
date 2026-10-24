@@ -16,6 +16,9 @@ browserTest('PE-02 with the GLB request failing: JOINT RIG · AVATAR UNAVAILABLE
     await page.until(() => page.consoleErrors.length > 0, {what: 'the avatar console.error'});
     assert.equal(await page.evaluate(label), 'JOINT RIG · AVATAR UNAVAILABLE');
     assert.equal(await page.evaluate('__explorer.state.rig'), 'fallback-rig');
+    assert.equal(await page.evaluate('__explorer.state.fallbackVisible'), true, 'the procedural rig is visible');
+    assert.equal(await page.evaluate("document.getElementById('avatar-controls').hidden"), true, 'avatar-only controls stay hidden');
+    await page.quiet(500);                       // let any second error arrive before counting
     assert.equal(page.consoleErrors.length, 1, page.consoleErrors.join(' | '));
     assert.match(page.consoleErrors[0], /^Avatar could not be loaded/);
     assert.deepEqual(page.exceptions, []);
@@ -36,10 +39,9 @@ browserTest('PE-37 with ?explorer-test=1 the hook is a frozen object with a read
     assert.equal(await page.evaluate('Object.isFrozen(window.__explorer)'), true);
     const result = await page.evaluate(`(() => {
       'use strict';
-      let threw = false;
-      try { __explorer.state = {hacked: true}; } catch { threw = true; }
+      try { __explorer.state = {hacked: true}; } catch {}   // throwing and silently ignoring are both allowed (PE-37)
       const snapshot = __explorer.state; snapshot.checks.elbow = 99; snapshot.hacked = true;
-      return {threw, hacked: __explorer.state.hacked, elbow: __explorer.state.checks.elbow, hasRenderer: typeof __explorer.state.renderer};
+      return {hacked: __explorer.state.hacked, elbow: __explorer.state.checks.elbow, hasRenderer: typeof __explorer.state.renderer};
     })()`);
     assert.equal(result.hacked, undefined, 'assigning to state must have no effect');
     assert.equal(result.elbow, 0, 'mutating a snapshot must not change real state');

@@ -56,13 +56,13 @@ browserTest('PE-08 renderCount does not change over 3 s without interaction, and
 browserTest('PE-08 a programmatic orbit while the panel is scrolled out of view does not render until it is visible again', () =>
   withExplorer({}, async page => {
     await settle(page);
-    await page.evaluate("document.body.append(Object.assign(document.createElement('div'), {id: 'test-spacer', style: 'height:20000px'})); window.scrollTo(0, document.body.scrollHeight);");
+    await page.evaluate("document.body.append(Object.assign(document.createElement('div'), {id: 'test-spacer', style: 'height:20000px'})); window.scrollTo({top: document.body.scrollHeight, behavior: 'instant'});");
     await page.waitFor("(() => { const r = document.getElementById('model-view').getBoundingClientRect(); return r.bottom < 0 || r.top > innerHeight; })()", {what: 'model panel out of view'});
-    await page.quiet(500);                       // IntersectionObserver delivers asynchronously; there is no event to await
+    await page.waitFor('__explorer.state.visible === false', {what: 'the IntersectionObserver to report the panel hidden'});
     const before = await renderCount(page);
     await page.evaluate(click('orbit-right'));
     await page.quiet(500);
     assert.equal(await renderCount(page), before, 'rendered while hidden');
-    await page.evaluate("document.getElementById('model-view').scrollIntoView()");
+    await page.evaluate("document.getElementById('model-view').scrollIntoView({behavior: 'instant'})");
     await page.waitFor(`__explorer.state.renderCount > ${before}`, {what: 'a render once visible again'});
   }));
