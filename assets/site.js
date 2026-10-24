@@ -4,11 +4,15 @@ const statusNames = {'direct':'Direct sequence match','endpoint-reference':'Endp
 let catalogue=[], current=null, source='montage', imageIndex=0;
 const node = (tag, text, className) => {const el=document.createElement(tag);if(text!==undefined)el.textContent=text;if(className)el.className=className;return el;};
 function filterList(){
+  const scrollTop=$('position-list').scrollTop;
   const query=$('search').value.trim().toLowerCase(), section=$('section-filter').value;
   const matches=catalogue.filter(m=>(section==='all'||String(m.section)===section)&&(!query||m.name.toLowerCase().includes(query)||String(m.id)===query||String(m.id).padStart(3,'0')===query||m.family.includes(query)));
   $('result-count').textContent=`${matches.length} of ${catalogue.length} positions`;
   $('position-list').replaceChildren(...matches.map(m=>{const a=node('a');a.href=`#move=${m.id}`;a.className='position-link';a.dataset.id=m.id;a.append(node('span',String(m.id).padStart(3,'0'),'num'),node('span',m.name));if(current?.id===m.id)a.setAttribute('aria-current','true');return a;}));
   if(!matches.length)$('position-list').append(node('p','No matching position. Try another name or section.','small'));
+  $('position-list').scrollTop=scrollTop;
+  const active=$('position-list').querySelector('[aria-current]');
+  if(active){const list=$('position-list'),bounds=list.getBoundingClientRect(),row=active.getBoundingClientRect();if(row.top<bounds.top)list.scrollTop+=row.top-bounds.top;else if(row.bottom>bounds.bottom)list.scrollTop+=row.bottom-bounds.bottom;}
 }
 function showImage(){
   const images=current.images.filter(im=>im.source===source), im=images[imageIndex];
