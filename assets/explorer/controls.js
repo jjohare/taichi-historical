@@ -21,13 +21,19 @@ export function bindControls(doc, actions, getState) {
   $('elbow-angle').oninput = e => actions.setElbow(Number(e.target.value));
   $('stance-angle').oninput = e => actions.setCrouch(Number(e.target.value));
   $('show-skeleton').onchange = e => actions.setSkeleton(e.target.checked);
+  $('show-neutral').onchange = e => actions.setShowNeutral(e.target.checked);
+  $('pose-file').onchange = e => { const file = e.target.files[0]; if (file) actions.openPoseFile(file); };
   return {
     sync() {
-      const state = getState(), {checks, rig, pose, camera, selectedJoint} = state, {tag, text, detail} = provenanceFor(pose, {rig});
+      const state = getState(), {checks, rig, pose, camera, selectedJoint} = state, {tag, text, detail} = provenanceFor(pose, {rig, imageLabel: pose.imageLabel});
       for (const button of presets) button.setAttribute('aria-pressed', String(button.dataset.preset === camera.preset));
       $('elbow-angle').value = checks.elbow; $('joint-value').textContent = `${checks.elbow}°`;
       $('stance-angle').value = checks.crouch; $('stance-value').textContent = `${checks.crouch}°`;
-      $('show-skeleton').checked = checks.skeleton;
+      $('show-skeleton').checked = checks.skeleton; $('show-neutral').checked = state.showNeutral;
+      // A shown estimate is never modified under its reviewed label (PE-20).
+      const locked = pose.kind !== 'neutral';
+      $('elbow-angle').disabled = locked; $('stance-angle').disabled = locked; $('slider-note').hidden = !locked;
+      $('pose-error').textContent = state.poseError ?? '';
       $('avatar-controls').hidden = rig !== 'avatar';
       if (tag) $('model-label').textContent = tag;
       $('model-provenance').textContent = text; $('model-provenance-detail').textContent = detail;

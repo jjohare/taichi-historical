@@ -56,7 +56,8 @@
               <label class="field-label" for="joint-select">Inspect a joint</label><select id="joint-select"><option value="">None</option></select>
               <p id="joint-readout" class="joint-readout" aria-live="polite"></p>
               <label class="joint-label" for="elbow-angle">Joint check <span id="joint-value">0°</span></label><input id="elbow-angle" type="range" min="0" max="100" value="0" aria-label="Bend elbows to check the joint hierarchy">
-              <div id="avatar-controls" hidden><label class="joint-label" for="stance-angle">Crouch clearance check <span id="stance-value">0°</span></label><input id="stance-angle" type="range" min="0" max="65" value="0"><label class="skeleton-toggle"><input id="show-skeleton" type="checkbox"> Show skeleton, hands &amp; feet</label></div>
+              <div id="avatar-controls" hidden><label class="joint-label" for="stance-angle">Crouch clearance check <span id="stance-value">0°</span></label><input id="stance-angle" type="range" min="0" max="65" value="0"><label class="skeleton-toggle"><input id="show-skeleton" type="checkbox"> Show skeleton, hands &amp; feet</label><label class="skeleton-toggle"><input id="show-neutral" type="checkbox"> Show neutral avatar</label><label class="field-label" for="pose-file">Open a pose file (local preview)</label><input id="pose-file" type="file" accept="application/json"></div>
+              <p id="slider-note" class="small" hidden>Clear the estimate to use the joint checks.</p><p id="pose-error" class="small" role="status"></p>
               <p class="small">Drag to orbit · scroll or pinch to zoom. This illustrative avatar is independent of the selected position. The crouch is a clothing check, not a recovered form posture. <a href="assets/model/README.md">Model notes</a></p>
             </section>
           </div>

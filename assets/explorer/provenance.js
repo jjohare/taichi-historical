@@ -5,12 +5,30 @@ export const TEXT = {
   avatar: 'ILLUSTRATIVE AVATAR',
   unavailable: 'JOINT RIG · AVATAR UNAVAILABLE',
   lost: 'The 3D graphics context was interrupted. Reload to restore the viewer.',
+  estimated: 'ESTIMATED POSE',
+  local: 'LOCAL FILE · NOT REVIEWED',
+  localText: 'Unpublished pose file — local preview, not reviewed for this site',
+  slidersLocked: 'Clear the estimate to use the joint checks.',
+  rejected: message => `This pose file was rejected: ${message}`,
 };
 
-// Pure function of state (ADR-0004): nothing sets the label on its own. `pose` is state.pose; `context` carries
-// the rig kind ('pending' while the avatar loads). Returns {tag, text, detail}; tag is null only while pending, so the markup's own NEUTRAL RIG label stands.
-// Only the neutral pose exists until S5; any other kind falls back to the conservative neutral wording.
-export function provenanceFor(pose, {rig} = {}) {
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+/** '2026-10-24' → '24 October 2026': no leading zero, no ordinal. */
+export const formatReviewDate = iso => { const [y, m, d] = iso.split('-').map(Number); return `${d} ${MONTHS[m - 1]} ${y}`; };
+
+// Pure function of state (ADR-0004): nothing sets the label on its own. `pose` is state.pose; the context carries the rig kind
+// ('pending' while the avatar loads) and the displayed image's label. Returns {tag, text, detail}; tag is null only while pending,
+// so the markup's own NEUTRAL RIG label stands. Every estimate string is built from the validated file alone.
+export function provenanceFor(pose, {rig, imageLabel} = {}) {
+  if (pose?.kind === 'estimate' && pose.origin === 'local') return {tag: TEXT.local, text: TEXT.localText, detail: ''};
+  if (pose?.kind === 'estimate') {
+    const {file} = pose;
+    return {
+      tag: TEXT.estimated,
+      text: `Estimated pose — from ${imageLabel ?? file.imageId} (${file.imageId}), reviewed ${formatReviewDate(file.review.date)}`,
+      detail: `${file.estimator.name} · confidence ${file.confidence.overall.toFixed(2)} · an estimate, not a measurement`,
+    };
+  }
   const tag = rig === 'pending' ? null : rig === 'fallback-rig' ? TEXT.unavailable : TEXT.avatar;
   return {tag, text: TEXT.neutral, detail: ''};
 }
