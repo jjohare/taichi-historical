@@ -24,3 +24,5 @@ The site is static GitHub Pages, and it has a binding rule against a frontend bu
 - Contributors must keep pure modules free of `three` bare imports. A node static check enforces this.
 
 *Amended by ADR-0007, 24 October 2026:* the PE-28 budget is now 56 KiB (57,344 B), not 48 KiB.
+
+*Amended by ADR-0008, 24 October 2026:* the PE-28 budget is now 60 KiB (61,440 B), and `lag.js` joins the pure modules.

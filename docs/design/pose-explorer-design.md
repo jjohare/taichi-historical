@@ -1,6 +1,6 @@
 # Pose explorer — design
 
-Status: proposed · 24 October 2026 · Requirements: [pose-explorer-spec.md](pose-explorer-spec.md) · Decisions: [ADR-0001](../adr/ADR-0001-explorer-module-split.md) to [ADR-0007](../adr/ADR-0007-sequence-transitions.md). §12 (slice S6) was added by ADR-0007
+Status: proposed · 24 October 2026 · Requirements: [pose-explorer-spec.md](pose-explorer-spec.md) · Decisions: [ADR-0001](../adr/ADR-0001-explorer-module-split.md) to [ADR-0007](../adr/ADR-0007-sequence-transitions.md). §12 (slice S6) was added by ADR-0007, and §13 (slice S7) by [ADR-0008](../adr/ADR-0008-secondary-cloth-lag.md)
 
 ## 1. Scope and starting point
 
@@ -358,6 +358,7 @@ After schema validation, `checkLeftRight` (PE-33) runs forward kinematics on the
 | S4 | `pose-schema.js`, `retarget.js`, fixtures, empty `index.json`, `SAM-LICENSE.txt`, check integration | PE-30–35 |
 | S5 | `site.js` event, `poses.js`, apply/clear/local-file UI | PE-18–21, 36, 41 |
 | S6 | `transition.js`, estimates on by default with a `Show neutral avatar` toggle, transition state and label, and the amended S2–S5 criteria (§12, ADR-0007). Depends on S5 | PE-42–59 |
+| S7 | `lag.js`, lag-node discovery in `rig.js`, the driver's settle window, `state.lag` and the snapshot (§13, ADR-0008). Depends on S6 and on the rebuilt avatar with `lag:*` nodes | PE-60–71 |
 
 S1 must not change pixels. Compare screenshots of the default view, the elbow at 60, the crouch at 40 and the skeleton on, before and after, with no visible difference.
 
@@ -508,3 +509,105 @@ Dependency direction: `main → transition → three.core`. `controls.js` does n
 | Context loss mid-hop | No frames; the target is applied silently | PE-56 |
 | The keyframe rule drifting from `site.js`'s `showSources` and `showImage` | The keyframe differs from the displayed photograph, so the arrival estimate mismatches | The target always comes from the event's `imageId`, not the rule, so arrival is right. PE-43's browser half catches drift for intermediates |
 | Joint-space slerp passing limbs through the body or sliding feet | Implausible in-between frames on large posture changes (turns, steps) | Accepted and labelled (ADR-0007). Reviewers look at long hops by hand; there is no automatic check |
+
+## 13. Secondary cloth lag (S7, ADR-0008)
+
+This section adds to §§3–12 and changes none of them except where marked. Requirements: spec section J, PE-60 to PE-71.
+
+### 13.1 Constraints that shape it
+
+- **Bones are reviewed data and cloth is not.** The lag moves only the plain `lag:*` nodes, never a bone. During the settle window the PE-18 label is already on screen, and the bones are bit-for-bit the reviewed target (PE-69, PE-20).
+- **Rendering on demand** (PE-08, PE-53). S7 adds no loop. It rides the S6 driver's ticks and extends them by at most 600 ms after arrival.
+- **No new request** (PE-28). Hinge parameters travel inside the GLB as node `extras`. `build-report.json` is a build artefact that only the node check reads.
+- **GLTFLoader sanitises names.** `:` is a reserved character in `PropertyBinding`, so `lag:hem_front` becomes `object.name === 'laghem_front'`. The loader keeps the glTF name in `userData.name`, and discovery keys on that (PE-60).
+- **Budget.** The total was 56,060 B of 57,344 B before S7, which leaves 1,284 B. That is not enough for `lag.js` plus its wiring, so ADR-0008 raises PE-28 to 60 KiB (PE-71).
+
+### 13.2 Module: `assets/explorer/lag.js` (pure)
+
+It imports only `../vendor/three.core.js` (`Quaternion`, `Vector3`) and has no DOM, clock or timer access. The rig is injected as a narrow port, so the module runs under `node --test` against a stub.
+
+```js
+export const OMEGA = 20, K_SPIN = 0.12, K_DROP = 120;              // rad/s · s · °·s/m (PE-62, PE-63)
+export const SETTLE_MS = 400, SETTLE_CAP_MS = 600;                  // design target · hard cap (PE-65)
+export const REST_DEG = 0.2, REST_DPS = 1;                          // rest test (PE-65)
+
+// Closed-form critically damped step towards constant c over dt seconds (PE-62). Exported for the node tests.
+export function springStep(theta, v, c, dt) → [theta', v']
+
+// rig port: { lagNodes: [{node, parent, maxDegrees, inwardDegrees, drop, restLocal}],
+//             setLagLocal(node, quatArray) }
+// report:   rig.lagNodes, passed separately so a test can supply its own list.
+export function createLag(rig, report) → {
+  active,                          // getter: true from the first step after begin() until reset()
+  begin(),                         // forget the previous sample (ω_h = v_y = 0 on the next step); keeps θ and v (PE-63, PE-68)
+  step(dt, jointWorldQuats, pelvisPos) → boolean,   // dt in s; Map<parent, [x,y,z,w]>; [x,y,z]. Returns true while not yet at rest
+  reset(),                         // θ = v = 0, every node to restLocal, active = false (PE-65 end, PE-68)
+  angles() → {[node]: degrees},    // for the snapshot
+}
+// An empty report returns an inert object: step() returns false, angles() is {} and nothing is touched (PE-61).
+```
+
+Per node and per `step`: compute `ω_h` from the parent's world quaternion against the previous sample, using the twist about the world hinge axis, `2·atan2(Δ.xyz·a, Δ.w)/dt`, which is in rad/s and converted to °/s before `K_SPIN` applies (PE-63). Add the pelvis term for `drop` nodes, clamp `c` to the node's range, call `springStep`, clamp `θ` and zero any outward `v` at a bound, then `rig.setLagLocal(node, restLocal · R_x(θ))`. `step` returns `false` once every node meets the rest test. The caller decides whether that ends anything. `dt ≤ 0` is a no-op.
+
+**rig.js additions** (about 0.4 KiB). In `makeRig`, the same traversal that collects bones also collects lag nodes by `userData.name` and `extras` (PE-60), capturing `restLocal`. `resetToRest()` does not touch them: their rest is owned by `lag.reset()`, so a bone reset and a cloth reset can never disagree about who owns what. The rig gains `lagNodes`, `setLagLocal(node, q)` and `worldQuaternionsOf(names)`, which calls `updateMatrixWorld` once and then reads `getWorldQuaternion` for each named bone. The fallback rig has `lagNodes = []`.
+
+### 13.3 Where it is called: the driver handshake (amends §12.2)
+
+`createDriver` gains two optional callbacks and one option. Without them it behaves exactly as in §12.2 (PE-61):
+
+```js
+createDriver({requestFrame, cancelFrame, now, onFrame, onArrive,
+              onSettle,      // (dt) → boolean: step the settle window; true = keep going
+              onSettled,     // () → void: the window is over (rest reached or cap hit)
+              settleCapMs})  // SETTLE_CAP_MS, passed in so transition.js does not import lag.js
+```
+
+Tick order for one transition frame, in `main.js`'s `onFrame`:
+
+1. `drive(pose)`, as now: the bones get the interpolated pose.
+2. `lag.step(dt, rig.worldQuaternionsOf(parents), rig.worldPositionOf('pelvis'))`, where `dt` is the difference of the driver's clock since the previous tick (`onFrame` receives it).
+3. `requestRender()`.
+
+Arrival, in one task:
+
+1. The final `onFrame` applies the exact target, then `onArrive()` runs `show(route.end, {keepLag: true})`. `show` normally calls `endMotion()`, which calls `driver.cancel()` and now also `lag.reset()`. `keepLag` skips `lag.reset()`. The `driver.cancel()` is harmless: the driver has already stopped its route before calling `onArrive`, and it decides whether to enter the settle state only after `onArrive` returns. A `cancel()` made inside `onArrive` therefore never suppresses the window. A `cancel()` made after that ends it. `transition` becomes `idle()` and the PE-18 label is set: PE-50 is unchanged.
+2. If `onSettle` was supplied, the lag is active and reduced motion was not on at navigation, the driver enters the settle state. It sets `t1 = now()`, `main.js` sets `state.lag.settling = true`, and the driver requests one frame.
+3. Each settle tick calls `onSettle(dt)`, which runs `lag.step(dt, …)` with the bones static and then `requestRender()`. The driver continues while it returns `true` and `now() − t1 < settleCapMs`.
+4. At the end, `onSettled()` runs `lag.reset()` and sets `settling = false`, with one final `requestRender()`. The driver requests nothing more (PE-53 amended).
+
+The other entry points:
+
+- **Interruption.** `driver.start()` and `retarget()` during a settle window stop the settle state silently, without `onSettled`, and call `lag.begin()`. The new route's ticks carry the cloth on (PE-68). `navigate()` calls `driver.cancel()` before its fetch, as it does now. `cancel()` stops the settle state but does not reset the lag: the reset belongs to `endMotion()`, which every cancellation path in §12.3 already runs.
+- **`finish()`** (context loss, reduced motion) jumps to the target, runs `onArrive` and skips the settle state. `main.js` calls `lag.reset()` on those two paths.
+- **Reduced motion** is read once per navigation, as now (PE-49). When it matches, `main.js` never calls `lag.step` and passes no settle, so the lag stays inert for that navigation (PE-66).
+
+`main.js` wiring is about 0.6 KiB: `createLag(avatar, avatar.lagNodes)` after `loadAvatar`, the three callbacks, `lag.reset()` in `endMotion`, and `state.lag`. The snapshot's `lag` (PE-71) is built on read from `lag.active`, `state.lag.settling`, `lag.angles()` and `SETTLE_CAP_MS`. It is never kept in `state` per frame, so `structuredClone` stays cheap.
+
+### 13.4 State and snapshot (amends §12.3)
+
+```js
+state += { lag: { settling: false } }                     // the only stored flag; the rest is read from lag.js
+snapshot.lag = { active, settling, angles: {[node]: deg}, capMs: SETTLE_CAP_MS }
+```
+
+The §12.3 action table gains one rule: every row that calls `driver.cancel()` or `driver.finish()` also ends the lag in the same task (PE-68). The sliders (`setElbow`, `setCrouch`) do not touch the lag (PE-67).
+
+### 13.5 Dependencies and budget (amends §3 and §12.4)
+
+| Module | Kind | Responsibility | Approx. size |
+|---|---|---|---|
+| `lag.js` | pure | Hinge spring, drive and rest test for the loose-cloth pieces | ≤ 2,560 B (about 60 lines) |
+
+Dependency direction: `main → lag → three.core`. `transition.js` does not import `lag.js`; the driver knows only the callbacks. `rig.js` does not import `lag.js` either. Total budget: 60 KiB (61,440 B), raised from 56 KiB by ADR-0008. Forecast after S7: at most 59,900 B, about 58.5 KiB (56,060 + 2,560 + 1,280), which leaves about 1.5 KiB.
+
+### 13.6 Failure modes
+
+| What breaks | First symptom | Detection |
+|---|---|---|
+| The avatar build names a node `lag:…` but omits or mistypes its extras | That piece hangs rigid; there is no console output (PE-60) | Node check: every `lag:*` node's extras equal its `build-report.json` entry (PE-60) |
+| A future three.js stops copying the glTF name into `userData.name` | Every piece hangs rigid; S7 is silently off | Browser PE-60: `lag.angles` must have one key per report entry |
+| A hem flap's inward range is larger than its clearance from the legs | The flap cuts into the thigh on a rise | Visual review of a crouch-to-stand transition. `inward_degrees` in the extras is the fix, not code |
+| A wrong hinge-axis convention in the build, such as +Z outward but the edge along +Y | Flaps flare inwards on a crouch | PE-63 node test against the built GLB's rest data: a falling pelvis must move the free edge's world position away from the pelvis axis |
+| A throttled background tab during the settle window | One large `dt`; the closed form lands at or near rest in one step | The cap on the driver's clock ends it on the next tick regardless; the end state is exact (PE-65) |
+| Rapid repeated navigation | Cloth keeps swinging and never settles between routes | Intended: it settles 600 ms at most after the last arrival. PE-68 checks there is no jump |
+| Joint spin on a 20-hop jump drives every piece to its clamp | Pieces pinned at their limits for most of the route | Accepted: it reads as speed. `K_SPIN` is tunable without an ADR (PE-63) |
