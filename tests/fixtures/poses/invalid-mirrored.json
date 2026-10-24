@@ -1,0 +1,117 @@
+{
+  "schema": "yang-form/pose-estimate",
+  "schemaVersion": 1,
+  "imageId": "chen-003",
+  "sourceImage": {
+    "path": "extracted/historical/chen-003.png",
+    "sha256": "3ca6f2ac01fccc002e4f04deeec6fa3f65442c0e6d4db0e3943609b87dab032f",
+    "crop": [
+      10,
+      20,
+      300,
+      480
+    ],
+    "personPrompt": "box",
+    "mirrored": false
+  },
+  "estimator": {
+    "name": "SAM 3D Body",
+    "repository": "https://github.com/facebookresearch/sam-3d-body",
+    "revision": "0123456789abcdef0123456789abcdef01234567",
+    "checkpoint": "facebook/sam-3d-body-dinov3",
+    "checkpointSha256": "9f2b1c7d5e8a4036b1d2c3e4f5a60718293a4b5c6d7e8f90a1b2c3d4e5f60718",
+    "licence": "SAM License",
+    "outputFrame": "camera frame: +X right, +Y down, +Z forward"
+  },
+  "rig": {
+    "name": "MHR",
+    "repository": "https://github.com/facebookresearch/MHR",
+    "revision": "fedcba9876543210fedcba9876543210fedcba98",
+    "modelSha256": "3ca6f2ac01fccc002e4f04deeec6fa3f65442c0e6d4db0e3943609b87dab032f"
+  },
+  "converter": {
+    "path": "tools/pose-estimation/convert.py",
+    "revision": "0123456789abcdef0123456789abcdef01234567"
+  },
+  "jointConvention": "yang-form-24/rest-world-delta@1",
+  "jointMap": "mhr-to-yang24@1",
+  "frame": {
+    "up": "+Y",
+    "forward": "+Z",
+    "left": "+X",
+    "units": "m"
+  },
+  "root": {
+    "translation": [
+      0,
+      0,
+      0
+    ],
+    "rotation": [
+      0,
+      0,
+      0,
+      1
+    ]
+  },
+  "joints": {
+    "right_shoulder": {
+      "rotation": [
+        0,
+        0,
+        0.6428,
+        0.766
+      ],
+      "confidence": 0.8
+    },
+    "left_hip": {
+      "rotation": [
+        -0.342,
+        0,
+        0,
+        0.9397
+      ],
+      "confidence": 0.8
+    }
+  },
+  "landmarks": {
+    "left_wrist": [
+      0.7986,
+      1.6337,
+      0
+    ],
+    "right_wrist": [
+      -0.55,
+      0.93,
+      0
+    ],
+    "left_ankle": [
+      0.15,
+      0.11,
+      0
+    ],
+    "right_ankle": [
+      -0.15,
+      0.2971,
+      0.5142
+    ]
+  },
+  "confidence": {
+    "overall": 0.72,
+    "method": "mean keypoint visibility × reviewer grade"
+  },
+  "review": {
+    "status": "accepted",
+    "reviewer": "jjohare",
+    "date": "2026-10-24",
+    "leftRight": "as-photographed",
+    "checks": {
+      "projection": true,
+      "leftRight": true,
+      "standingLeg": true,
+      "handsFeet": true,
+      "truncation": true
+    },
+    "overlaySha256": "9f2b1c7d5e8a4036b1d2c3e4f5a60718293a4b5c6d7e8f90a1b2c3d4e5f60718"
+  }
+}
