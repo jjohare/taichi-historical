@@ -1,8 +1,10 @@
 {
   "bones": 24,
-  "meshes": 62,
-  "vertices": 8016,
+  "meshes": 8,
+  "vertices": 16572,
   "source": "Original illustrative model; historic clothing reference only",
   "pose_estimates": 0,
-  "binding": "none"
+  "binding": "none",
+  "build": "continuous skinned mesh v2",
+  "blender": "5.2.2 LTS"
 }
