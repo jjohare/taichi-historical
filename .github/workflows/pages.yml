@@ -31,7 +31,9 @@ jobs:
       - uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
       - name: Stage public site
         run: |
+          node tools/check-lee.mjs
           mkdir _site
+          cp -R lee _site/
           cp index.html .nojekyll moves.md Yang_Chengfu_Form.jpg _site/
           cp -R assets extracted poses research _site/
       - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3

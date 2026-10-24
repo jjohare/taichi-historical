@@ -1,0 +1,23 @@
+@font-face{font-family:"Noto Serif Lee";font-style:normal;font-weight:400;font-display:swap;src:url("noto-serif-sc-lee.ttf") format("truetype")}
+.seal{font-family:"Noto Serif Lee",serif}
+.lee-hero{display:grid;grid-template-columns:1.1fr 1fr;gap:90px;padding-block:64px;align-items:center}
+.lee-hero .lead{max-width:36ch}.lee-hero .primary{margin-bottom:20px}
+.form-map{border-top:2px solid var(--jade);border-bottom:1px solid var(--border);padding-block:24px}
+.form-count{display:flex;align-items:center;gap:24px;margin-bottom:24px}.form-count strong{font:100px/1 var(--display);letter-spacing:-.06em}.form-count span{font-size:14px;color:var(--muted)}
+.sequence-map{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:20px}
+.sequence-map a{display:flex;align-items:center;justify-content:center;min-height:44px;border:1px solid var(--border);font-size:12px;text-decoration:none;background:var(--surface);font-variant-numeric:tabular-nums}
+.sequence-map a.opening{background:var(--floor)}.sequence-map a[aria-current]{background:var(--jade);color:var(--surface)}
+.evidence{margin-top:0;margin-bottom:24px}.evidence .tag{white-space:normal}
+.media-heading{display:flex;align-items:start;justify-content:space-between;gap:16px}.media-heading .segmented{margin:0 0 16px}.media-heading .segmented button{flex:auto;white-space:nowrap}
+.media-stage{min-height:300px;border:1px solid var(--border);background:var(--floor);display:grid;place-items:center;padding:32px;text-align:center}
+.media-stage .media-intro{max-width:55ch}.media-stage h5{font:30px/1.25 var(--display);margin:12px 0 20px}.media-stage p{font-size:14px}.media-stage button{background:var(--jade);color:var(--surface);border-color:var(--jade);margin-bottom:14px}.media-stage button:hover{color:var(--jade)}
+.media-stage.loaded{padding:0;background:var(--surface)}.media-stage iframe{border:0;display:block;width:100%;aspect-ratio:16/9;min-height:300px}.media-stage iframe.manual{aspect-ratio:auto;height:550px}
+#media-caption{margin-top:12px}#position-list{max-height:900px}#entry-sources a{overflow-wrap:anywhere}#comparison:empty{display:none}
+.principles{padding-block:48px;border-top:1px solid var(--border)}.principle-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:40px}.principle-grid h3{font-size:26px}.principle-grid p{font-size:15px}
+.history{padding-block:48px}.timeline{list-style:none;padding:0;margin:0}.timeline li{display:grid;grid-template-columns:100px 1fr;gap:20px;padding-block:18px;border-top:1px solid var(--border)}.timeline strong{font-size:13px;color:var(--accent)}.timeline h3{font-size:24px;margin-bottom:10px}
+details{border-top:1px solid var(--border);padding-top:16px}summary{cursor:pointer;min-height:44px;color:var(--jade)}details p{margin-top:16px}
+.document{max-width:900px;padding-block:48px}.document h1{font-size:48px;margin-top:24px}.document h2{font-size:28px;margin-top:32px}.plain-index{padding-left:24px}.plain-index li{padding:12px;border-bottom:1px solid var(--border)}.plain-index span{display:block;font-size:13px;color:var(--muted)}
+.masthead nav a{min-height:44px;display:flex;align-items:center}
+@media(max-width:1100px){.lee-hero{gap:40px}}
+@media(max-width:920px){.lee-hero{grid-template-columns:1fr 1fr;gap:32px}.lee-hero h1{font-size:60px}.form-count strong{font-size:80px}.principle-grid{grid-template-columns:1fr;gap:20px}.principle-grid section{max-width:80ch}.timeline li{grid-template-columns:100px 1fr}}
+@media(max-width:600px){.lee-hero{grid-template-columns:1fr;padding-block:36px}.lee-hero h1{font-size:56px}.form-count strong{font-size:80px}.form-map{padding-block:20px}.tradition-nav{gap:0}.tradition-nav a{padding:10px;flex:1;font-size:13px}.tradition-nav a span{font-size:10px}.media-heading{display:block}.media-heading .segmented{display:flex}.media-stage{padding:22px;min-height:310px}.media-stage h5{font-size:26px}.media-stage iframe{min-height:220px}.media-stage iframe.manual{height:460px}.timeline li{grid-template-columns:1fr;gap:8px}.document h1{font-size:38px}.section-heading>a{font-size:13px;max-width:12ch}.form-count{margin-bottom:18px}}
