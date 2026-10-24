@@ -8,16 +8,12 @@ export const setSlider = (id, value) =>
 export const click = id => `document.getElementById(${JSON.stringify(id)}).click()`;
 export const text = id => `document.getElementById(${JSON.stringify(id)}).textContent`;
 
-/** Avatar meshes and the skeleton helper. Needs `__explorer.scene` (see the report: the hook must expose it). */
+/** Avatar mesh visibility and the skeleton helper, from the read-only hook snapshot (state.meshVisibility, state.skeletonVisible). */
 export const SCENE_VISIBILITY = `(() => {
-  const scene = __explorer.scene;
-  if (!scene) throw new Error('__explorer.scene is not exposed; PE-05 and PE-07 need it');
-  const avatar = scene.getObjectByName('ArchiveAvatar');
-  const meshes = []; avatar.traverse(o => { if (o.isMesh) meshes.push({name: o.name, visible: o.visible}); });
-  const helper = scene.children.find(c => c.isSkeletonHelper);
-  return {meshes, skeleton: helper ? helper.visible : null};
+  const s = __explorer.state;
+  if (typeof s.skeletonVisible !== 'boolean' || !s.meshVisibility) throw new Error('state.skeletonVisible / state.meshVisibility are missing from the hook');
+  return {meshes: Object.entries(s.meshVisibility).map(([name, visible]) => ({name, visible})), skeleton: s.skeletonVisible};
 })()`;
 
-// |cos| of half the angle between two rotations. Normalised, because the GLB's float32-derived quaternions are not exactly unit length.
 export const dot = (a, b) => Math.abs(a[0] * b[0] + a[1] * b[1] + a[2] * b[2] + a[3] * b[3]) / (Math.hypot(...a) * Math.hypot(...b));
 export const dist = (a, b) => Math.hypot(...a.map((v, i) => v - b[i]));
