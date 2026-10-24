@@ -1,4 +1,4 @@
-// PE-34 (published estimates are allowlisted) and PE-35 (the empty index is the shipped default), node halves; slice S4.
+// PE-34 (published estimates are allowlisted) and PE-35 (the shipped index is well-formed; empty until estimates are published), node halves; slice S4.
 // The corpus checks are generic over the shipped directory, so they bite as soon as the first estimate is published;
 // with the shipped empty index they confirm only the invariants that hold for an empty corpus.
 import test from 'node:test';
@@ -16,12 +16,22 @@ const poses = () => import('../../assets/explorer/poses.js');
 const indexText = () => readFileSync(path.join(DIR, 'index.json'), 'utf8');
 
 // ---------------------------------------------------------------- PE-35 / PE-34: the shipped index
-test('PE-35 assets/pose-estimates/index.json ships with an empty estimates array', () => {
+test('PE-35 assets/pose-estimates/index.json is well-formed and every entry names a present, hash-matching file', async () => {
   const index = JSON.parse(indexText());
   assert.equal(index.schema, 'yang-form/pose-estimate-index');
   assert.equal(index.schemaVersion, 1);
-  assert.deepEqual(index.estimates, []);
   assert.deepEqual(Object.keys(index).sort(), ['estimates', 'schema', 'schemaVersion']);
+  assert.ok(Array.isArray(index.estimates));
+  const {createHash} = await import('node:crypto');
+  const seen = new Set();
+  for (const e of index.estimates) {
+    assert.match(e.imageId, /^(yang|chen)-\d{3}$/, `imageId ${e.imageId}`);
+    assert.equal(e.file, `${e.imageId}.json`, `file for ${e.imageId}`);
+    assert.ok(!seen.has(e.imageId), `duplicate ${e.imageId}`);
+    seen.add(e.imageId);
+    const bytes = readFileSync(new URL(`../../assets/pose-estimates/${e.file}`, import.meta.url));
+    assert.equal(createHash('sha256').update(bytes).digest('hex'), e.sha256, `sha256 for ${e.imageId}`);
+  }
 });
 
 test('PE-34 the shipped index validates', async () => {
@@ -135,11 +145,11 @@ function withFetch(routes, fn) {
 const BASE = new URL('http://localhost/assets/pose-estimates/');
 const fullText = () => fixtureText('valid-full.json');
 
-test('PE-35 loadIndex with the shipped index issues exactly one request, for index.json, and yields no entries', withFetch({'index.json': indexText()}, async calls => {
+test('PE-35 loadIndex with the shipped index issues exactly one request, for index.json, and yields one entry per listed estimate', withFetch({'index.json': indexText()}, async calls => {
   const {loadIndex} = await poses();
   const r = await loadIndex(BASE);
   assert.equal(r.ok, true);
-  assert.equal(r.entries.size, 0);
+  assert.equal(r.entries.size, JSON.parse(indexText()).estimates.length);
   assert.deepEqual(calls, ['http://localhost/assets/pose-estimates/index.json']);
 }));
 

@@ -1,0 +1,288 @@
+{
+  "schema": "yang-form/pose-estimate",
+  "schemaVersion": 1,
+  "imageId": "yang-053",
+  "sourceImage": {
+    "path": "extracted/historical/yang-053.png",
+    "sha256": "80bd73124d0e13af3f9189796bb41403dab34d5427efad552140cc0fd584f0e0",
+    "crop": [
+      0,
+      0,
+      193,
+      248
+    ],
+    "personPrompt": "none",
+    "mirrored": false
+  },
+  "estimator": {
+    "name": "SAM 3D Body",
+    "repository": "https://github.com/facebookresearch/sam-3d-body",
+    "revision": "b5c765a0d89d789985e186d396315e7590887b94",
+    "checkpoint": "facebook/sam-3d-body-dinov3",
+    "checkpointSha256": "b5a2f9d305dd02626b967aa2e86021fba07065df66ce7a7e00ffb9664f150abf",
+    "licence": "SAM License",
+    "outputFrame": "keypoints/joints: camera frame, +X image right, +Y down, +Z into scene, m; C = diag(1,-1,-1). pred_global_rots: MHR body axes (+Y up, +Z forward, +X left); C = I"
+  },
+  "rig": {
+    "name": "MHR",
+    "repository": "https://github.com/facebookresearch/MHR",
+    "revision": "877cba5ee61a5f77d1457bf4de93a66695132bd9",
+    "modelSha256": "352e271a6c42729c68554ceaea0c955e866970160c31e35506d782dc0f7377bc"
+  },
+  "converter": {
+    "path": "tools/pose-estimation/src/main.rs",
+    "revision": "35c15dc853d7ad32eb0e2562f4608932ff7654e4"
+  },
+  "jointConvention": "yang-form-24/rest-world-delta@1",
+  "jointMap": "mhr-to-yang24@1",
+  "frame": {
+    "up": "+Y",
+    "forward": "+Z",
+    "left": "+X",
+    "units": "m"
+  },
+  "root": {
+    "translation": [
+      0.0,
+      0.01,
+      0.0
+    ],
+    "rotation": [
+      -0.250965,
+      0.873523,
+      0.284065,
+      0.305419
+    ]
+  },
+  "joints": {
+    "left_hip": {
+      "rotation": [
+        0.254782,
+        0.04568,
+        0.179364,
+        0.94912
+      ],
+      "confidence": 1.0
+    },
+    "left_knee": {
+      "rotation": [
+        0.209559,
+        0.000068,
+        0.007176,
+        0.97777
+      ],
+      "confidence": 1.0
+    },
+    "left_ankle": {
+      "rotation": [
+        -0.151032,
+        0.083765,
+        0.026075,
+        0.984628
+      ],
+      "confidence": 1.0
+    },
+    "left_foot": {
+      "rotation": [
+        0.094349,
+        -0.016461,
+        -0.014826,
+        0.995293
+      ],
+      "confidence": 1.0
+    },
+    "right_hip": {
+      "rotation": [
+        -0.47319,
+        -0.032431,
+        -0.141069,
+        0.868987
+      ],
+      "confidence": 1.0
+    },
+    "right_knee": {
+      "rotation": [
+        0.342783,
+        -0.001254,
+        -0.003523,
+        0.939407
+      ],
+      "confidence": 1.0
+    },
+    "right_ankle": {
+      "rotation": [
+        -0.166014,
+        -0.010428,
+        0.041828,
+        0.985181
+      ],
+      "confidence": 1.0
+    },
+    "right_foot": {
+      "rotation": [
+        0.159726,
+        0.018118,
+        0.006844,
+        0.986971
+      ],
+      "confidence": 1.0
+    },
+    "spine1": {
+      "rotation": [
+        0.059196,
+        -0.020654,
+        0.028234,
+        0.997633
+      ],
+      "confidence": 1.0
+    },
+    "spine2": {
+      "rotation": [
+        0.160573,
+        0.0234,
+        0.050836,
+        0.985436
+      ],
+      "confidence": 1.0
+    },
+    "spine3": {
+      "rotation": [
+        0.223097,
+        0.017696,
+        0.03729,
+        0.973922
+      ],
+      "confidence": 1.0
+    },
+    "left_collar": {
+      "rotation": [
+        -0.233051,
+        0.361367,
+        0.071629,
+        0.899984
+      ],
+      "confidence": 1.0
+    },
+    "left_shoulder": {
+      "rotation": [
+        -0.212129,
+        -0.084048,
+        0.151284,
+        0.961795
+      ],
+      "confidence": 1.0
+    },
+    "left_elbow": {
+      "rotation": [
+        -0.499743,
+        -0.252676,
+        0.289605,
+        0.776235
+      ],
+      "confidence": 1.0
+    },
+    "left_wrist": {
+      "rotation": [
+        -0.132821,
+        0.129386,
+        0.30811,
+        0.933105
+      ],
+      "confidence": 1.0
+    },
+    "neck": {
+      "rotation": [
+        0.08781,
+        -0.041898,
+        0.038977,
+        0.994492
+      ],
+      "confidence": 1.0
+    },
+    "head": {
+      "rotation": [
+        -0.146666,
+        -0.035697,
+        0.036585,
+        0.987865
+      ],
+      "confidence": 1.0
+    },
+    "right_collar": {
+      "rotation": [
+        -0.235825,
+        -0.260909,
+        -0.049907,
+        0.934785
+      ],
+      "confidence": 1.0
+    },
+    "right_shoulder": {
+      "rotation": [
+        -0.365965,
+        0.225315,
+        -0.054458,
+        0.901297
+      ],
+      "confidence": 1.0
+    },
+    "right_elbow": {
+      "rotation": [
+        -0.380626,
+        0.180744,
+        -0.233658,
+        0.876276
+      ],
+      "confidence": 1.0
+    },
+    "right_wrist": {
+      "rotation": [
+        -0.169321,
+        -0.061822,
+        -0.263679,
+        0.947619
+      ],
+      "confidence": 1.0
+    }
+  },
+  "landmarks": {
+    "left_wrist": [
+      -0.7934,
+      1.6226,
+      -0.3218
+    ],
+    "right_wrist": [
+      0.5076,
+      1.714,
+      0.2452
+    ],
+    "left_ankle": [
+      -0.0942,
+      -0.0748,
+      -0.0721
+    ],
+    "right_ankle": [
+      0.9308,
+      0.8795,
+      -0.3443
+    ]
+  },
+  "confidence": {
+    "overall": 0.9,
+    "method": "overall = first-pass reviewer grade of the chosen checkpoint (A or A? 0.9, B or B? 0.7, draft 0); per-joint fixed at 1.0: SAM 3D Body reports no per-joint score"
+  },
+  "review": {
+    "status": "accepted",
+    "reviewer": "John O'Hare",
+    "date": "2026-10-24",
+    "leftRight": "as-photographed",
+    "checks": {
+      "projection": true,
+      "leftRight": true,
+      "standingLeg": true,
+      "handsFeet": true,
+      "truncation": true
+    },
+    "notes": "kick"
+  }
+}
