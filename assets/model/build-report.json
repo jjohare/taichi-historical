@@ -1,10 +1,102 @@
 {
   "bones": 24,
-  "meshes": 8,
-  "vertices": 16572,
+  "meshes": 16,
+  "vertices": 19096,
   "source": "Original illustrative model; historic clothing reference only",
   "pose_estimates": 0,
   "binding": "none",
   "build": "continuous skinned mesh v2",
-  "blender": "5.2.2 LTS"
+  "blender": "5.2.2 LTS",
+  "skinned_meshes": 8,
+  "lag_meshes": 8,
+  "lag": [
+    {
+      "node": "lag:hem_front",
+      "parent": "spine1",
+      "hinge_axis": [
+        1,
+        0,
+        0
+      ],
+      "max_degrees": 25,
+      "inward_degrees": 6,
+      "drop": true
+    },
+    {
+      "node": "lag:hem_back",
+      "parent": "spine1",
+      "hinge_axis": [
+        1,
+        0,
+        0
+      ],
+      "max_degrees": 25,
+      "inward_degrees": 6,
+      "drop": true
+    },
+    {
+      "node": "lag:hem_left",
+      "parent": "spine1",
+      "hinge_axis": [
+        1,
+        0,
+        0
+      ],
+      "max_degrees": 25,
+      "inward_degrees": 6,
+      "drop": true
+    },
+    {
+      "node": "lag:hem_right",
+      "parent": "spine1",
+      "hinge_axis": [
+        1,
+        0,
+        0
+      ],
+      "max_degrees": 25,
+      "inward_degrees": 6,
+      "drop": true
+    },
+    {
+      "node": "lag:left_cuff",
+      "parent": "left_elbow",
+      "hinge_axis": [
+        1,
+        0,
+        0
+      ],
+      "max_degrees": 35
+    },
+    {
+      "node": "lag:right_cuff",
+      "parent": "right_elbow",
+      "hinge_axis": [
+        1,
+        0,
+        0
+      ],
+      "max_degrees": 35
+    },
+    {
+      "node": "lag:left_trouser",
+      "parent": "left_knee",
+      "hinge_axis": [
+        1,
+        0,
+        0
+      ],
+      "max_degrees": 20
+    },
+    {
+      "node": "lag:right_trouser",
+      "parent": "right_knee",
+      "hinge_axis": [
+        1,
+        0,
+        0
+      ],
+      "max_degrees": 20
+    }
+  ]
 }
