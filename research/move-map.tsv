@@ -1,0 +1,104 @@
+local_id	family	montage_panels	yang_photos	chen_photos	mapping_status	note
+0	prepare	1	1	1	direct	Standing preparation; the montage does not separately illustrate the rising and lowering of the arms.
+1	opening	-	1	1	endpoint-reference	No separate Opening panel exists. Historical standing photographs are endpoint references only, not pictures of the moving opening.
+2	grasp	2,3,4,5	2,3,4,5	2,3,4,5,6,7,8,9,10	direct	Four montage panels: ward-off, rollback, press and push. Panel 2 is ward-off, not Opening. Some intermediate actions have no montage panel.
+3	whip	6	6	11,12,13	direct	Hook hand and extended opposite palm identify Single Whip.
+4	raise	7	7	14	direct	The terminal raised-hands position is shown; the preceding step is not a separate panel.
+5	crane	8	8	15,16	direct	One hand above the head, the other low; distinguish this occurrence from Ride the Tiger by its place in the sequence.
+6	brush-left	9	9	17,18,19	direct	First left Brush Knee occurrence.
+7	lute	10	10	20	direct	First Lute occurrence.
+8	brush-left	11	11	17,18,19	direct	First of the three alternating Brush Knee steps.
+9	brush-right	12	12	22,23	direct	Right Brush Knee; the reversed body view is not evidence of a mirrored image.
+10	brush-left	13	13	24,19	direct	Third alternating Brush Knee step.
+11	lute	14	14	20	direct	Second Lute occurrence.
+12	brush-left	15	9	17,18,19	direct-with-reused-photo	The montage has this extra left Brush Knee. The 1931 illustrated sequence passes from its second Lute to Punch, so photo 9 is a clearly reused posture reference.
+13	punch	16	15	27,28,29,30	direct	Montage shows the punch endpoint; Chen supplies intervening turns and steps.
+14	close-up	17	16	31,32,33	direct	Both palms finish forward after the preceding punch.
+15	cross	18	17	34,35,36	direct	First section boundary.
+16	embrace	19,20,21,22	18,19,20,21	37,38,5,6,7,8,9,10	direct	The turning action and rollback, press and push all belong to this compound entry; do not invent extra move numbers for its four panels.
+17	elbow	23	22	47,48,49	direct	The low fist sits beneath the opposite elbow.
+18	repulse-left	24	23	50,51	direct	Left denotes the retreating/receiving side in this list; Chen describes the same first side by its advancing right hand.
+19	repulse-right	25	24	52,53	direct	Opposite side of the paired retreat.
+20	repulse-left	24	23	50,51	reused	No third distinct montage panel: panel 24 is reused as a posture reference, not claimed as a second exposure.
+21	flying	26	25	56,57	direct	Diagonal opening of the arms after the retreating series.
+22	raise	27	26	14	direct	Second Raise Hands occurrence.
+23	crane	28	27	15,16	direct	Second White Crane occurrence.
+24	brush-left	29	28	17,18,19	direct	Left Brush Knee before the downward Needle movement.
+25	needle	30	29	64	direct	The body folds forward and the leading hand points down.
+26	fan	31	30	65	direct	One arm shelters above the head while the other extends forward.
+27	turn-fist	32,33	31,32	66,67,68	direct	Two phases of the turning punch; the change of view follows the turn.
+28	punch	34	33	69,70,71,72	direct	This illustration catches a parrying/stepping phase, not the final extended punch; use Chen's sequence to see the completion.
+29	grasp	35	34,35,36	73,4,5,6,7,8,9,10	direct	Only rollback is retained in the montage here; the historical sequence also illustrates press and push.
+30	whip	36	37	11,12,13	direct	Single Whip before the first Cloud Hands series.
+31	cloud	37	38,39	84,85,86,87	shared-series	One montage image represents the three Cloud Hands repetitions; the reference photographs show phases, not three numbered cycles.
+32	cloud	37	38,39	84,85,86,87	shared-series	Same representative panel as moves 31 and 33; do not infer a distinct repetition from a still image.
+33	cloud	37	38,39	84,85,86,87	shared-series	Final repetition of this series, using the same representative panel.
+34	whip	38	40	11,12,13	direct	Single Whip after the first Cloud Hands series.
+35	high-pat	39	41	90,91	direct	High hand extends while the weight is drawn back.
+36	separation-right	40,41	42,43	92,93,94	direct	Preparation and right separation kick are separate panels.
+37	separation-left	42,43	44,45	95,96,97	direct	Preparation and left separation kick are separate panels.
+38	heel-left	44	46	98	direct	Turning left heel kick; back view is part of the sequence, not an image flip.
+39	brush-left	45	47	99	direct	Left Brush Knee after the turning kick; camera-relative direction differs from the opening section.
+40	brush-right	46	48	100	direct	Right Brush Knee before the low punch.
+41	punch-down	47	49	101	direct	Downward punch; visually similar to the later groin punch, but a different sequence position.
+42	turn-fist	48,49	50,51	-	direct	Both montage panels match the 1931 turning-punch section. Panel 49 can resemble the parry preparation when isolated. Chen's corresponding passage is named White Snake, so it is not silently substituted here.
+43	punch	50	52	104,30	direct	The 1933 page repeats label 104 for the endpoint reused from photo 30; this catalogue uses its original photo 30.
+44	heel-right	51	53	106,107	direct	First right heel kick in the central kicking sequence.
+45	tiger-left	52	54	108,109	direct	Left Strike Tiger, shown from behind.
+46	tiger-right	53	55	110	direct	Right Strike Tiger, with the upper fist beside the head.
+47	heel-right	54	56	111,107	direct	Right heel kick after the paired Tiger movements.
+48	ears	55	57	113,114	direct	Both fists curve towards the head-height target; this remains a solo illustration.
+49	heel-left	56	58	115,116	direct	Left heel kick before the final turning right kick.
+50	heel-right	57	59	111,107	direct	The montage shows the kick endpoint; the turn cannot be reconstructed from this still alone.
+51	punch	58	60	29,30	direct	Punch after the last heel kick in this section.
+52	close-up	59	61	31,32,33	direct	Second Apparent Close Up.
+53	cross	60	62	34,35,36	direct	Second section boundary.
+54	embrace	61	63,64,65,66	37,38,5,6,7,8,9,10	direct	This is official movement 55. The absent local number 55 is a numbering discontinuity, not a missing named posture.
+56	whip-diagonal	62	67	137	direct	Local and official numbering agree from here onwards. Diagonal Single Whip is a different orientation, not an extra entry to insert before it.
+57	mane-right	63	68	138,139	direct	First right Parting Mane.
+58	mane-left	64	69	140,141	direct	Left Parting Mane.
+59	mane-right	63	68	142,139	reused	No third distinct montage panel; the first right-side panel is reused. Chen explicitly repeats his right-side endpoint after the next transition.
+60	grasp	65	70,71,72,73	144,145,146,4,5,6,7,8,9,10	direct	The montage retains ward-off only; it does not supply a separate image for each following action.
+61	whip	66	74	11,12,13	direct	Single Whip before the four Shuttles corners.
+62	shuttle	67,68,69,70	75,76,77,78	157,158,159,160,161,162,163,164	direct	Four corners belong to one entry in moves.md. Preserve their order and the changing camera-relative directions.
+63	grasp	71	79,80,81,82	145,146,4,5,6,7,8,9,10	direct	Ward-off represents the larger compound sequence in the montage.
+64	whip	72	83	11,12,13	direct	Single Whip before the second Cloud Hands series.
+65	cloud	73	84,85	84,85,86,87	shared-series	One montage image represents all three repetitions.
+66	cloud	73	84,85	84,85,86,87	shared-series	Same representative panel as moves 65 and 67.
+67	cloud	73	84,85	84,85,86,87	shared-series	Final repetition of the second Cloud Hands series.
+68	whip	74	86	13	direct	In the 1931 manual this is grouped with the following low posture.
+69	snake-down	75	87	183	direct	Low posture following Single Whip, before Golden Rooster.
+70	rooster-left	76	88	184,185	direct-with-naming-caveat	Standing on the left leg, right knee raised. The 1931 heading names the raised side and calls this right; the supplied list and Chen caption 185 name the standing leg. The 1933 webpage URL ends in photo-186 despite caption 185; caption and actual leg position govern this mapping.
+71	rooster-right	77	89	186	direct-with-naming-caveat	Standing on the right leg, left knee raised. The 1931 heading calls this left. The 1933 webpage URL ends in photo-185 despite caption 186; do not infer side from the filename.
+72	repulse-left	78	90	50,51	direct	One left-side representative survives in this montage series.
+73	repulse-right	25	91	52,53	reused	The opposite-side montage image is borrowed from the earlier series; the 1931 manual supplies its own later right-side photograph.
+74	repulse-left	78	90	50,51	reused	Third repetition shares the first left-side image of this series.
+75	flying	79	92	56,57	direct	Diagonal Flying after the second retreating series.
+76	raise	80	93	14	direct	Third Raise Hands occurrence.
+77	crane	81	94	15,16	direct	Third White Crane occurrence.
+78	brush-left	82	95	17,18,19	direct	Left Brush Knee before the second Needle.
+79	needle	83	96	64	direct	Second Needle at Sea Bottom.
+80	fan	84	97	65	direct	Second Fan Through the Back.
+81	white-snake	85,86	98,99	102,103	direct-with-variant	The 1931 text distinguishes the open palm in the second phase from the earlier turning fist. Chen's White Snake photographs occur earlier in his sequence; included as a named historical comparison, not proof of identical placement.
+82	punch	87	100	69,70,71,72	direct	The montage again retains a parrying/stepping phase; historical photographs provide the larger action.
+83	grasp	88	101,102,103	73,4,5,6,7,8,9,10	direct	Rollback represents the compound action in the montage.
+84	whip	89	104	11,12,13	direct	Single Whip before the third Cloud Hands series.
+85	cloud	90	105,106	84,85,86,87	shared-series	One montage panel represents the three repetitions.
+86	cloud	90	105,106	84,85,86,87	shared-series	Same representative panel as moves 85 and 87.
+87	cloud	90	105,106	84,85,86,87	shared-series	Final repetition of the third Cloud Hands series.
+88	whip	91	107	11,12,13	direct	Single Whip before High Pat with Palm Thrust.
+89	high-palm	92	108	90,91,228	direct	The reaching palm is the distinguishing continuation; do not substitute the earlier High Pat endpoint alone.
+90	cross-kick	93	109	229,230	direct-with-variant	The 1931 source describes an instep/slapping cross-body action; Chen caption 230 explicitly calls his image a pressing kick. Keep the Chen example as a variant, not an exact mechanical equivalent.
+91	groin	94	110	231,232	direct	Low forward punch after Cross Kick; sequence separates it from the earlier downward punch.
+92	grasp	95	111,112,113	233,4,5,6,7,8,9,10	direct	Rollback represents the larger sequence in the montage.
+93	whip	96	114	13	direct	Grouped with the low posture in the 1931 source.
+94	snake-down	97	115	183	direct	Second low posture, leading to Seven Stars rather than Golden Rooster.
+95	seven	98	116	245	direct	Crossed fists and a light front foot distinguish this from the bow-stance Punch.
+96	ride	99	117	246	direct	Visually resembles White Crane. Its location after Seven Stars and before Lotus establishes this occurrence as Ride the Tiger.
+97	lotus	100	118	247,248	direct	The lifted leg and hands indicate the lotus-kick phase; a single frame does not show the complete circular path.
+98	bow	101	119	249,250	direct	Turning stance with separated fists, after Lotus.
+99	punch	102	120	251,252,29,30	direct	Final Parry, Block and Punch.
+100	close-up	103	121	31,32,33	direct	Final Apparent Close Up.
+101	cross	60	62	34,35,36	reused	No final Cross Hands panel in the montage. Panel 60 and photo 62 are explicitly reused references; the 1931 final section and Chen's concluding sequence both call for Cross Hands.
+102	closing	104	122	1	endpoint-reference	The standing final panel is a shared endpoint, not a separate picture of the arms descending. Chen reuses his opening photograph for the close.
+103	return	104	122	1	endpoint-reference	Shares the final standing panel with Closing. No additional frame is invented to make the counts agree.

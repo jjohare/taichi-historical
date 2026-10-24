@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Explore the Yang long form through historical photographs, drawings and annotated source comparisons.">
+  <meta name="theme-color" content="#33594d">
+  <title>The Yang long form — a historical image study</title>
+  <link rel="stylesheet" href="assets/site.css">
+  <script type="importmap">{"imports":{"three":"./assets/vendor/three.module.js"}}</script>
+  <script type="module" src="assets/site.js"></script>
+</head>
+<body>
+  <a class="skip" href="#explore">Skip to the positions</a>
+  <header class="masthead wrap">
+    <a class="brand" href="#top"><span class="seal" lang="zh">楊</span><span>THE YANG FORM<span class="brand-sub">An illustrated historical study</span></span></a>
+    <nav aria-label="Main navigation"><a href="#explore">Explore the form</a><a href="#sources">Sources &amp; context</a><a href="https://github.com/jjohare/yang-form">Repository ↗</a></nav>
+  </header>
+  <main id="top">
+    <section class="hero wrap" data-od-id="introduction" aria-labelledby="hero-title">
+      <div class="hero-copy"><p class="eyebrow">TAIJIQUAN · IMAGE, SEQUENCE, CONTEXT</p><h1 id="hero-title">The Yang<br>long form.</h1><p class="lead">A way into the positions, transitions and imagery of a living art, through the records it has left behind.</p><a class="primary" href="#move=0">Explore the positions <span aria-hidden="true">→</span></a><p class="hero-meta">103 named entries · 104 drawings · two historical manuals</p></div>
+      <div class="hero-plates" aria-label="Historical photographic references">
+        <figure><img src="extracted/historical/yang-002.png" alt="Yang Chengfu holding a rounded ward-off posture" width="220" height="330"><figcaption>Yang Chengfu<br><span>Published 1931 · plate 2</span></figcaption></figure>
+        <figure><img src="extracted/historical/chen-013.png" alt="Chen Weiming demonstrating Single Whip" width="220" height="330"><figcaption>Chen Weiming<br><span>1932 photograph · plate 13</span></figcaption></figure>
+        <p class="vertical-label" lang="zh">楊式太極拳</p>
+      </div>
+    </section>
+    <section class="scope wrap" data-od-id="historical-scope" aria-labelledby="scope-title">
+      <h2 id="scope-title">A historical record.<br>An evolving practice.</h2>
+      <div><p>This archive studies the form as documented in the images and manuals of their time. <strong>Modern teaching may differ as the art continues to evolve.</strong> These records offer historical context, rather than a standard against which every present-day school should be judged.</p><p>The <a href="https://brennantranslation.wordpress.com/2011/11/24/methods-of-applying-taiji-boxing-taiji-quan-shiyong-fa/">1931 Yang Chengfu manual</a> and <a href="https://brennantranslation.wordpress.com/2020/06/05/chen-weimings-additional-taiji-photos/">Chen Weiming’s 1933 supplement</a> are read alongside a <a href="https://commons.wikimedia.org/wiki/File:Yang_Chengfu_Form.jpg">2010 drawing montage</a>. Our position descriptions, application ideas and practice cues are editorial interpretations; differences and uncertain matches stay visible.</p></div>
+    </section>
+    <section id="explore" class="archive wrap" data-od-id="position-explorer" aria-labelledby="explore-title">
+      <div class="section-heading"><div><p class="eyebrow">THE SEQUENCE</p><h2 id="explore-title">Explore the positions</h2></div><p>Browse, compare, and follow the form.</p></div>
+      <div class="explorer">
+        <aside class="index" aria-label="Position index">
+          <label for="search">Find a position</label><input id="search" type="search" placeholder="Name or number…" autocomplete="off">
+          <label for="section-filter">Section of the form</label><select id="section-filter"><option value="all">All three sections</option><option value="1">I · Opening sequence</option><option value="2">II · Turns and kicks</option><option value="3">III · Returning sequence</option></select>
+          <p id="result-count" class="small" role="status">Loading the catalogue…</p><nav id="position-list" aria-label="Positions"></nav>
+          <p class="index-note">Original numbering is preserved: 0–54, then 56–103. <a href="#sources">Why no 55?</a></p>
+        </aside>
+        <article id="study" aria-labelledby="move-title" aria-busy="true">
+          <div class="move-heading"><div><p id="move-number" class="eyebrow"></p><h3 id="move-title" tabindex="-1">Loading the archive</h3></div><div class="step-controls"><button id="previous" aria-label="Previous position">←</button><button id="next" aria-label="Next position">→</button></div></div>
+          <p id="route-status" class="small" role="status"></p>
+          <div class="study-spread">
+            <div class="image-study">
+              <div id="source-filters" class="segmented" role="group" aria-label="Image collection"></div>
+              <figure class="plate"><a id="full-image" target="_blank" rel="noopener" title="Open full image"><img id="pose-image" alt=""></a><figcaption><span id="image-caption"></span><a id="image-source" target="_blank" rel="noopener">Original source ↗</a></figcaption></figure>
+              <div id="thumbnails" class="thumbnails" aria-label="Images of this position"></div>
+            </div>
+            <section class="model-panel" data-od-id="three-dimensional-study" aria-labelledby="model-title">
+              <div class="model-heading"><h4 id="model-title">Spatial study</h4><span class="tag">NEUTRAL RIG</span></div>
+              <div id="model-view" class="model-view"><p id="model-status" role="status">Preparing the orbitable model…</p></div>
+              <div class="model-controls" role="group" aria-label="Model camera controls"><button id="orbit-left" aria-label="Orbit left">↶</button><button id="orbit-right" aria-label="Orbit right">↷</button><button id="zoom-in" aria-label="Zoom in">+</button><button id="zoom-out" aria-label="Zoom out">−</button><button id="reset-view">Reset view</button></div>
+              <label class="joint-label" for="elbow-angle">Joint check <span id="joint-value">0°</span></label><input id="elbow-angle" type="range" min="0" max="100" value="0" aria-label="Bend elbows to check the joint hierarchy">
+              <p class="small">Drag to orbit · scroll or pinch to zoom. The rig is independent of the selected position. It is not a reconstruction of the photograph.</p>
+            </section>
+          </div>
+          <div class="evidence"><span id="match-label" class="tag"></span><p id="mapping-note"></p></div>
+          <div class="reading-grid">
+            <section data-od-id="position-notes"><p class="eyebrow">OBSERVING THE IMAGES</p><h4>Position &amp; transition</h4><p id="position-note"></p><p id="transition-note"></p><p id="sequence-context" class="small"></p></section>
+            <section data-od-id="application-notes"><p class="eyebrow">EDITORIAL INTERPRETATION</p><h4>Application study</h4><p id="application-note"></p><h4>Name &amp; context</h4><p id="name-note"></p></section>
+            <section data-od-id="attention-notes"><p class="eyebrow">PRACTICE SUGGESTIONS</p><h4>Breath &amp; attention</h4><p id="attention-note"></p><p id="breathing-note" class="small"></p><p class="small">Further reading: <a href="https://www.journals.yangfamilytaichi.com/journal-31.pdf">Yang Family journal 31</a>.</p></section>
+            <section data-od-id="entry-sources"><p class="eyebrow">TRACE THE EVIDENCE</p><h4>Images &amp; source data</h4><ul id="entry-sources"></ul><a id="entry-notes">Read this entry’s notes ↗</a></section>
+          </div>
+        </article>
+      </div>
+      <noscript><p>The interactive explorer needs JavaScript. You can still read the <a href="moves.md">position list</a>, <a href="research/README.md">research notes</a> and <a href="https://github.com/jjohare/yang-form/tree/main/poses">individual position directories</a>.</p></noscript>
+    </section>
+    <section id="sources" class="sources wrap" data-od-id="sources-and-method" aria-labelledby="sources-title">
+      <div><p class="eyebrow">PROVENANCE &amp; METHOD</p><h2 id="sources-title">Read the sources.<br>Keep the differences.</h2><p>This is a Yang-lineage archive. Chen’s supplement explicitly compares his photographs with Yang Chengfu’s. A similar silhouette alone is not evidence of Chee Soo’s Lee style.</p><p>The supplied list starts at 0 and skips 55. Its named sequence aligns with the <a href="https://yangfamilytaichi.com/wp-content/uploads/2021/03/Forms-Worksheets_2020_.pdf">Yang Family 103-form worksheet</a>; the original numbering is retained here. Images expand some compound actions and compress repeated ones, so the counts need not agree.</p></div>
+      <ol class="source-list">
+        <li><span>01 / 1931</span><a href="https://brennantranslation.wordpress.com/2011/11/24/methods-of-applying-taiji-boxing-taiji-quan-shiyong-fa/">Yang Chengfu · Methods of Applying Taiji Boxing ↗</a><p>122 solo photographic plates. Publication date does not establish the date of each exposure.</p></li>
+        <li><span>02 / 1932–33</span><a href="https://brennantranslation.wordpress.com/2020/06/05/chen-weimings-additional-taiji-photos/">Chen Weiming · Additional Taiji Photos ↗</a><p>Photographed in 1932, published in 1933. The source reuses photographs within its longer sequence.</p></li>
+        <li><span>03 / 2010</span><a href="https://commons.wikimedia.org/wiki/File:Yang_Chengfu_Form.jpg">Matthias Wagner · 104 drawings ↗</a><p>CC BY 3.0. Cropped from the montage and converted to sRGB PNG; original proportions retained.</p></li>
+        <li><span>04 / CATALOGUE</span><a href="research/move-map.tsv">Download the image-to-position mapping ↗</a><p><a href="moves.md">Supplied names</a> · <a href="research/README.md">Research notes</a> · <a href="assets/catalogue.json">Full catalogue JSON</a> · <a href="research/panel-bounds.txt">Crop coordinates</a></p></li>
+      </ol>
+    </section>
+  </main>
+  <footer class="wrap"><span>The Yang form · Historical image study</span><span>Photographic sources via <a href="https://brennantranslation.wordpress.com/">Paul Brennan</a> · <a href="https://creativecommons.org/licenses/by/3.0/">Drawing licence</a></span></footer>
+</body>
+</html>
