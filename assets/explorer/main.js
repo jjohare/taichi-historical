@@ -8,6 +8,7 @@ import {presetPosition, detectPreset} from './presets.js';
 import {TEXT} from './provenance.js';
 import {loadIndex, fetchEstimate, readLocalFile, validatePose} from './poses.js';
 import {applyPose, checkLeftRight} from './retarget.js';
+import {createLag, SETTLE_CAP_MS} from './lag.js';
 import {HOP_MS, CAP_MS, MAX_KEYFRAMES, keyframeSequence, sequenceIndexOf, planRoute, createDriver} from './transition.js';
 
 const host = document.getElementById('model-view'), status = document.getElementById('model-status');
@@ -17,8 +18,9 @@ const idle = () => ({active: false, from: null, to: null, progress: 0, hopsTotal
 const state = {
   renderer: 'pending', rig: 'pending', camera: {preset: 'three-quarter'},
   checks: {elbow: 0, crouch: 0, skeleton: false}, selectedJoint: null,
-  displayedImage: null, availableEstimate: null, showNeutral: false, indexed: false, pose: {kind: 'neutral'}, transition: idle(), poseError: null, renderCount: 0,
+  displayedImage: null, availableEstimate: null, showNeutral: false, indexed: false, pose: {kind: 'neutral'}, transition: idle(), poseError: null, renderCount: 0, lag: {settling: false},
 };
+let lag = createLag({}, []); // inert until the avatar's lag nodes are known (PE-61)
 
 const $ = id => document.getElementById(id), forced = new URLSearchParams(location.search).get('explorer-test');
 // The still path (PE-23, PE-24). The <img> is created only here, so a normal load never requests the PNG (PE-28).
@@ -34,7 +36,7 @@ try { // probe first: three.js logs console.error before it throws, and PE-24 al
     host, colour,
     onRender: () => { state.renderCount++; },
     onContextChange: kind => {
-      if (kind === 'lost') { state.renderer = 'lost'; status.hidden = false; status.textContent = TEXT.lost; driver.finish(); timer = setTimeout(fail, 5000); } // PE-56: complete to the target, no frames
+      if (kind === 'lost') { state.renderer = 'lost'; status.hidden = false; status.textContent = TEXT.lost; driver.finish(); endMotion(); timer = setTimeout(fail, 5000); } // PE-56: complete to the target, no frames
       else if (state.renderer === 'lost') { clearTimeout(timer); state.renderer = 'webgl'; status.hidden = true; view.requestRender(); }
     },
   });
@@ -70,17 +72,22 @@ const reject = errors => {
   return {ok: false, errors};
 };
 const drive = file => { const {locals, rootTranslation} = applyPose(rig.rest, file); for (const [name, q] of locals) rig.setLocal(name, q); rig.setRootTranslation(rootTranslation); };
-function show(pose) {
-  endMotion(); rig.resetToRest(); drive(pose.file);
+function show(pose, keepLag) {
+  endMotion(keepLag); rig.resetToRest(); drive(pose.file);
   Object.assign(state.checks, {elbow: 0, crouch: 0}); state.pose = pose; state.poseError = null; settle();
 }
 // The S6 driver owns the only frame loop. `route` = {start, startId, from, fromMove, at, end} while a transition is pending or running.
 let route = null, estimates = null;
-const endMotion = () => { driver.cancel(); route = null; state.transition = idle(); };
+const endMotion = keepLag => { driver.cancel(); route = null; state.transition = idle(); if (!keepLag) { lag.reset(); state.lag.settling = false; } }; // PE-68
+let lagParents = [];
+const stepLag = dt => lag.step(dt, rig.worldQuaternionsOf(lagParents), rig.worldPositionOf('pelvis'));
 const driver = createDriver({
   requestFrame: requestAnimationFrame.bind(window), cancelFrame: cancelAnimationFrame.bind(window), now: () => performance.now(),
-  onFrame: ({pose, hopIndex}, progress) => { drive(pose); Object.assign(state.transition, {progress, hopIndex}); requestRender(); }, // no ui.sync: aria-live stays quiet (PE-51)
-  onArrive: () => show(route.end),
+  onFrame: ({pose, hopIndex}, progress, dt) => { drive(pose); stepLag(dt); Object.assign(state.transition, {progress, hopIndex}); requestRender(); }, // no ui.sync: aria-live stays quiet (PE-51)
+  onArrive: () => { show(route.end, true); state.lag.settling = lag.active; },
+  settleCapMs: SETTLE_CAP_MS,
+  onSettle: dt => { if (!state.lag.settling) return false; const moving = stepLag(dt); requestRender(); return moving; },
+  onSettled: () => { if (state.lag.settling) { lag.reset(); state.lag.settling = false; requestRender(); } },
 });
 async function estimate(id) {
   if (!fetched.has(id)) fetched.set(id, fetchEstimate(undefined, estimates.get(id)));
@@ -116,7 +123,7 @@ async function navigate(prev) {
     const e = Math.abs(t - b) <= Math.abs(t - a) ? b : a, d = Math.sign(t - e) || Math.sign(e - (e === b ? a : b));
     r = {start: live.pose, from: e - d};
   }
-  route = r; driver.cancel();
+  route = r; driver.cancel(); state.lag.settling = false; if (reduce) lag.reset();
   state.pose = {kind: 'interpolated', fromImageId: r.startId, toImageId: image.imageId};
   state.transition = {...idle(), active: true, from: r.startId ?? state.transition.from, to: image.imageId};
   ui.sync();
@@ -143,7 +150,7 @@ async function navigate(prev) {
   if (loaded[last].errors.length) { toNeutral(); return reject(loaded[last].errors); }
   r.end = {kind: 'estimate', origin: 'published', imageId: image.imageId, imageLabel: image.label, file: files[files.length - 1]};
   state.transition.hopsTotal = files.length; ui.sync();
-  driver.start([r.start, ...files]);
+  lag.begin(); driver.start([r.start, ...files]);
   if (reduce || state.renderer !== 'webgl') driver.finish(); // context lost while loading: land on the target without frames
 }
 function loadResult(result, origin, imageLabel) {
@@ -207,7 +214,7 @@ if (new URLSearchParams(location.search).get('explorer-test') === '1') {
   const bones = () => Object.fromEntries(rig.jointNames.map(name => [name, {quaternion: rig.localOf(name), position: rig.worldPositionOf(name)}]));
   window.__explorer = Object.freeze({
     get state() {
-      return structuredClone({...state, ...rig.visibility(), bones: bones(), cameraPosition: view.camera.position.toArray(), label: document.getElementById('model-label').textContent, fallbackVisible: fallback.isVisible(), visible: view.isVisible(),
+      return structuredClone({...state, lag: {active: lag.active, settling: state.lag.settling, angles: lag.angles(), capMs: SETTLE_CAP_MS}, ...rig.visibility(), bones: bones(), cameraPosition: view.camera.position.toArray(), label: document.getElementById('model-label').textContent, fallbackVisible: fallback.isVisible(), visible: view.isVisible(),
         readout: document.getElementById('joint-readout').textContent, provenance: document.getElementById('model-provenance').textContent, marker: rig.markerState()});
     },
     get renderer() { return view.renderer; }, camera: view.camera, controls: view.controls,
@@ -221,7 +228,7 @@ if (new URLSearchParams(location.search).get('explorer-test') === '1') {
 status.hidden = true;
 try {
   const avatar = await loadAvatar(view.scene, new URL('../model/archive-avatar.glb', import.meta.url).href, colour);
-  rig.setVisible(false); rig.setMarker(null); rig = avatar; state.rig = 'avatar'; rig.setMarker(state.selectedJoint);
+  rig.setVisible(false); rig.setMarker(null); rig = avatar; state.rig = 'avatar'; lag = createLag(rig, rig.lagNodes); lagParents = [...new Set(rig.lagNodes.map(n => n.parent))]; rig.setMarker(state.selectedJoint);
   ui.sync(); requestRender(); refreshEstimate();
 } catch (error) {
   // A usable joint rig remains available if the avatar asset cannot be fetched.

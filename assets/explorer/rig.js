@@ -7,13 +7,18 @@ const SKELETON_VISIBLE = /palm|finger|thumb|shoe|Head/;
 
 function makeRig(kind, group, extras = {}) {
   group.updateMatrixWorld(true);
-  const bones = new Map(), rest = new Map(), meshes = [], scratch = new THREE.Quaternion();
+  const bones = new Map(), rest = new Map(), meshes = [], lagNodes = [], lagObjects = new Map(), scratch = new THREE.Quaternion();
   group.traverse(object => {
     if (object.isBone) {
       bones.set(object.name, object);
       rest.set(object.name, {local: object.quaternion.toArray(), world: object.getWorldQuaternion(scratch).toArray(), position: object.position.toArray()});
     }
     if (object.isMesh) meshes.push(object);
+    const {name, hinge_axis: h, max_degrees: max, inward_degrees: inward, drop} = object.userData; // PE-60: GLTFLoader strips ':' from object.name
+    if (name?.startsWith('lag:') && bones.has(object.parent?.name) && h?.join() === '1,0,0' && max > 0) {
+      lagObjects.set(name, object);
+      lagNodes.push({node: name, parent: object.parent.name, maxDegrees: max, inwardDegrees: inward ?? max, drop: drop === true, restLocal: object.quaternion.toArray()});
+    }
   });
   const skeleton = extras.skeleton;
   // Joint marker: a child of the selected bone, so it follows every pose change with no per-frame bookkeeping.
@@ -21,7 +26,9 @@ function makeRig(kind, group, extras = {}) {
   const marker = new THREE.Mesh(new THREE.SphereGeometry(.06, 16, 12), new THREE.MeshBasicMaterial({color: extras.accent, depthTest: false, transparent: true, opacity: .8}));
   marker.renderOrder = 999; marker.visible = false;
   return {
-    kind, rest, jointNames: [...bones.keys()],
+    kind, rest, jointNames: [...bones.keys()], lagNodes,
+    setLagLocal(node, quaternion) { lagObjects.get(node)?.quaternion.fromArray(quaternion); },
+    worldQuaternionsOf: names => new Map(names.map(name => [name, bones.get(name).getWorldQuaternion(scratch).toArray()])),
     setLocal(name, quaternion) { bones.get(name)?.quaternion.fromArray(quaternion); },
     // Offset from the pelvis rest position. A rig without a pelvis ignores it rather than throwing.
     setRootTranslation(offset) {

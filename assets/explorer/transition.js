@@ -42,16 +42,24 @@ export function sampleRoute(poses, p) {
 }
 
 // The only self-rescheduling frame loop in the explorer (PE-08, PE-53): it runs only between start() and arrival.
-export function createDriver({requestFrame, cancelFrame, now, onFrame, onArrive}) {
-  let poses = null, handle = null, t0 = 0, total = 0, latest = null;
-  const stop = () => { if (handle !== null) cancelFrame(handle); handle = poses = null; };
+// ADR-0008: after arrival it may run a settle window while onSettle(dt) returns true, for at most settleCapMs (PE-53).
+export function createDriver({requestFrame, cancelFrame, now, onFrame, onArrive, onSettle, onSettled, settleCapMs = 0}) {
+  let poses = null, handle = null, t0 = 0, total = 0, latest = null, last = 0, t1 = null;
+  const stop = () => { if (handle !== null) cancelFrame(handle); handle = poses = t1 = null; };
+  const end = () => { t1 = null; onSettled?.(); };
   const tick = () => {
     handle = null;
-    const x = Math.min(1, (now() - t0) / total), p = easeInOutCubic(x);
-    latest = {...sampleRoute(poses, p), progress: p}; onFrame(latest, p);
-    if (x < 1) handle = requestFrame(tick); else { stop(); onArrive(); }
+    const n = now(), dt = (n - last) / 1000; last = n;
+    if (t1 !== null) { if (n - t1 < settleCapMs && onSettle(dt)) handle = requestFrame(tick); else end(); return; }
+    const x = Math.min(1, (n - t0) / total), p = easeInOutCubic(x);
+    latest = {...sampleRoute(poses, p), progress: p}; onFrame(latest, p, dt);
+    if (x < 1) handle = requestFrame(tick);
+    else {
+      stop(); onArrive(); // a cancel inside onArrive must not suppress the window
+      if (onSettle && poses === null) { t1 = last = now(); if (onSettle(0)) handle = requestFrame(tick); else end(); }
+    }
   };
-  const start = list => { stop(); poses = list; total = routeTiming(list.length - 1).total; t0 = now(); latest = null; handle = requestFrame(tick); };
+  const start = list => { stop(); poses = list; total = routeTiming(list.length - 1).total; t0 = last = now(); latest = null; handle = requestFrame(tick); };
   return {
     start, retarget: start, current: () => latest,
     finish() { if (poses) { stop(); onArrive(); } },
