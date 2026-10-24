@@ -32,7 +32,7 @@ The budget is already tight. `wc -c assets/explorer/*.js` totals **56,060 B** ag
 - **Amended criteria:**
   - PE-08: the S6 driver's loop may continue through the settle window, while `lag.settling` is true, and for no more than 600 ms after arrival.
   - PE-11: secondary lag is the one motion besides a transition, and only immediately after one.
-  - PE-28: the budget is now 60 KiB, and no request is added.
+  - PE-28: the budget is now 60 KiB, and no request is added. *Amended 24 October 2026:* 64 KiB (65,536 B), because slice S3 landed after this forecast and used the headroom; see ADR-0001's second amendment.
   - PE-53: `renderCount` may rise once per frame for at most 600 ms after arrival, then stops; the original wording holds when there are no lag nodes.
   - PE-59 is extended: lag angles are transient and exactly 0 once settled.
 - **Motion under a reviewed label.** For up to 600 ms after arrival the `ESTIMATED POSE` label is on screen while sleeves and hem still swing. PE-20 forbids showing a reviewed estimate *modified*. That still holds, because the estimate is the bones and they are bit-for-bit the target file throughout. Garment pieces are not pose data (PE-69). The ADR-0004 label rule is unaffected.

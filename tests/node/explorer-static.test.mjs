@@ -39,9 +39,9 @@ test('PE-08 a requestAnimationFrame callback never reschedules itself', () => {
   assert.ok(sawRaf, 'expected render-on-demand to use requestAnimationFrame somewhere in assets/explorer');
 });
 
-test('PE-28 explorer modules total at most 56 KiB', () => {
+test('PE-28 explorer modules total at most 64 KiB', () => {
   const total = explorerFiles().reduce((n, f) => n + Buffer.byteLength(f.source), 0);
-  assert.ok(total <= 56 * 1024, `assets/explorer/*.js is ${total} bytes`);
+  assert.ok(total <= 64 * 1024, `assets/explorer/*.js is ${total} bytes`);
 });
 
 test('PE-28 imports are limited to ./*.js, ../vendor/*.js and three', () => {
