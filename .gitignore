@@ -4,3 +4,5 @@
 .claude/
 .claude-flow/
 .swarm/
+/tools/pose-estimation/target/
+/tools/pose-estimation/out/

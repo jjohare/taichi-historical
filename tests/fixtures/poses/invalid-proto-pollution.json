@@ -30,7 +30,7 @@
     "modelSha256": "3ca6f2ac01fccc002e4f04deeec6fa3f65442c0e6d4db0e3943609b87dab032f"
   },
   "converter": {
-    "path": "tools/pose-estimation/convert.py",
+    "path": "tools/pose-estimation/src/main.rs",
     "revision": "0123456789abcdef0123456789abcdef01234567"
   },
   "jointConvention": "yang-form-24/rest-world-delta@1",
