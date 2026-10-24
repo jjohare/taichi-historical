@@ -26,8 +26,9 @@ jobs:
         run: |
           node tools/check-lee.mjs
           mkdir _site
+          cp -R lee _site/
           cp index.html .nojekyll moves.md Yang_Chengfu_Form.jpg _site/
-          cp -R assets extracted poses research lee _site/
+          cp -R assets extracted poses research _site/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
