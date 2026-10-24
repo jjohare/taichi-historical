@@ -1,8 +1,9 @@
 // Pure: pose-estimate and index validation (design §8, ADR-0002). No imports. validatePose and validateIndex never throw;
 // they return {ok:true, ...} or {ok:false, errors:[{code, path, message}]}. Messages are plain English, for textContent only.
 export const JOINT_NAMES = Object.freeze([
-  'pelvis', 'spine1', 'spine2', 'spine3', 'neck', 'head',
-  ...['left', 'right'].flatMap(s => ['collar', 'shoulder', 'elbow', 'wrist', 'hand', 'hip', 'knee', 'ankle', 'foot'].map(p => `${s}_${p}`)),
+  'pelvis', 'left_hip', 'left_knee', 'left_ankle', 'left_foot', 'right_hip', 'right_knee', 'right_ankle', 'right_foot',
+  'spine1', 'spine2', 'spine3', 'left_collar', 'left_shoulder', 'left_elbow', 'left_wrist', 'left_hand',
+  'neck', 'head', 'right_collar', 'right_shoulder', 'right_elbow', 'right_wrist', 'right_hand',
 ]);
 export const POSE_JOINTS = Object.freeze(JOINT_NAMES.filter(n => n !== 'pelvis'));
 export const MAX_BYTES = 65536;
