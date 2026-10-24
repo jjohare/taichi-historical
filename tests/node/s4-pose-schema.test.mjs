@@ -303,7 +303,7 @@ test('PE-41 the first error message is plain English, fit for #pose-error, and T
   assert.doesNotMatch(first.message, /<|>|undefined|\[object|NaN/);
 });
 
-test('PE-41 TEXT.rejected wraps the first error message exactly', {todo: 'slice S5: provenance.js gains TEXT.rejected with the binding'}, async () => {
+test('PE-41 TEXT.rejected wraps the first error message exactly', async () => {
   const [first] = (await validate(fixture('invalid-E_DATE.json'))).errors;
   const {TEXT} = await import('../../assets/explorer/provenance.js');
   assert.equal(typeof TEXT.rejected, 'function', 'provenance.js must export TEXT.rejected(message)');

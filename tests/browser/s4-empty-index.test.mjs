@@ -1,11 +1,7 @@
 // PE-35 (browser half): the shipped empty index is fetched once, answers 200, and nothing else is requested.
 // PE-34 (browser half, safe part): pose files are never requested from a URL taken from the hash or query.
 import assert from 'node:assert/strict';
-import test from 'node:test';
-import {browserTest, cdpSkipReason, withExplorer} from '../helpers/cdp.mjs';
-
-// Like browserTest, but expected to fail until the named slice lands (reported as TODO, not as a failure).
-const todoBrowserTest = (name, todo, fn) => (cdpSkipReason ? test(name, {skip: cdpSkipReason}) : test(name, {todo, timeout: 60000}, fn));
+import {browserTest, withExplorer} from '../helpers/cdp.mjs';
 
 const poseRequests = page => page.requests.filter(u => /\/assets\/pose-estimates\//.test(u));
 
@@ -14,7 +10,7 @@ async function responsesOf(page) {
   return page.evaluate(`performance.getEntriesByType('resource').map(e => ({url: e.name, status: e.responseStatus}))`);
 }
 
-todoBrowserTest('PE-35 a normal load makes exactly one pose-estimates request, index.json, with status 200 and no 404', 'slice S5: main.js does not load the index until the binding lands', () =>
+browserTest('PE-35 a normal load makes exactly one pose-estimates request, index.json, with status 200 and no 404', () =>
   withExplorer({}, async page => {
     await page.until(() => poseRequests(page).length > 0, {what: 'the index request', timeout: 8000});
     await page.quiet(500);
@@ -38,10 +34,10 @@ browserTest('PE-35 with the empty index no #apply-estimate button is present or 
     }
   }));
 
-todoBrowserTest('PE-34 a pose-file URL in the hash or query is never fetched', 'slice S5: needs the index request to exist before "only index.json" is meaningful', () =>
+browserTest('PE-34 a pose-file URL in the hash or query is never fetched', () =>
   withExplorer({query: '?explorer-test=1&pose=chen-001.json&file=../x.json&pose-file=https://example.com/p.json', hash: '#move=13&pose=chen-001.json'}, async page => {
     await page.until(() => poseRequests(page).length > 0, {what: 'the index request', timeout: 8000});
     await page.quiet(500);
     assert.deepEqual(poseRequests(page).map(u => u.split('/').pop()), ['index.json']);
-    assert.ok(page.requests.every(u => !u.includes('example.com')), 'no cross-origin request');
+    assert.ok(page.requests.every(u => new URL(u).hostname !== 'example.com'), 'no cross-origin request (the navigation URL itself carries the string, so compare hostnames)');
   }));
