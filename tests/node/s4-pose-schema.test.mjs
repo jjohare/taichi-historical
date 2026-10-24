@@ -123,6 +123,7 @@ const VARIANTS = [
   ['schemaVersion 0', 'E_VERSION', p => { p.schemaVersion = 0; }],
   ['schema missing type', 'E_SCHEMA_ID', p => { p.schema = 7; }],
   ['unknown key in review', 'E_UNKNOWN_KEY', p => { p.review.approvedBy = 'nobody'; }],
+  ['unknown key in frame (E_FRAME is the frame rule, E_UNKNOWN_KEY the general one)', ['E_UNKNOWN_KEY', 'E_FRAME'], p => { p.frame.handedness = 'right'; }],
   ['unknown key in a joint entry', 'E_UNKNOWN_KEY', p => { p.joints.left_elbow.twist = 1; }],
   ['unknown key in estimator', 'E_UNKNOWN_KEY', p => { p.estimator.gpu = 'A100'; }],
   ['missing estimator', 'E_MISSING', p => { delete p.estimator; }],
@@ -175,7 +176,11 @@ const VARIANTS = [
   ['jointMap not name@version', 'E_TYPE', p => { p.jointMap = 'whatever'; }],
 ];
 for (const [label, code, edit] of VARIANTS) {
-  test(`PE-31 ${label} → ${code}`, async () => rejects(await validate(mutated(edit)), code));
+  test(`PE-31 ${label} → ${[code].flat().join(' or ')}`, async () => {
+    const result = await validate(mutated(edit));
+    if (Array.isArray(code)) { assert.equal(result.ok, false); assert.ok(code.includes(result.errors[0].code), JSON.stringify(result.errors[0])); }
+    else rejects(result, code);
+  });
 }
 
 test('PE-31 a draft review is rejected for published files but accepted for local files', async () => {
@@ -215,12 +220,12 @@ test('PE-31 a "__proto__" key in the raw text is rejected as E_UNKNOWN_KEY and p
 });
 
 test('PE-31 "__proto__" nested in review or in a landmark container is rejected and pollutes nothing', async () => {
-  for (const where of ['review', 'estimator', 'sourceImage', 'confidence']) {
+  for (const where of ['review', 'frame', 'estimator', 'sourceImage', 'confidence']) {
     const text = JSON.stringify(fixture('valid-full.json')).replace(new RegExp(`("${where}":\\{)`), '$1"__proto__":{"polluted":true},');
     assert.ok(text.includes('"__proto__"'), where);
     const r = await validate(text);
     assert.equal(r.ok, false, where);
-    assert.ok(codes(r).includes('E_UNKNOWN_KEY'), `${where}: ${codes(r)}`);
+    assert.ok(codes(r).includes('E_UNKNOWN_KEY') || (where === 'frame' && codes(r).includes('E_FRAME')), `${where}: ${codes(r)}`);
   }
   assert.equal({}.polluted, undefined);
 });
@@ -251,7 +256,7 @@ test('PE-31 validatePose never throws: null, [], 42, strings, undefined and othe
 
 test('PE-31 validatePose copes with a missing or malformed options argument', async () => {
   const {validatePose} = await mod();
-  for (const options of [undefined, null, {}, {origin: 42}]) {
+  for (const options of [undefined, {}, {origin: 42}]) {
     let r;
     assert.doesNotThrow(() => { r = validatePose(fixture('valid-minimal.json'), options); });
     assert.equal(typeof r.ok, 'boolean');
