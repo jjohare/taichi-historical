@@ -397,7 +397,7 @@ This section adds to §§3–9 and changes none of them except where marked. Req
 
 ### 12.2 Module: `assets/explorer/transition.js` (pure)
 
-It imports only `../vendor/three.core.js` (for `Quaternion.slerpQuaternions`) and has no DOM, `window` or timer access: the driver receives its clock and frame scheduler. That keeps it under `node --test` with a fake clock, and keeps §3's rule that pure modules never touch `window`.
+It imports only `../vendor/three.core.js` (for `Quaternion.slerpQuaternions`) and `./pose-schema.js` (the joint list) and has no DOM, `window` or timer access: the driver receives its clock and frame scheduler. That keeps it under `node --test` with a fake clock, and keeps §3's rule that pure modules never touch `window`.
 
 ```js
 export const HOP_MS = 1600, CAP_MS = 3000, MAX_KEYFRAMES = 24;   // ADR-0007 justifies the values; exposed in the snapshot
