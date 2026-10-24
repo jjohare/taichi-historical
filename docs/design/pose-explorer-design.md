@@ -1,6 +1,6 @@
 # Pose explorer — design
 
-Status: proposed · 24 October 2026 · Requirements: [pose-explorer-spec.md](pose-explorer-spec.md) · Decisions: [ADR-0001](../adr/ADR-0001-explorer-module-split.md) to [ADR-0006](../adr/ADR-0006-vendored-library-pinning.md)
+Status: proposed · 24 October 2026 · Requirements: [pose-explorer-spec.md](pose-explorer-spec.md) · Decisions: [ADR-0001](../adr/ADR-0001-explorer-module-split.md) to [ADR-0007](../adr/ADR-0007-sequence-transitions.md). §12 (slice S6) was added by ADR-0007
 
 ## 1. Scope and starting point
 
@@ -51,6 +51,7 @@ Every file is a plain ES module, loaded through the existing import map (`"three
 | `retarget.js` | pure | `bendQuaternion`, `retargetJoint`, `applyPose`, `jointAngleDegrees`, `forwardKinematics`, `checkLeftRight`. | ≤ 120 |
 | `pose-schema.js` | pure | `validatePose(input, {origin})`, `validateIndex(input)`, `JOINT_NAMES`, error codes. No three.js import. | ≤ 200 |
 | `poses.js` | DOM | Fetches `pose-estimates/index.json`, fetches allowlisted files on demand, runs validation, and reads local files through `FileReader`. | ≤ 80 |
+| `transition.js` | pure | (S6) Keyframe sequence, route planning, interpolation and frame driver. See §12.2. | ≤ 140 |
 
 `#model-still` is created by `main.js` only on the still path, so normal loads never fetch `avatar-neutral.png` (PE-28). Total budget: 48 KiB (PE-28). Each file stays under 500 lines, and well under in practice.
 
@@ -354,6 +355,7 @@ After schema validation, `checkLeftRight` (PE-33) runs forward kinematics on the
 | S3 | Context restore, still fallback, 44 px and 360 px fixes | PE-22–25 |
 | S4 | `pose-schema.js`, `retarget.js`, fixtures, empty `index.json`, `SAM-LICENSE.txt`, check integration | PE-30–35 |
 | S5 | `site.js` event, `poses.js`, apply/clear/local-file UI | PE-18–21, 36, 41 |
+| S6 | `transition.js`, estimate mode, transition state and label, amended PE-08/11/19/36 (§12, ADR-0007). Depends on S5 | PE-42–59 |
 
 S1 must not change pixels. Compare screenshots of the default view, the elbow at 60, the crouch at 40 and the skeleton on, before and after, with no visible difference.
 
@@ -375,3 +377,115 @@ S1 must not change pixels. Compare screenshots of the default view, the elbow at
 | A console 404 for a missing index | The empty index always ships (PE-35) |
 | The SAM Licence travelling with derived pose data | Licence copy and acknowledgement shipped beside the data (ADR-0003). Weights and code never in the repository |
 | The procedural fallback rig cannot take estimates | Estimate controls are hidden when `state.rig === 'fallback-rig'` |
+| Interpolated frames read as a recovered movement (S6) | Their own label and wording (`TRANSITION · INTERPOLATED`, "not a photograph"), transient state, and arrival always at a reviewed file (PE-50, PE-59, ADR-0007) |
+
+## 12. Sequence transitions (S6, ADR-0007)
+
+This section adds to §§3–9 and changes none of them except where marked. Requirements: spec section I, PE-42 to PE-59.
+
+### 12.1 Constraints that shape it
+
+- **Only reviewed poses are poses** (ADR-0003, ADR-0004). Each keyframe is a published, validated estimate. Interpolated frames are synthetic, so they get their own label and are never stored.
+- **The catalogue and the rig meet at one event** (§7). S6 adds no new event and does not widen `yang:image-shown`. The explorer tells a navigation from an image change by comparing `moveId` with the previous event. It reads the sequence from `catalogue.json`, the same bytes `site.js` loaded, so normally the HTTP cache serves it.
+- **Rendering on demand** (PE-08). An rAF loop exists only while a transition runs.
+- **Estimates are keyed by source image, not by entry** (§7). An entry has up to 17 images across three sources, and 8 adjacent pairs per photographic source share their first image. The keyframe rule therefore follows what `site.js` actually shows (spec I, "Keyframe image"), and the route collapses repeats.
+- **Budget** (PE-28). The explorer modules are 36.2 KiB of 48 KiB before S3–S5. `transition.js` is capped at 140 lines, about 5 KiB.
+
+### 12.2 Module: `assets/explorer/transition.js` (pure)
+
+It imports only `../vendor/three.core.js` (for `Quaternion.slerpQuaternions`) and has no DOM, `window` or timer access: the driver receives its clock and frame scheduler. That keeps it under `node --test` with a fake clock, and keeps §3's rule that pure modules never touch `window`.
+
+```js
+export const HOP_MS = 350, TOTAL_CAP_MS = 1200, MAX_KEYFRAMES = 24;
+
+// Sequence in ascending ordinal; imageId is the keyframe image for `source`, or null (spec I, PE-43).
+export function keyframeSequence(catalogue, source) → [{moveId, imageId: string | null}]
+export function sequenceIndexOf(sequence, moveId) → number      // −1 if absent
+
+// Keyframes strictly after fromIndex up to and including toIndex, in travel order. Drops null and unreviewed ids
+// (estimatesIndex: Set or Map of reviewed image ids). Collapses consecutive repeats, including one equal to
+// startImageId. Sub-samples evenly to MAX_KEYFRAMES, always keeping the target (PE-44, PE-48).
+// Returns {keyframes: []} when the target itself is unreviewed.
+export function planRoute(sequence, fromIndex, toIndex, estimatesIndex, {startImageId} = {})
+  → {keyframes: string[], skipped: number}
+
+export function routeTiming(hops) → {total, perHop}             // total = min(HOP_MS·hops, TOTAL_CAP_MS)
+export function easeInOutCubic(x) → number
+
+// Per-joint shortest-arc slerp of Q over POSE_JOINTS and root.rotation; lerp of root.translation; a missing
+// joint counts as identity. a and b are validated pose files or earlier interpolatePose results.
+// Returns {joints: {name: {rotation}}, root: {translation, rotation}}, no provenance fields (PE-46).
+export function interpolatePose(a, b, t) → InternalPose
+
+// The pose at eased progress p along [start, k1, …, kN]: hop = min(N−1, floor(p·N)), local t = p·N − hop.
+export function sampleRoute(poses, p) → {pose: InternalPose, hopIndex}
+
+// The only self-rescheduling rAF in the explorer (PE-08 amended, PE-53).
+export function createDriver({requestFrame, cancelFrame, now, onFrame, onArrive}) → {
+  start(poses /* [startPose, ...keyframePoses] */, {hopsTotal, skipped}),  // clock starts here, after fetching
+  retarget(poses, meta),     // poses[0] must be the current interpolated pose (PE-52)
+  current() → {pose, progress, hopIndex} | null,
+  finish(),                  // jump to the last pose, call onArrive, no further frames (context loss, reduced motion)
+  cancel()                   // stop without onArrive (reset, clear, fallback)
+}
+// Each tick: p = easeInOutCubic(min(1, (now() − t0) / total)); onFrame(sampleRoute(poses, p), p).
+// At p = 1 it calls onFrame with the exact last pose, then onArrive(), and requests no further frame.
+```
+
+`interpolatePose` works on the file's delta `Q_j`, not on bone locals. The retarget rule `L = L_r · (W_r⁻¹ · Q · W_r)` is a fixed left product and a fixed conjugation, and both preserve slerp paths, so this gives the same frames as slerping `L`. It also means the module never needs the rig. `rig.js` gains nothing: `main.js` applies each frame with `applyPose` (§4) and `rig.setLocal` / `setRootTranslation`, as it does for an estimate.
+
+The easing is global, across the route, not per hop. Per-hop easing would stop the figure at every intermediate keyframe and look like stuttering when hops are 50–100 ms. With global easing the figure moves continuously, passes through each reviewed keyframe exactly at `p = k/N`, and starts and ends at rest.
+
+### 12.3 State model changes (amends §6)
+
+```js
+state += {
+  estimateMode: 'off' | 'follow',                 // never persisted; 'off' on every load (PE-42)
+  transition: { active: false, from: null, to: null, progress: 0, hopsTotal: 0, hopIndex: 0, skipped: 0 },
+}
+state.pose |= { kind: 'interpolated', fromImageId, toImageId }   // only while transition.active (PE-59)
+```
+
+`displayedImage` gains `moveId` and `source`, which are already in the §7 event detail. `main.js` also keeps two private fields, never exposed in the snapshot: `sequenceBySource` (memoised `keyframeSequence` results, filled from `catalogue.json` on first entry to `follow`) and `estimateCache` (a Map from image id to validated pose file, bounded to the files the index lists).
+
+| Action | Effect |
+|---|---|
+| `applyEstimate()` (S5) | as §6, and also `estimateMode = 'follow'`. On first entry, fetch `catalogue.json` once |
+| `clearPose()`, `reset()` | as §6, and also `driver.cancel()`, `transition` inactive, `estimateMode = 'off'` |
+| `imageShown(detail)`, navigation (`moveId` changed) | if `estimateMode === 'follow'` and `pose.kind ∈ {estimate (published), interpolated}`: run the route steps below. Otherwise §6 behaviour (PE-19) |
+| `imageShown(detail)`, image change (same `moveId`) | `driver.cancel()`. In `follow` with a reviewed estimate for the new image, apply it at once. Otherwise `clearPose()` but leave `estimateMode` alone (PE-54) |
+| context `lost` | `driver.finish()`: the target is applied without rendering (PE-56) |
+| context `failed`, avatar fallback | `driver.cancel()`, `clearPose()`, `estimateMode = 'off'` |
+
+Route steps on a navigation, all in the event's task until the fetch:
+
+1. Look up `toIndex`. For `fromIndex`, use the sequence index of the previous `displayedImage` when idle. Mid-transition (PE-52), use the endpoint of the current hop on the far side from the target, so the new route's first keyframe is the near one.
+2. `planRoute(…)`. Empty, which means the target is unreviewed: `clearPose()`, PE-19. Done.
+3. Set `pose = {kind:'interpolated', …}`, `transition = {active: true, progress: 0, hopsTotal, …}`, then `ui.sync()`. The transition label now shows (PE-50) and the sliders are disabled (PE-51). The start pose is the rig's current pose: the applied estimate, or `driver.current().pose` when retargeting.
+4. Fetch the keyframes not already in `estimateCache`, in parallel, through `poses.fetchEstimate` (index entries only). Bump a generation counter first. A completion whose generation is stale is discarded.
+5. Drop failed or invalid intermediates, with one `console.warn` each. If the target failed: `clearPose()` and the PE-41 status. If the route is now empty but the target is fine, apply the target at once.
+6. Reduced motion (checked now): `driver.start(...)` and then `finish()` at once. Otherwise `driver.start(poses, meta)`.
+7. `onFrame`: apply the pose to the rig, update `transition.progress` and `hopIndex`, then `requestRender()`. The DOM is **not** synced per frame: only the label and slider state are set at step 3, and `ui.sync()` runs again on arrival. This keeps `aria-live` quiet (PE-51).
+8. `onArrive`: `pose = {kind:'estimate', origin:'published', imageId: to, file}` (the normal S5 applied estimate), `transition` inactive, `ui.sync()`. Nothing else renders after this (PE-53).
+
+**How S6 and S5 share the "applied estimate" state.** The state reached on arrival is the same as clicking Apply on that photograph. The same `file` object, label, slider lock and clearing rules apply, and a later reset or image change treats it exactly as an S5 estimate. `interpolated` is a transient third pose kind. Only the driver enters it, and only arrival or cancellation leaves it. It is not in the URL, storage, the hook's `actions` or any validator input. `provenanceFor(pose, {rig, transition})` gains one branch that returns the PE-50 strings. The label stays derived from state (ADR-0004).
+
+### 12.4 Dependencies and budget (amends §3)
+
+| Module | Kind | Responsibility | Approx. size |
+|---|---|---|---|
+| `transition.js` | pure | Keyframe sequence, route planning, timing, interpolation, frame driver | ≤ 140 |
+
+Dependency direction: `main → transition → three.core`. `controls.js` does not import `transition.js`; it reads `state.transition` through `getState()`. Test-hook additions (§6): `transition` and `estimateMode` in the snapshot (PE-58). No new actions.
+
+### 12.5 Failure modes
+
+| What breaks | First symptom | Detection |
+|---|---|---|
+| A slow or failed fetch on a far jump | The transition label holds on the old pose until the files arrive | `transition.active && progress === 0` for more than 1 s; one `console.warn` per dropped intermediate (PE-55) |
+| A corrupt target file | Neutral rig and the PE-41 status line, never a half-applied pose | PE-55 browser check; CI already rejects unindexed or invalid files (PE-34) |
+| A background tab or throttled rAF | Arrives late or in one step | The driver clamps `elapsed` and completes on the next tick, so the end state is always exact |
+| Rapid repeated navigation (holding Enter on `#next`) | Constant retargeting; the figure keeps easing in | The generation counter discards stale fetches; each retarget starts from the current pose, so nothing jumps |
+| Context loss mid-hop | No frames; the target is applied silently | PE-56 |
+| The keyframe rule drifting from `site.js`'s `showSources` and `showImage` | The keyframe differs from the displayed photograph, so the arrival estimate mismatches | The target always comes from the event's `imageId`, not the rule, so arrival is right. PE-43's browser half catches drift for intermediates |
+| Joint-space slerp passing limbs through the body or sliding feet | Implausible in-between frames on large posture changes (turns, steps) | Accepted and labelled (ADR-0007). Reviewers look at long hops by hand; there is no automatic check |
