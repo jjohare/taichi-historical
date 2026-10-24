@@ -214,12 +214,14 @@ Renderer states: `pending → webgl` on success. `pending → still` if WebGL2 i
 
 ```js
 window.__explorer = Object.freeze({
-  get state() { return structuredClone(state) },       // read-only snapshot
+  get state() { return structuredClone(state) },       // read-only snapshot, plus the derived fields below
   get renderer() { return renderer }, camera, controls, rig,   // for context-loss and pose checks
   actions: { setPreset, selectJoint, loadPoseObject, applyEstimate, clearPose, reset },
   jointAngle: name => number
 })
 ```
+
+The snapshot adds derived fields that are not part of `state`: `bones` (name → `{quaternion, position}`, local quaternion and world position), `cameraPosition`, `label` (the `#model-label` text), `skeletonVisible` (the `SkeletonHelper`'s `visible`; `false` on the fallback rig) and `meshVisibility` (avatar mesh name → `visible`, for every avatar mesh; empty on the fallback rig). The live scene is never exposed.
 
 Exposing actions is safe. They go through the same validation as the UI and cannot reach the network beyond the index allowlist.
 

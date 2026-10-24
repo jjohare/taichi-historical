@@ -35,6 +35,11 @@ function makeRig(kind, group, extras = {}) {
       for (const mesh of meshes) mesh.visible = !show || SKELETON_VISIBLE.test(mesh.name);
     },
     setVisible(show) { group.visible = show; },
+    // Read-only view for the test hook: skeleton helper and per-mesh visibility, keyed by mesh name.
+    visibility: () => ({
+      skeletonVisible: skeleton ? skeleton.visible : false,
+      meshVisibility: kind === 'avatar' ? Object.fromEntries(meshes.map(mesh => [mesh.name, mesh.visible])) : {},
+    }),
   };
 }
 

@@ -57,7 +57,7 @@ if (new URLSearchParams(location.search).get('explorer-test') === '1') {
   const bones = () => Object.fromEntries(rig.jointNames.map(name => [name, {quaternion: rig.localOf(name), position: rig.worldPositionOf(name)}]));
   window.__explorer = Object.freeze({
     get state() {
-      return structuredClone({...state, bones: bones(), cameraPosition: view.camera.position.toArray(), label: document.getElementById('model-label').textContent});
+      return structuredClone({...state, ...rig.visibility(), bones: bones(), cameraPosition: view.camera.position.toArray(), label: document.getElementById('model-label').textContent});
     },
     get renderer() { return view.renderer; }, camera: view.camera, controls: view.controls,
     get rig() { return rig; },
