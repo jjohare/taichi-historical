@@ -10,6 +10,8 @@ The requested estimator is [EternalEvan/DPMesh](https://github.com/EternalEvan/D
 
 The upstream code takes a person image plus 2D joints and their validity masks. Its PW3D loader transforms input joints into a 32 × 32 heatmap frame and uses a 256 × 256 image crop. Feeding untransformed pixel coordinates, fabricated zero joints or a whole image without the expected crop would not reproduce that pipeline.
 
+This is body-mesh estimation, not detailed finger reconstruction. The source's VPoser wrapper appends zero terminal hand rotations; the SMPL body representation does not infer the individual finger articulations shown in the photographs. Visible fingers on the illustrative avatar are authored geometry, not measured hand poses.
+
 The published model setup requires:
 
 - A DPMesh checkpoint; the project's Tsinghua download directory was reachable during setup.

@@ -2,11 +2,13 @@
 
 A static historical image archive for [GitHub Pages](https://jjohare.github.io/yang-form/): 103 named entries, 104 extracted drawings and photographic comparisons from Yang Chengfu and Chen Weiming.
 
-The landing page explains the historical scope and the possibility of differences in modern teaching. Every position includes source links, mapping qualifications and editorial notes. The orbitable Three.js rig is independent of the selected position.
+The landing page explains the historical scope and the possibility of differences in modern teaching. Every position includes source links, mapping qualifications and editorial notes. The orbitable Three.js avatar is independent of the selected position, with joint and crouch controls and a skeleton view that retains the hands and feet.
 
 ## Browse locally
 
 Serve the repository root over HTTP, for example `python -m http.server 8080`, then open `http://localhost:8080`. No frontend build or CDN is required; Three.js 0.186.1 and OrbitControls are vendored with their MIT licence.
+
+The [avatar](assets/model/README.md) is an original illustrative Blender model, not a recovered historical pose. [DPMesh preparation](research/dpmesh/README.md) records the separate estimation workflow and its remaining dependencies. No inferred poses are currently bound to the website.
 
 ## Rebuild the catalogue
 

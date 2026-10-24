@@ -17,7 +17,7 @@ A quiet historical image archive, with the spacing of a museum catalogue and the
 | `--floor` | #E4E5D9 | Three-dimensional study floor |
 
 ## Typography
-Georgia / Noto Serif CJK SC / serif for display, regular weight, 30–76px, line-height 1.08. System sans-serif for body and controls, 16–18px, line-height 1.65. Captions 14px minimum. Two font stacks; no remote font requests. Tabular numerals for position numbers. Negative tracking only on large headings.
+Georgia / Noto Serif SC / serif for display, regular weight, 30–86px, line-height 1.08. System sans-serif for body and controls, 16–18px, line-height 1.65. Compact image metadata uses 12–14px; reading text uses 15–19px. Two font stacks; a local Noto subset supplies the five Chinese characters without remote font requests. Tabular numerals for position numbers. Negative tracking only on large headings.
 
 ## Components
 Square image mounts and fine horizontal rules. Buttons have 2px corner radii, 12px by 18px padding and a 44px minimum target. Jade focus outlines. Links are underlined in prose. No decorative shadows. Source and evidence labels remain visible beside the associated image.
