@@ -53,7 +53,7 @@ Every file is a plain ES module, loaded through the existing import map (`"three
 | `poses.js` | DOM | Fetches `pose-estimates/index.json`, fetches allowlisted files on demand, runs validation, and reads local files through `FileReader`. | ≤ 80 |
 | `transition.js` | pure | (S6) Keyframe sequence, route planning, interpolation and frame driver. See §12.2. | ≤ 140 |
 
-`#model-still` is created by `main.js` only on the still path, so normal loads never fetch `avatar-neutral.png` (PE-28). Total budget: 48 KiB (PE-28). Each file stays under 500 lines, and well under in practice.
+`#model-still` is created by `main.js` only on the still path, so normal loads never fetch `avatar-neutral.png` (PE-28). Total budget: 64 KiB (PE-28, ADR-0008 amended). Each file stays under 500 lines, and well under in practice.
 
 Dependency direction: `main → {scene, rig, controls, poses} → {retarget, presets, provenance, pose-schema}`. Pure modules import nothing from DOM modules. `controls.js` does not import `scene.js` or `rig.js`. It receives an `actions` object from `main.js` (constructor injection), which makes it testable in a browser against a stub.
 
@@ -181,7 +181,7 @@ Target `(0, 0.95, 0)`. The distance is the default `d = 3.3392`, with elevation 
 
 ```js
 state = {
-  renderer: 'pending' | 'webgl' | 'lost' | 'failed' | 'still',
+  renderer: 'pending' | 'webgl' | 'lost' | 'failed' | 'none',
   rig: 'pending' | 'avatar' | 'fallback-rig',
   camera: { preset: 'three-quarter' | 'front' | 'side' | 'back' | 'top' | 'custom' },
   checks: { elbow: 0, crouch: 0, skeleton: false },
@@ -211,7 +211,7 @@ state = {
 *Amended by ADR-0007:* `applyEstimate()` is withdrawn as a user action, and `clearPose()` stays internal. The defaults, `setShowNeutral(bool)` and the S6 rows replace both; see §12.3.
 | context `lost` / `webgl` / `failed` | `renderer` changes. `failed` swaps in the still image; rig state is kept for `webgl` |
 
-Renderer states: `pending → webgl` on success. `pending → still` if WebGL2 is unavailable or the renderer constructor throws. `webgl → lost` on `webglcontextlost`, with `preventDefault()`. `lost → webgl` on `webglcontextrestored`. `lost → failed` after 5 s without a restore. `failed` and `still` render the same fallback, with different text.
+Renderer states: `pending → webgl` on success. `pending → none` if WebGL2 is unavailable or the renderer constructor throws. `webgl → lost` on `webglcontextlost`, with `preventDefault()`. `lost → webgl` on `webglcontextrestored`. `lost → failed` after 5 s without a restore. `failed` and `none` render the same fallback, with different text.
 
 **Test hook (`window.__explorer`).** It is installed only when `new URLSearchParams(location.search).get('explorer-test')` is `1` or `no-webgl`. `no-webgl` also forces the still path, which gives the browser test a fallback route that doesn't depend on init scripts. Its shape:
 

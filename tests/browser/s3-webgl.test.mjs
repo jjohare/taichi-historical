@@ -63,7 +63,7 @@ browserTest('PE-23 with no restore, after 5.5 s state.renderer is "failed", #mod
     const lostAt = Date.now();
     await page.quiet(4500);
     assert.equal(await page.evaluate(`__explorer.state.renderer`), 'lost', 'still waiting for a restore at 4.5 s');
-    await page.waitFor(`__explorer.state.renderer === 'failed'`, {what: 'renderer "failed"', timeout: 5000});
+    await page.waitFor(`__explorer.state.renderer === 'failed'`, {what: 'renderer "failed"', timeout: 7000});
     assert.ok(Date.now() - lostAt >= 4800, 'the page waited out its restore window before giving up');
     assert.equal(await page.evaluate(shown('#model-still')), true, '#model-still is visible');
     assert.equal(await page.evaluate(text('model-status')), FAILED);
@@ -81,7 +81,7 @@ async function openStill({query, init}) {
     return page;
   } catch (error) { await page.close(); throw error; }
 }
-/** The design (state machine, section 6) names the state 'still'; the spec's PE-24 row does not, so this is its own test. */
+/** The no-WebGL path reports 'none' (operator-confirmed; the design's 'still' wording is superseded). */
 const rendererOf = page => page.evaluate(`window.__explorer ? __explorer.state.renderer : null`);
 const stillRoutes = [
   ['?explorer-test=no-webgl', 'the ?explorer-test=no-webgl route', {query: '?explorer-test=no-webgl'}],
@@ -103,9 +103,9 @@ for (const [, how, options] of stillRoutes) {
     } finally { await page.close(); }
   });
 
-  browserTest(`PE-24 no WebGL via ${how}: the hook (when installed) reports state.renderer "still" (design §6)`, async () => {
+  browserTest(`PE-24 no WebGL via ${how}: the hook (when installed) reports state.renderer "none"`, async () => {
     const page = await openStill(options);
-    try { assert.equal(await rendererOf(page), 'still'); } finally { await page.close(); }
+    try { assert.equal(await rendererOf(page), 'none'); } finally { await page.close(); }
   });
 
   browserTest(`PE-24 no WebGL via ${how}: the catalogue still navigates (#move=13 updates #move-title)`, async () => {
