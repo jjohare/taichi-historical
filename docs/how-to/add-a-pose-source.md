@@ -34,6 +34,7 @@ The converter reads the raw SAM 3D Body JSON (one `<imageId>.json` per photograp
 cargo run --manifest-path tools/pose-estimation/Cargo.toml -- \
   --batch <workdir>/batch-dinov3 [--batch-alt <workdir>/batch-vith] \
   --review <workdir>/review.md --out tools/pose-estimation/out \
+  --reviewer <name> --date <YYYY-MM-DD> \
   [--only <imageId>,…] [--bones] [--tentative-draft] [--publish]
 ```
 
@@ -53,7 +54,7 @@ Open the site locally (`python -m http.server 8080`), go to an entry showing the
 | `handsFeet` | Are wrist and ankle orientations plausible? Fingers are not represented: the avatar has no finger bones. |
 | `truncation` | Is no estimated joint lying outside the crop or hidden by clothing without a note? |
 
-If any answer is "no" and cannot be fixed by re-prompting or re-cropping, **do not publish**. Write what you found in the image's research notes instead. Record uncertainty in `review.notes` ("sleeve hides the left elbow"). Set `confidence.overall` to reflect the review, not only the model score, and describe how in `confidence.method`. Then record the grade (A, B, C or `?`) and any note in the review table and re-run the converter. It fills `review.status`, `review.reviewer`, `review.date` and `review.notes` from the table.
+If any answer is "no" and cannot be fixed by re-prompting or re-cropping, **do not publish**. Write what you found in the image's research notes instead. Record uncertainty in `review.notes` ("sleeve hides the left elbow"). The converter derives `confidence.overall` from the grade (A 0.9, B 0.7), not from a model score, and says so in `confidence.method`. Record the grade (A, B, C or `?`) and any note in the review table and re-run the converter. It sets `review.status` and `review.notes` from the table, and `review.reviewer` and `review.date` from `--reviewer` and `--date`.
 
 ## 5. Write and index the file
 

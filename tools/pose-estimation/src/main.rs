@@ -1,7 +1,8 @@
 //! Convert SAM 3D Body output (MHR skeleton) into `yang-form/pose-estimate` schema v1 files (design §8.3).
 //! Run from anywhere:
 //! `cargo run --manifest-path tools/pose-estimation/Cargo.toml -- --batch <dir> [--batch-alt <dir>] --review <table.md>
-//! --out <dir> [--only yang-001,yang-043] [--bones] [--tentative-draft] [--publish]`.
+//! --out <dir> --reviewer <name> --date <YYYY-MM-DD> [--only yang-001,yang-043] [--bones] [--tentative-draft]
+//! [--publish]`.
 //!
 //! Published (accepted) files and `index.json` go to `--out`, or to `assets/pose-estimates/` with `--publish`;
 //! drafts (grade `?` or C, or any tentative grade under `--tentative-draft`) always go to `<out>/draft/`.
@@ -75,7 +76,6 @@ const OUTPUT_FRAME: &str = "keypoints/joints: camera frame, +X image right, +Y d
 pred_global_rots: MHR body axes (+Y up, +Z forward, +X left); C = I";
 const CONFIDENCE_METHOD: &str = "overall = first-pass reviewer grade of the chosen checkpoint (A or A? 0.9, B or B? 0.7, \
 draft 0); per-joint fixed at 1.0: SAM 3D Body reports no per-joint score";
-const REVIEW_DATE: &str = "2026-10-24";
 
 pub fn sha256_hex(bytes: &[u8]) -> String {
     Sha256::digest(bytes)
@@ -117,6 +117,8 @@ struct Args {
     batch_alt: Option<String>,
     review: String,
     out: String,
+    reviewer: String,
+    date: String,
     only: Option<Vec<String>>,
     publish: bool,
     bones: bool,
@@ -126,6 +128,7 @@ struct Args {
 fn args() -> Args {
     let mut it = std::env::args().skip(1);
     let (mut batch, mut batch_alt, mut review, mut out, mut only) = (None, None, None, None, None);
+    let (mut reviewer, mut date) = (None, None);
     let (mut publish, mut bones, mut tentative_draft) = (false, false, false);
     while let Some(a) = it.next() {
         let mut val = || it.next().unwrap_or_else(|| panic!("{a} needs a value"));
@@ -134,6 +137,8 @@ fn args() -> Args {
             "--batch-alt" => batch_alt = Some(val()),
             "--review" => review = Some(val()),
             "--out" => out = Some(val()),
+            "--reviewer" => reviewer = Some(val()),
+            "--date" => date = Some(val()),
             "--only" => only = Some(val().split(',').map(str::to_owned).collect()),
             "--publish" => publish = true,
             "--bones" => bones = true,
@@ -146,6 +151,8 @@ fn args() -> Args {
         batch_alt,
         review: review.expect("--review <table.md> is required"),
         out: out.expect("--out <dir> is required"),
+        reviewer: reviewer.expect("--reviewer <name> is required (who reviewed the table)"),
+        date: date.expect("--date <YYYY-MM-DD> is required (when the table was reviewed)"),
         only,
         publish,
         bones,
@@ -159,6 +166,8 @@ struct Context<'a> {
     accepted: bool,
     overall: f64,
     revision: &'a str,
+    reviewer: &'a str,
+    date: &'a str,
 }
 
 fn pose_file(
@@ -231,8 +240,8 @@ fn pose_file(
     let [lw, rw, la, ra] = pose.landmarks;
     let mut review = json!({
         "status": if cx.accepted { "accepted" } else { "draft" },
-        "reviewer": "jjohare",
-        "date": REVIEW_DATE,
+        "reviewer": cx.reviewer,
+        "date": cx.date,
         "leftRight": "as-photographed",
         "checks": {"projection": cx.accepted, "leftRight": cx.accepted, "standingLeg": cx.accepted,
                    "handsFeet": cx.accepted, "truncation": cx.accepted},
@@ -296,6 +305,14 @@ fn main() {
     let (rest, map) = (mhr::Rest::parse(MHR_REST), mhr::JointMap::parse(JOINT_MAP));
     let av = avatar::Avatar::load(&format!("{REPO}/assets/model/archive-avatar.glb"));
     let rows = review::load(&a.review);
+    let d = a.date.as_bytes();
+    assert!(
+        d.len() == 10
+            && d[4] == b'-'
+            && d[7] == b'-'
+            && a.date.replace('-', "").bytes().all(|b| b.is_ascii_digit()),
+        "--date must be YYYY-MM-DD"
+    );
     let revision = git(&["rev-parse", "HEAD"]);
     if !git(&["status", "--porcelain", "--", "tools/pose-estimation"]).is_empty() {
         eprintln!(
@@ -324,7 +341,9 @@ fn main() {
     }
     let (mut published, mut drafts, mut tentative) = (vec![], vec![], 0);
     let mut ty = vec![];
-    let mut worst: BTreeMap<String, (f64, String)> = BTreeMap::new();
+    // Per bone: (worst error, id) and (worst template witness, id).
+    type Worst = ((f64, String), (f64, String));
+    let mut worst: BTreeMap<String, Worst> = BTreeMap::new();
     println!("id        model   grade status    t_y      scale");
     for id in ids {
         let row = &rows[id];
@@ -350,6 +369,8 @@ fn main() {
             accepted,
             overall: review::grade_confidence(grade, false).unwrap_or(0.0),
             revision: &revision,
+            reviewer: &a.reviewer,
+            date: &a.date,
         };
         let pose = convert::convert(&sam, &rest, &av, &map);
         let file = pose_file(&sam, &av, &map, &pose, &cx);
@@ -380,23 +401,27 @@ fn main() {
         let errors = convert::bone_errors(&sam, &rest, &av, &map, &pose);
         if a.bones {
             println!(
-                "  {:<28} {:<26} {:>8}  aligned",
-                "avatar bone", "MHR bone", "error°"
+                "  {:<28} {:<26} {:>8} {:>10}  aligned",
+                "avatar bone", "MHR bone", "error°", "template°"
             );
             for e in &errors {
                 println!(
-                    "  {:<28} {:<26} {:>8.3}  {}",
+                    "  {:<28} {:<26} {:>8.3} {:>10.3}  {}",
                     e.avatar,
                     e.mhr,
                     e.degrees,
+                    e.template_degrees,
                     if e.aligned { "yes" } else { "no" }
                 );
             }
         }
         for e in errors {
-            let w = worst.entry(e.avatar).or_insert((0.0, String::new()));
-            if e.degrees > w.0 {
-                *w = (e.degrees, id.clone());
+            let w = worst.entry(e.avatar).or_default();
+            if e.degrees >= w.0.0 {
+                w.0 = (e.degrees, id.clone());
+            }
+            if e.template_degrees >= w.1.0 {
+                w.1 = (e.template_degrees, id.clone());
             }
         }
     }
@@ -416,10 +441,16 @@ fn main() {
         ty.len(),
         sorted[ty.len() / 2]
     );
-    println!("worst bone error per bone across the run:");
-    for (bone, (deg, id)) in &worst {
-        println!("  {bone:<28} {deg:>8.3}°  ({id})");
+    println!("worst per bone across the run: error° (id), template witness° (id)");
+    for (bone, ((deg, id), (tdeg, tid))) in &worst {
+        println!("  {bone:<28} {deg:>8.3}  ({id})  {tdeg:>8.3}  ({tid})");
     }
+    let undecided: Vec<&String> = rows
+        .iter()
+        .filter(|(_, r)| r.preferred == "?")
+        .map(|(id, _)| id)
+        .collect();
+    println!("preferred '?' (dinov3 used): {undecided:?}");
     println!(
         "published {} ({} with a tentative grade) -> {published_dir}; draft {} -> {draft_dir}: {}",
         published.len(),

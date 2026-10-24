@@ -10,6 +10,7 @@ Run it from anywhere in the repository:
 cargo run --manifest-path tools/pose-estimation/Cargo.toml -- \
   --batch <dir>/batch-dinov3 --batch-alt <dir>/batch-vith \
   --review <dir>/pose-review-first-pass.md --out tools/pose-estimation/out \
+  --reviewer jjohare --date 2026-10-24 \
   [--only yang-001,yang-043] [--bones] [--tentative-draft] [--publish]
 ```
 
@@ -19,6 +20,7 @@ cargo run --manifest-path tools/pose-estimation/Cargo.toml -- \
 | `--batch-alt` | The vith batch, used only for rows whose `preferred` column says `vith` |
 | `--review` | Review table: `\| id \| dinov3 \| vith \| preferred \| note \|`, exactly 240 rows |
 | `--out` | Accepted files and `index.json` go here; drafts go to `<out>/draft/`. `tools/pose-estimation/out/` is gitignored |
+| `--reviewer`, `--date` | Who reviewed the table, and when (`YYYY-MM-DD`): written to `review.reviewer` and `review.date` |
 | `--publish` | Write accepted files and `index.json` to `assets/pose-estimates/` instead of `--out` |
 | `--only` | Convert only these ids |
 | `--bones` | Print the per-bone direction check (below) |
@@ -64,9 +66,10 @@ The map is `mhr-to-yang24.json`, embedded at compile time.
   - §5.3 FK preserving world deltas;
   - SHA-256 test vectors.
 - A golden test converts raw SAM output. Raw output stays outside the repository (ADR-0003), so the test is ignored by default. Run it with `SAM_SAMPLE_DIR=<batch-dinov3> cargo test -- --include-ignored`.
-- `--bones` compares each avatar bone's posed direction, from FK on the GLB rest with the written `Q_j`, against MHR's posed bone from `pred_joint_coords`:
-  - Aligned bones come out at 0.000°.
-  - Bones that only join two rigs' differing rest offsets show their structural difference: pelvis→hip, pelvis→spine1 and spine3→collar. That difference moves joint positions, not limb aim.
+- `--bones` prints two columns per bone:
+  - **`error°`** compares the avatar bone's posed direction, from FK on the GLB rest with the written `Q_j`, against MHR's posed bone from `pred_joint_coords` through `C`. Aligned bones come out at 0.000° by construction, so this column checks the frames, the composition and the FK, not the rotations. Bones that only join the two rigs' differing rest offsets show their structural difference: pelvis→hip, pelvis→spine1 and spine3→collar. That difference moves joint positions, not limb aim.
+  - **`template°`** is a witness for the rotations themselves. It compares MHR's own world delta applied to the zero-shape template bone with the posed bone. A rotation in the wrong frame would show here. What remains is per-identity shape offset.
+- Twist about each bone comes from `pred_global_rots`, and no check covers it.
 
 ## Licence requirement
 

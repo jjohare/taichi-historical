@@ -115,10 +115,14 @@ pub struct BoneError {
     pub mhr: String,
     pub degrees: f64,
     pub aligned: bool,
+    /// Rotation-only witness, independent of the alignment: the zero-shape template bone carried by MHR's own
+    /// world delta, `D_mj · b_template`, against the posed bone from `pred_joint_coords` through C. A wrong
+    /// rotation frame shows up here; it cannot show up in `degrees`, whose swing comes from the joint coordinates.
+    pub template_degrees: f64,
 }
 
 /// Compare each avatar bone's posed direction (FK with the converted deltas) with the MHR bone's posed direction
-/// taken from `pred_joint_coords` through C.
+/// taken from `pred_joint_coords` through C, and report the template witness alongside.
 pub fn bone_errors(
     sam: &Sam,
     rest: &Rest,
@@ -140,12 +144,23 @@ pub fn bone_errors(
             (_, Some(m)) => m.clone(),
             _ => continue,
         };
-        let src = cam_to_avatar(sub(sam.joints[rest.index(&mc)], sam.joints[rest.index(mj)]));
+        let (mi, ci) = (rest.index(mj), rest.index(&mc));
+        let src = cam_to_avatar(sub(sam.joints[ci], sam.joints[mi]));
+        // The witness needs a bone rigid in one joint's frame: c_spine1 hangs from c_spine0 (folded into the
+        // pelvis, with its own rotation), not from root.
+        let wi = if mc == "c_spine1" {
+            rest.index("c_spine0")
+        } else {
+            mi
+        };
+        let witness = cam_to_avatar(sub(sam.joints[ci], sam.joints[wi]));
+        let d = mul(sam.global_rots[wi], conj(rest.rot[wi]));
         out.push(BoneError {
             avatar: format!("{}→{name}", av.names[j]),
             mhr: format!("{mj}→{mc}"),
             degrees: angle_deg(unit(sub(p[c], p[j])), unit(src)),
             aligned,
+            template_degrees: angle_deg(rotate(d, sub(rest.pos[ci], rest.pos[wi])), witness),
         });
     }
     out
@@ -211,9 +226,25 @@ mod tests {
                 ((q[0] * q[0] + q[1] * q[1] + q[2] * q[2] + q[3] * q[3]).sqrt() - 1.0).abs() < 1e-9
             );
         }
+        // Shortest-arc aligned bones match by construction (the pelvis frame matches its hip line exactly and the
+        // spine within 2°); the template witness checks the rotations themselves (limbs and spine; the hand proxy
+        // is a finger base, below this rig's fidelity, and excluded).
         for e in bone_errors(&sam, &rest, &av, &map, &pose) {
             if e.aligned {
-                assert!(e.degrees < 2.0, "{} {:.2}°", e.avatar, e.degrees);
+                let exact = if e.avatar.starts_with("pelvis") {
+                    2.0
+                } else {
+                    1e-3
+                };
+                assert!(e.degrees < exact, "{} {:e}°", e.avatar, e.degrees);
+                if !e.avatar.ends_with("_hand") {
+                    assert!(
+                        e.template_degrees < 2.0,
+                        "{} template {:.2}°",
+                        e.avatar,
+                        e.template_degrees
+                    );
+                }
             }
         }
     }

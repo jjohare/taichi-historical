@@ -3,8 +3,9 @@ use crate::maths::{Q, V3, from_matrix};
 use serde_json::Value;
 use std::{collections::HashMap, fs};
 
-/// MHR zero-pose world rotations in its body axes (+Y up, +Z forward, +X left).
+/// MHR zero-pose skeleton state (zero shape) in its body axes (+Y up, +Z forward, +X left), metres.
 pub struct Rest {
+    pub pos: Vec<V3>,
     pub rot: Vec<Q>,
     by_name: HashMap<String, usize>,
 }
@@ -21,6 +22,10 @@ impl Rest {
         let state = v["rest_state"].as_array().unwrap();
         assert_eq!((names.len(), state.len()), (127, 127), "MHR has 127 joints");
         let f = |s: &Value, i: usize| s[i].as_f64().unwrap();
+        let pos = state
+            .iter()
+            .map(|s| [f(s, 0) / 100.0, f(s, 1) / 100.0, f(s, 2) / 100.0])
+            .collect();
         let rot = state
             .iter()
             .map(|s| [f(s, 3), f(s, 4), f(s, 5), f(s, 6)])
@@ -30,7 +35,7 @@ impl Rest {
             .enumerate()
             .map(|(i, n)| (n.clone(), i))
             .collect();
-        Rest { rot, by_name }
+        Rest { pos, rot, by_name }
     }
     pub fn index(&self, name: &str) -> usize {
         *self
@@ -256,11 +261,7 @@ mod tests {
     #[test]
     fn rest_skeleton_is_in_avatar_axes() {
         let rest = Rest::parse(MHR_REST);
-        let v: Value = serde_json::from_str(MHR_REST).unwrap();
-        let at = |n: &str| {
-            let s = &v["rest_state"][rest.index(n)];
-            [0, 1, 2].map(|i| s[i].as_f64().unwrap() / 100.0)
-        };
+        let at = |n: &str| rest.pos[rest.index(n)];
         assert!(
             (at("root")[1] - 0.924).abs() < 1e-3,
             "+Y up, pelvis at 0.924 m"
