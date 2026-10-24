@@ -40,6 +40,7 @@ function showMedia() {
       frame.src = `https://www.youtube-nocookie.com/embed/${e.video}`;
       frame.allow = 'fullscreen; picture-in-picture';
       frame.referrerPolicy = 'strict-origin-when-cross-origin';
+      frame.sandbox = 'allow-scripts allow-same-origin allow-presentation allow-popups';
     }
     stage.replaceChildren(frame); stage.classList.add('loaded');
     // Keep an accessible exit and direct-source fallback after media loads.

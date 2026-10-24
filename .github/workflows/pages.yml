@@ -2,14 +2,41 @@ name: Publish historical form archive
 on:
   push:
     branches: [main]
+  pull_request:
   workflow_dispatch:
 permissions:
   contents: read
 concurrency:
-  group: github-pages
+  group: github-pages-${{ github.event_name == 'pull_request' && github.head_ref || 'main' }}
   cancel-in-progress: false
 jobs:
-  publish:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+      - name: Explorer node tests (vendor manifest, static constraints, retarget parity, pose schema)
+        run: npm run test:node
+      - name: Check catalogue and local assets
+        run: node tools/check-site.mjs
+      - name: Check the Lee archive
+        run: node tools/check-lee.mjs
+      - name: Stage public site
+        run: |
+          mkdir _site
+          cp -R lee _site/
+          cp index.html .nojekyll moves.md Yang_Chengfu_Form.jpg _site/
+          cp -R assets extracted poses research _site/
+      - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
+        with:
+          path: _site
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: check
     runs-on: ubuntu-latest
     permissions:
       pages: write
@@ -18,27 +45,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-        with:
-          persist-credentials: false
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
-        with:
-          node-version: 22
-      - name: Explorer node tests (vendor manifest, static constraints, retarget parity)
-        run: npm run test:node
-      - name: Check catalogue and local assets
-        run: node tools/check-site.mjs
       - uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
-      - name: Stage public site
-        run: |
-          node tools/check-lee.mjs
-          mkdir _site
-          cp -R lee _site/
-          cp index.html .nojekyll moves.md Yang_Chengfu_Form.jpg _site/
-          cp -R assets extracted poses research _site/
-      - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
-        with:
-          path: _site
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4
