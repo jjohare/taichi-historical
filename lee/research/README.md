@@ -49,9 +49,3 @@ node tools/check-site.mjs
 ```
 
 The Rust generator produces `lee/catalogue.json`, `lee/sequence.html` and one static entry directory for each of the 42 named sets. Shared closing ranges are intentional; they must not be counted as six separate numbered movements. All source URLs and kinds remain available in the JSON ledger.
-
-## Integration with concurrent development
-
-Implemented on `research/lee-main-form` in the separate worktree `/home/devuser/workspace/yang-form-lee`, from published baseline `9935c7a`. The other checkout was on `explorer-improvements`, with active pose-viewer work and uncommitted files. That worktree was not edited.
-
-The new route is `lee/`. Changes to existing files are limited to a navigation stylesheet/link, the archive-switch navigation in `index.html`, and Lee validation/staging in the Pages workflow. Yang catalogue data, model assets, pose estimates and viewer code are untouched. When integrating with the development branch, retain its newer workflow action pins and test commands, and add the Lee check and staging directory alongside them. No external service or runtime build is required by the static site.

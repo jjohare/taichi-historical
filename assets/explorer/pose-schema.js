@@ -190,7 +190,7 @@ export function validateIndex(input) {
         if (!isObject(entry)) return at(p, 'E_TYPE', 'must be an object.');
         for (const k of Object.keys(entry)) if (!['imageId', 'file', 'sha256'].includes(k)) at(`${p}.${k}`, 'E_UNKNOWN_KEY', `"${k}" is not an allowed key.`);
         for (const k of ['imageId', 'file', 'sha256']) if (!own(entry, k)) at(`${p}.${k}`, 'E_MISSING', 'is required.');
-        if (own(entry, 'imageId') && !/^(yang|chen)-\d{3}$/.test(entry.imageId)) at(`${p}.imageId`, 'E_IMAGE_ID', 'must look like chen-001 or yang-001.');
+        if (own(entry, 'imageId') && (typeof entry.imageId !== 'string' || !/^(yang|chen)-\d{3}$/.test(entry.imageId))) at(`${p}.imageId`, 'E_IMAGE_ID', 'must look like chen-001 or yang-001.');
         else if (own(entry, 'imageId')) {
           if (seen.has(entry.imageId)) at(`${p}.imageId`, 'E_IMAGE_ID', 'is listed twice.');
           seen.add(entry.imageId);

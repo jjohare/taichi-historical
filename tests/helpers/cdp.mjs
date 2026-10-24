@@ -1,7 +1,7 @@
 // Minimal Chrome DevTools Protocol driver for a remote browser sidecar (Node 22 global WebSocket, no dependencies).
 // Env: CDP_HOST (default localhost), CDP_PORT (9223), SITE_URL (default http://localhost:8790/).
 // Internal hostnames stay out of the repository: set them in the environment, e.g.
-//   CDP_HOST=browsercontainer SITE_URL=http://agentbox:8790/ npm run test:browser
+//   CDP_HOST=<sidecar-host> SITE_URL=http://<this-host>:8790/ npm run test:browser
 // When the endpoint is unreachable the browser suites skip with a reason instead of failing.
 import dns from 'node:dns/promises';
 import http from 'node:http';
