@@ -27,7 +27,8 @@ export async function fetchEstimate(baseUrl = DEFAULT_BASE, entry) {
     if (bytes.byteLength > MAX_BYTES) return failure('E_SIZE', 'The file is larger than 64 KiB.');
     const digest = [...new Uint8Array(await crypto.subtle.digest('SHA-256', bytes))].map(b => b.toString(16).padStart(2, '0')).join('');
     if (digest !== entry.sha256) return failure('E_HASH', 'The estimate does not match the hash in the index.');
-    return validatePose(new TextDecoder().decode(bytes), {origin: 'published'});
+    const result = validatePose(new TextDecoder().decode(bytes), {origin: 'published'});
+    return result.ok && entry.file !== `${result.pose.imageId}.json` ? failure('E_IMAGE_ID', 'Pose file is for a different image') : result; // index entries carry no imageId: the file name is the id
   } catch { return failure('E_JSON', 'The estimate could not be loaded.'); }
 }
 

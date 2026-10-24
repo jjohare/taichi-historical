@@ -21,7 +21,7 @@ export function bindControls(doc, actions, getState) {
   return {
     label,
     sync() {
-      const state = getState(), {checks, rig, pose, camera, selectedJoint} = state, {tag, text, detail} = provenanceFor(pose, {rig, imageLabel: pose.imageLabel, transition: state.transition});
+      const state = getState(), {checks, rig, pose, camera, selectedJoint} = state, {tag, text, detail, note, aria} = provenanceFor(pose, {rig, imageLabel: pose.imageLabel, transition: state.transition, renderer: state.renderer});
       for (const button of presets) button.setAttribute('aria-pressed', String(button.dataset.preset === camera.preset));
       $('elbow-angle').value = checks.elbow; $('joint-value').textContent = `${checks.elbow}°`;
       $('stance-angle').value = checks.crouch; $('stance-value').textContent = `${checks.crouch}°`;
@@ -32,6 +32,7 @@ export function bindControls(doc, actions, getState) {
       $('pose-error').textContent = state.poseError ?? '';
       $('avatar-controls').hidden = rig !== 'avatar';
       if (tag) $('model-label').textContent = tag;
+      $('model-note').textContent = note; doc.querySelector('#model-view canvas')?.setAttribute('aria-label', aria);
       $('model-provenance').textContent = text; $('model-provenance-detail').textContent = detail;
       select.value = selectedJoint ?? '';
       // Only bones the current rig has can be inspected (the fallback rig names its joints differently).

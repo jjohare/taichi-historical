@@ -20,14 +20,30 @@ const state = {
   displayedImage: null, availableEstimate: null, showNeutral: false, indexed: false, pose: {kind: 'neutral'}, transition: idle(), poseError: null, renderCount: 0,
 };
 
-const view = createScene({
-  host, colour,
-  onRender: () => { state.renderCount++; },
-  onContextChange: kind => {
-    if (kind !== 'lost') return;
-    state.renderer = 'lost'; status.hidden = false; status.textContent = TEXT.lost; driver.finish(); // PE-56: complete to the target, no frames
-  },
-});
+const $ = id => document.getElementById(id), forced = new URLSearchParams(location.search).get('explorer-test');
+// The still path (PE-23, PE-24). The <img> is created only here, so a normal load never requests the PNG (PE-28).
+function showStill() {
+  host.closest('.model-panel').dataset.still = ''; status.hidden = false; status.textContent = TEXT[state.renderer]; // TEXT.failed or TEXT.none
+  const img = Object.assign(new Image(), {id: 'model-still', alt: TEXT.stillAlt}); img.setAttribute('src', 'assets/model/avatar-neutral.png'); host.append(img);
+}
+let timer = 0, view = null;
+const fail = () => { state.renderer = 'failed'; showStill(); ui.sync(); };
+try { // probe first: three.js logs console.error before it throws, and PE-24 allows none
+  if (forced === 'no-webgl' || !document.createElement('canvas').getContext('webgl2')) throw new Error('WebGL2 is unavailable or forced off');
+  view = createScene({
+    host, colour,
+    onRender: () => { state.renderCount++; },
+    onContextChange: kind => {
+      if (kind === 'lost') { state.renderer = 'lost'; status.hidden = false; status.textContent = TEXT.lost; driver.finish(); timer = setTimeout(fail, 5000); } // PE-56: complete to the target, no frames
+      else if (state.renderer === 'lost') { clearTimeout(timer); state.renderer = 'webgl'; status.hidden = true; view.requestRender(); }
+    },
+  });
+} catch (error) { console.info(`3D view unavailable: ${error.message}`); }
+if (!view) {
+  state.renderer = 'none'; showStill(); $('model-label').textContent = TEXT.still; $('model-provenance').textContent = TEXT.neutral;
+  if (forced === '1' || forced === 'no-webgl') window.__explorer = Object.freeze({state: {...state, label: TEXT.still}});
+  await new Promise(() => {}); // nothing more to wire; the catalogue is site.js's and keeps working
+}
 const {requestRender} = view;
 state.renderer = 'webgl';
 // A drag starts as 'custom'; when it ends the camera is compared with the presets, so dragging back onto one re-selects it.
@@ -43,7 +59,6 @@ let rig = createFallbackRig(view.scene, colour); const fallback = rig; // state.
 // `seq` tags each refresh so a slower, older one can never overwrite a newer pose.
 const indexPromise = loadIndex(), fetched = new Map(), file = () => $('pose-file');
 let seq = 0;
-const $ = id => document.getElementById(id);
 const settle = () => { requestRender(); ui.sync(); };
 const toNeutral = () => {
   endMotion();
@@ -107,7 +122,7 @@ async function navigate(prev) {
   ui.sync();
   if (!reduce && catalogue.source !== image.source) {
     try { catalogue.sequence = keyframeSequence(await (catalogue.data ??= fetch(new URL('../catalogue.json', import.meta.url)).then(x => x.json())), image.source); catalogue.source = image.source; }
-    catch (error) { console.warn(`Route unavailable: ${error.message}`); catalogue.source = null; }
+    catch (error) { console.warn(`Route unavailable: ${error.message}`); catalogue.source = catalogue.data = null; } // a rejected fetch is not cached for the session
     if (ticket !== seq) return;
     if (catalogue.source !== image.source) return refreshEstimate();
   }

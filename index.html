@@ -60,7 +60,7 @@
               <label class="joint-label" for="elbow-angle">Joint check <span id="joint-value">0°</span></label><input id="elbow-angle" type="range" min="0" max="100" value="0" aria-label="Joint check — bend both elbows to test the joint hierarchy">
               <div id="avatar-controls" hidden><label class="joint-label" for="stance-angle">Crouch clearance check <span id="stance-value">0°</span></label><input id="stance-angle" type="range" min="0" max="65" value="0"><label class="skeleton-toggle"><input id="show-skeleton" type="checkbox"> Show skeleton, hands &amp; feet</label><label class="skeleton-toggle" hidden><input id="show-neutral" type="checkbox"> Show neutral avatar</label><label class="field-label" for="pose-file">Open a pose file (local preview)</label><input id="pose-file" type="file" accept="application/json"></div>
               <p id="slider-note" class="small" hidden>Choose “Show neutral avatar” to use the joint checks.</p><p id="pose-error" class="small" role="status"></p>
-              <p class="small">This illustrative avatar is independent of the selected position. The crouch is a clothing check, not a recovered form posture. <a href="assets/model/README.md">Model notes</a></p>
+              <p class="small"><span id="model-note">This illustrative avatar is independent of the selected position.</span> The crouch is a clothing check, not a recovered form posture. <a href="assets/model/README.md">Model notes</a></p>
             </section>
           </div>
           <div class="evidence"><span id="match-label" class="tag"></span><p id="mapping-note"></p></div>

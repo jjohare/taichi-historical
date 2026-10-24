@@ -2,13 +2,14 @@
 // driven by the controls' change event and by the resize and visibility observers. There is no loop.
 import * as THREE from 'three';
 import {OrbitControls} from '../vendor/OrbitControls.js';
+import {TEXT} from './provenance.js';
 
 export function createScene({host, colour, onRender, onContextChange}) {
   const scene = new THREE.Scene(); scene.background = new THREE.Color(colour('--floor'));
   const camera = new THREE.PerspectiveCamera(36, 1, .01, 30); camera.position.set(1.9, 1.45, 2.7);
   const renderer = new THREE.WebGLRenderer({antialias: true, alpha: false});
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); renderer.outputColorSpace = THREE.SRGBColorSpace;
-  renderer.domElement.setAttribute('aria-label', 'Orbitable neutral human rig. Camera controls are available below.');
+  renderer.domElement.setAttribute('aria-label', TEXT.aria);
   renderer.domElement.setAttribute('role', 'img'); host.append(renderer.domElement);
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.target.set(0, .95, 0); controls.minDistance = 2.2; controls.maxDistance = 7; controls.maxPolarAngle = Math.PI * .86;
@@ -20,7 +21,7 @@ export function createScene({host, colour, onRender, onContextChange}) {
   const grid = new THREE.PolarGridHelper(.75, 8, 3, 64, colour('--border'), colour('--border')); grid.position.y = .012; scene.add(grid);
 
   let visible = true, frame = 0;
-  function render() { frame = 0; if (visible) { renderer.render(scene, camera); onRender(); } }
+  function render() { frame = 0; if (visible && !renderer.getContext().isContextLost()) { renderer.render(scene, camera); onRender(); } }
   function requestRender() { if (!frame) frame = requestAnimationFrame(render); }
   controls.addEventListener('change', requestRender);
   function resize() {
@@ -30,6 +31,7 @@ export function createScene({host, colour, onRender, onContextChange}) {
   new ResizeObserver(resize).observe(host);
   new IntersectionObserver(entries => { visible = entries[0].isIntersecting; if (visible) requestRender(); }).observe(host);
   renderer.domElement.addEventListener('webglcontextlost', event => { event.preventDefault(); onContextChange('lost'); });
+  renderer.domElement.addEventListener('webglcontextrestored', () => onContextChange('restored'));
 
   const up = new THREE.Vector3(0, 1, 0);
   function orbit(angle) {
