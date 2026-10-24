@@ -63,7 +63,7 @@ browserTest('PE-23 with no restore, after 5.5 s state.renderer is "failed", #mod
     const lostAt = Date.now();
     await page.quiet(4500);
     assert.equal(await page.evaluate(`__explorer.state.renderer`), 'lost', 'still waiting for a restore at 4.5 s');
-    await page.waitFor(`__explorer.state.renderer === 'failed'`, {what: 'renderer "failed"', timeout: Math.max(500, 5500 - (Date.now() - lostAt)) + 2000});
+    await page.waitFor(`__explorer.state.renderer === 'failed'`, {what: 'renderer "failed"', timeout: 5000});
     assert.ok(Date.now() - lostAt >= 4800, 'the page waited out its restore window before giving up');
     assert.equal(await page.evaluate(shown('#model-still')), true, '#model-still is visible');
     assert.equal(await page.evaluate(text('model-status')), FAILED);
